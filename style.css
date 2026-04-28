@@ -1,0 +1,507 @@
+/* ============================================================
+   CSS Variables — edit here to retheme the entire site
+   ============================================================ */
+:root {
+  /* Brand palette */
+  --green-50:   #f0fdf4;
+  --green-100:  #dcfce7;
+  --green-200:  #bbf7d0;
+  --green-300:  #86efac;
+  --green-400:  #4ade80;
+  --green-500:  #22c55e;
+  --green-600:  #16a34a;
+  --green-700:  #15803d;
+  --teal-300:   #5eead4;
+  --teal-400:   #2dd4bf;
+  --sky-300:    #7dd3fc;
+
+  /* Semantic tokens */
+  --primary:        var(--green-500);
+  --primary-dark:   var(--green-600);
+  --primary-light:  var(--green-300);
+  --primary-pale:   var(--green-50);
+
+  /* Surfaces */
+  --bg:      #f4fef7;
+  --surface: #ffffff;
+
+  /* Text */
+  --text-head:  #14532d;
+  --text-body:  #1e293b;
+  --text-muted: #64748b;
+
+  /* Borders */
+  --border:       #e2e8f0;
+  --border-green: var(--green-200);
+
+  /* Meal-type badge colours */
+  --badge-lunch-bg:   #eff6ff;
+  --badge-lunch-txt:  #1d4ed8;
+  --badge-snack-bg:   #fff7ed;
+  --badge-snack-txt:  #c2410c;
+  --badge-dinner-bg:  #faf5ff;
+  --badge-dinner-txt: #7c3aed;
+
+  /* Prep section */
+  --prep-bg:     #fffbeb;
+  --prep-border: #fde68a;
+
+  /* Shadows */
+  --sh-sm:    0 1px 4px rgba(0,0,0,.05);
+  --sh-md:    0 4px 16px rgba(0,0,0,.07);
+  --sh-lg:    0 20px 48px rgba(0,0,0,.14);
+  --sh-green: 0 8px 28px rgba(34,197,94,.22);
+
+  /* Shape */
+  --r-sm:   8px;
+  --r-md:   14px;
+  --r-lg:   22px;
+  --r-pill: 100px;
+
+  /* Motion */
+  --ease: cubic-bezier(.4,0,.2,1);
+  --dur:  .2s;
+}
+
+/* ============================================================
+   Reset & Base
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text-body);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+header {
+  background: linear-gradient(135deg, var(--green-400) 0%, var(--teal-400) 60%, var(--sky-300) 100%);
+  color: #fff;
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle shimmer overlay */
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg,
+    transparent 30%,
+    rgba(255,255,255,.15) 50%,
+    transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 4s linear infinite;
+  pointer-events: none;
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+header h1 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -.5px;
+  text-shadow: 0 1px 6px rgba(0,0,0,.15);
+  position: relative;
+}
+header p {
+  margin-top: .5rem;
+  font-size: .95rem;
+  opacity: .92;
+  position: relative;
+}
+
+/* Language toggle */
+.lang-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255,255,255,.22);
+  border: 1.5px solid rgba(255,255,255,.55);
+  color: #fff;
+  padding: .35rem 1rem;
+  border-radius: var(--r-pill);
+  font-size: .8rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+  z-index: 1;
+}
+.lang-btn:hover { background: rgba(255,255,255,.38); transform: scale(1.05); }
+
+/* ============================================================
+   Tab Navigation
+   ============================================================ */
+.tabs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+  padding: .875rem 1rem;
+  background: rgba(255,255,255,.8);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 2px 14px rgba(0,0,0,.07);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.tab-btn {
+  padding: .5rem 1.35rem;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: .875rem;
+  transition: all var(--dur) var(--ease);
+  white-space: nowrap;
+}
+.tab-btn:hover,
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--primary), var(--teal-400));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(34,197,94,.38);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   Week Sections
+   ============================================================ */
+.week-section { display: none; max-width: 1440px; margin: 0 auto; padding: 2rem 1.25rem; }
+.week-section.active { display: block; }
+
+.week-header {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-head);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.week-header::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-light), transparent);
+  border-radius: var(--r-pill);
+}
+
+/* ============================================================
+   Sunday Prep Card
+   ============================================================ */
+.sunday-prep {
+  background: var(--prep-bg);
+  border: 2px solid var(--prep-border);
+  border-radius: var(--r-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.sunday-prep h3 {
+  color: #92400e;
+  font-size: .95rem;
+  font-weight: 700;
+  margin-bottom: .75rem;
+}
+.sunday-prep ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem .6rem;
+}
+.sunday-prep li {
+  color: #78350f;
+  font-size: .8rem;
+  padding: .25rem .7rem;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--r-sm);
+  transition: background var(--dur) var(--ease);
+}
+.sunday-prep li:hover { background: #fef3c7; }
+.sunday-prep li::before { content: "✓ "; color: #d97706; font-weight: 700; }
+
+/* ============================================================
+   Calendar Grid
+   ============================================================ */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 960px) { .calendar { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 500px)  { .calendar { grid-template-columns: 1fr; } }
+
+.day-col {
+  background: var(--surface);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--sh-md);
+  border: 1px solid var(--border-green);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.day-col:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--sh-green);
+}
+
+.day-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--teal-400) 100%);
+  color: #fff;
+  padding: .7rem 1rem;
+  font-weight: 700;
+  font-size: .9rem;
+}
+.day-header span {
+  display: block;
+  font-weight: 400;
+  font-size: .72rem;
+  opacity: .85;
+  margin-top: .1rem;
+}
+
+/* ============================================================
+   Meal Slots
+   ============================================================ */
+.meal-slot {
+  padding: .8rem 1rem;
+  border-bottom: 1px solid var(--green-50);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), padding-left var(--dur) var(--ease);
+}
+.meal-slot:last-child { border-bottom: none; }
+.meal-slot:hover {
+  background: var(--primary-pale);
+  padding-left: 1.25rem;
+}
+
+.meal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: .64rem;
+  font-weight: 700;
+  padding: .18rem .65rem;
+  border-radius: var(--r-pill);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: .3rem;
+}
+.badge-lunch  { background: var(--badge-lunch-bg);  color: var(--badge-lunch-txt); }
+.badge-snack  { background: var(--badge-snack-bg);  color: var(--badge-snack-txt); }
+.badge-dinner { background: var(--badge-dinner-bg); color: var(--badge-dinner-txt); }
+
+.meal-name {
+  font-size: .855rem;
+  font-weight: 600;
+  color: var(--text-body);
+  line-height: 1.3;
+}
+.meal-hint {
+  font-size: .7rem;
+  color: var(--text-muted);
+  margin-top: .2rem;
+}
+
+/* ============================================================
+   Shopping Section
+   ============================================================ */
+.shopping-section {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--sh-md);
+  border: 1px solid var(--border-green);
+}
+.shopping-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  gap: 1rem;
+}
+.shopping-toggle h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-head);
+}
+.arrow {
+  font-size: 1rem;
+  color: var(--primary);
+  transition: transform var(--dur) var(--ease);
+  flex-shrink: 0;
+}
+.shopping-toggle.open .arrow { transform: rotate(180deg); }
+
+.shopping-body { display: none; margin-top: 1rem; }
+.shopping-body.open { display: block; }
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px,1fr));
+  gap: 1rem;
+}
+.shop-cat h4 {
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-bottom: .4rem;
+  padding-bottom: .3rem;
+  border-bottom: 2px solid var(--primary-light);
+}
+.shop-cat ul { list-style: none; }
+.shop-cat li {
+  font-size: .8rem;
+  color: var(--text-body);
+  padding: .22rem 0;
+  border-bottom: 1px solid var(--green-50);
+  display: flex;
+  align-items: flex-start;
+  gap: .35rem;
+}
+.shop-cat li::before {
+  content: "•";
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   Modal
+   ============================================================ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.5);
+  backdrop-filter: blur(5px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2rem;
+  position: relative;
+  box-shadow: var(--sh-lg);
+  animation: modalIn .22s var(--ease);
+}
+@keyframes modalIn {
+  from { transform: scale(.94) translateY(16px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--green-100);
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.modal-close:hover { background: var(--green-200); transform: scale(1.1); }
+
+.modal h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-head);
+  line-height: 1.3;
+  padding-right: 2.5rem;
+  margin-bottom: .3rem;
+}
+.modal-meta {
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.modal h3 {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  margin: 1rem 0 .45rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.modal h3::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.modal ul { list-style: none; }
+.modal ul li {
+  font-size: .875rem;
+  padding: .3rem 0;
+  border-bottom: 1px solid var(--green-50);
+  display: flex;
+  gap: .5rem;
+  align-items: flex-start;
+}
+.modal ul li::before {
+  content: "•";
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.modal ol { padding-left: 1.25rem; }
+.modal ol li {
+  font-size: .875rem;
+  padding: .3rem 0;
+  border-bottom: 1px solid var(--green-50);
+  line-height: 1.45;
+}
+.tip-box {
+  background: var(--primary-pale);
+  border: 1px solid var(--green-200);
+  border-radius: var(--r-sm);
+  padding: .875rem 1rem;
+  margin-top: 1rem;
+  font-size: .82rem;
+  color: #166534;
+  line-height: 1.55;
+}
+
+/* ============================================================
+   Utility — scrollbar tint
+   ============================================================ */
+.modal::-webkit-scrollbar { width: 6px; }
+.modal::-webkit-scrollbar-track { background: var(--green-50); }
+.modal::-webkit-scrollbar-thumb { background: var(--green-300); border-radius: 3px; }
