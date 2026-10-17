@@ -307,6 +307,7 @@ main {
   color: var(--text-muted);
 }
 .chip.chip-exp { border-color: #c4b5fd; background: #f5f3ff; color: #6d28d9; }
+.exp-chip .beaker, .chip-exp .beaker { margin-right: .1rem; }
 .chip {
   display: inline-flex;
   align-items: center;
@@ -527,7 +528,6 @@ main {
 .badge-snack  { background: var(--badge-snack-bg);  color: var(--badge-snack-txt); }
 .badge-dinner { background: var(--badge-dinner-bg); color: var(--badge-dinner-txt); }
 
-.flask { font-size: .9em; }
 .exp-chip {
   padding: .1rem .55rem;
   border: 1px dashed #a78bfa;
@@ -990,6 +990,109 @@ main {
 }
 .nav-btn:active { background: var(--primary); color: #fff; }
 .nav-btn:disabled { opacity: .35; cursor: default; }
+
+/* ============================================================
+   Plan bar, beaker and the recipe-choice panel
+   ============================================================ */
+.plan-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+  margin-top: 1rem;
+}
+.check.toggle {
+  align-items: center;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--color-primary-darker);
+}
+.check.toggle input:checked ~ span { text-decoration: none; opacity: 1; }
+.beaker {
+  display: inline-block;
+  width: .8em;
+  height: .92em;
+  vertical-align: -.12em;
+  flex-shrink: 0;
+}
+.meal-badge.badge-exp {
+  border: 1px dashed #a78bfa;
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.panel { max-width: 720px; }
+.panel h2 { margin-bottom: .2rem; }
+.panel-intro { font-size: .8rem; color: var(--text-muted); }
+.panel-tools {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  padding: .75rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.panel-search {
+  width: 100%;
+  min-height: 40px;
+  padding: .4rem .9rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  font: inherit;
+  font-size: .9rem;
+  color: var(--text-body);
+}
+.panel-search:focus { outline: none; border-color: var(--color-primary); }
+.panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+}
+.pick-group { margin-top: .5rem; }
+.pick-head {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: .6rem 0 .4rem;
+  background: var(--surface);
+}
+.pick-head h3 { flex: 1; margin: 0; }
+.pick-head h3::after { display: none; }
+.pick-head small.low { color: #b91c1c; }
+.mini-btn {
+  padding: .15rem .65rem;
+  border: 1.5px solid var(--color-primary-light);
+  border-radius: var(--r-pill);
+  background: var(--color-bg-light);
+  color: var(--color-primary-darker);
+  font-size: .72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pick-group ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 0 1rem;
+}
+.modal .pick-group li { border-bottom: 1px solid var(--color-bg-soft); }
+.check.pick { font-size: .875rem; padding: .45rem 0; }
+.check.pick input:checked ~ span { text-decoration: none; opacity: 1; }
+.check.pick input:not(:checked) ~ span { text-decoration: line-through; opacity: .5; }
+.check.pick.off { opacity: .45; cursor: default; }
+@media (hover: hover) {
+  .mini-btn:hover { background: var(--color-bg-soft); border-color: var(--color-primary); }
+}
+@media (max-width: 600px) {
+  .plan-bar { justify-content: space-between; }
+  .panel-tools { padding: .6rem 1.1rem; }
+}
 
 /* ============================================================
    Tooltip & toast

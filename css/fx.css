@@ -34,23 +34,97 @@
 header .px { position: absolute; z-index: 0; bottom: 14px; }
 header .px-pot { left: 7%; }
 header .px-pan { right: 7%; }
-.px-kitchen {
-  position: relative;
-  max-width: 1440px;
-  height: 56px;
-  margin: 0 auto;
-  pointer-events: none;
-}
-.px-kitchen .px-toaster { position: absolute; left: 1.25rem; bottom: 0; }
-.px-walker { position: absolute; bottom: 0; left: 50%; }
-.px-chef { filter: drop-shadow(0 0 1px rgba(59, 42, 31, .7)); }
 @media (max-width: 600px) {
   header .px { bottom: auto; top: 12px; transform: scale(.67); transform-origin: top center; }
   header .px-pot { left: calc(50% - 64px); }
   header .px-pan { right: auto; left: calc(50% + 4px); }
-  .px-kitchen .px-toaster { left: .85rem; }
 }
-@media print { .px, .px-kitchen { display: none; } }
+@media print { .px, .fx-stage, .fx-stage-open { display: none !important; } }
+
+/* ── Kitchen TV (built by js/fx-scenes.js) ─────────────────── */
+.fx-stage {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 150;
+  width: 304px;                 /* 288-px canvas = the 144-px scene at 2× */
+  padding: 6px 6px 0;
+  border: 2px solid #2b1d14;
+  border-radius: 12px;
+  background: #5a3e2b;
+  box-shadow: 0 10px 30px rgba(0,0,0,.3);
+}
+.fx-stage canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.fx-stage-bar {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: 4px 2px 5px 4px;
+  color: #fbe7cf;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+.fx-stage-bar span { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fx-stage-bar span::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
+  vertical-align: 1px;
+}
+.fx-stage-min, .fx-stage-open {
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 1;
+}
+.fx-stage-min {
+  width: 22px;
+  height: 22px;
+  background: rgba(255,255,255,.14);
+  color: #fbe7cf;
+  font-size: .8rem;
+}
+.fx-stage-open {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 150;
+  width: 46px;
+  height: 46px;
+  border: 2px solid #2b1d14;
+  background: #5a3e2b;
+  font-size: 1.3rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+}
+body.fx-stage-on .site-footer { padding-bottom: calc(180px + env(safe-area-inset-bottom)); }
+body.fx-stage-on .toast { bottom: calc(176px + env(safe-area-inset-bottom)); }
+@media (min-width: 1200px) {
+  .fx-stage { width: 448px; }  /* 3× */
+  body.fx-stage-on .site-footer { padding-bottom: calc(236px + env(safe-area-inset-bottom)); }
+  body.fx-stage-on .toast { bottom: calc(232px + env(safe-area-inset-bottom)); }
+}
+@media (hover: hover) {
+  .fx-stage-min:hover { background: rgba(255,255,255,.28); }
+}
+@media (max-width: 600px) {
+  .fx-stage { width: 236px; right: 10px; bottom: 10px; padding: 4px 4px 0; }
+  .fx-stage-bar { font-size: .66rem; padding: 3px 1px 4px 3px; }
+  body.fx-stage-on .site-footer { padding-bottom: calc(130px + env(safe-area-inset-bottom)); }
+  body.fx-stage-on .toast { bottom: calc(126px + env(safe-area-inset-bottom)); }
+}
 
 /* ── Confetti when a list is fully ticked (js/fx.js) ──────── */
 .fx-confetti {
@@ -144,13 +218,14 @@ header .px-pan { right: 7%; }
     .chip:hover { transform: translateY(-1px); border-color: var(--color-primary); }
   }
 
-  /* ── Pixel kitchen: step through the frames; the chef strolls ── */
+  /* ── Pixel kitchen: step through the frames ── */
   .px svg { animation: px-play var(--px-time, 1s) steps(var(--frames, 1)) infinite; }
-  .px-walker { animation: px-stroll 26s linear infinite; }
   @media (hover: hover) {
-    header .px:hover, .px-toaster:hover { translate: 0 -3px; transition: translate .15s; }
+    header .px:hover { translate: 0 -3px; transition: translate .15s; }
   }
-  .meal-slot:hover .flask { display: inline-block; animation: fx-flask .9s ease-in-out infinite; }
+  .meal-slot:hover .badge-exp .beaker { animation: fx-flask .9s ease-in-out infinite; }
+  .fx-stage { transition: opacity .25s var(--ease), transform .25s var(--ease); }
+  .fx-stage.swap canvas { animation: fx-tv .3s steps(3); }
 
   /* ── Moments — classes added by js/fx.js ────────────────── */
   .meal-slot.fx-deal { animation: fx-deal .45s cubic-bezier(.2,.8,.3,1.15) both; animation-delay: calc(var(--fx-i, 0) * 28ms); }
@@ -163,13 +238,11 @@ header .px-pan { right: 7%; }
 @keyframes px-play {
   to { transform: translateX(-100%); }
 }
-/* Walk to the right edge, turn around, walk back */
-@keyframes px-stroll {
-  0%     { left: 80px;               transform: scaleX(1); }
-  49.9%  { left: calc(100% - 52px);  transform: scaleX(1); }
-  50%    { left: calc(100% - 52px);  transform: scaleX(-1); }
-  99.9%  { left: 80px;               transform: scaleX(-1); }
-  100%   { left: 80px;               transform: scaleX(1); }
+/* The kitchen TV flickers when the channel changes */
+@keyframes fx-tv {
+  0%   { filter: brightness(1.8) contrast(.6); }
+  50%  { filter: brightness(.6); }
+  100% { filter: none; }
 }
 @keyframes fx-flask {
   0%, 100% { transform: rotate(0) translateY(0); }

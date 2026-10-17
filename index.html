@@ -8,8 +8,8 @@
   <title>Family Meal Plan</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽</text></svg>">
   <!-- UI, then the optional flashy layer (motion, sound button) -->
-  <link rel="stylesheet" href="css/ui.css?v=7">
-  <link rel="stylesheet" href="css/fx.css?v=7">
+  <link rel="stylesheet" href="css/ui.css?v=8">
+  <link rel="stylesheet" href="css/fx.css?v=8">
 </head>
 <body>
 
@@ -23,6 +23,8 @@
 <nav class="tabs" id="tabs-nav" aria-label="Weeks"></nav>
 
 <main>
+  <div class="plan-bar" id="plan-bar"></div>
+
   <div class="hint" id="hint" hidden>
     <span id="hint-text"></span>
     <button class="hint-close" type="button" data-action="hide-hint" data-tip-key="tipHintClose" data-label>✕</button>
@@ -63,20 +65,42 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="panel">
+  <div class="modal panel" role="dialog" aria-modal="true" aria-labelledby="p-title">
+    <div class="modal-head">
+      <div>
+        <h2 id="p-title" data-i18n="panelTitle">Choose the recipes</h2>
+        <p class="panel-intro" data-i18n="panelIntro"></p>
+      </div>
+      <button class="modal-close" id="p-close" type="button" data-action="close-panel" data-tip-key="tipClose" data-label>✕</button>
+    </div>
+    <div class="panel-tools">
+      <input class="panel-search" id="p-search" type="search" autocomplete="off" spellcheck="false">
+      <div class="panel-row" id="p-row"></div>
+    </div>
+    <div class="modal-body" id="p-list"></div>
+    <div class="modal-foot">
+      <span class="modal-pos" id="p-count"></span>
+      <button class="nav-btn" type="button" data-action="close-panel" data-i18n="done">Done</button>
+    </div>
+  </div>
+</div>
+
 <div class="tooltip" id="tooltip" role="tooltip" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <!-- Meals & recipes -->
-<script src="data/recipes.js?v=7"></script>
-<script src="data/ingredients.js?v=7"></script>
+<script src="data/recipes.js?v=8"></script>
+<script src="data/ingredients.js?v=8"></script>
 <!-- Logic: balanced menus, shopping & prep lists -->
-<script src="js/planner.js?v=7"></script>
-<script src="js/lists.js?v=7"></script>
+<script src="js/planner.js?v=8"></script>
+<script src="js/lists.js?v=8"></script>
 <!-- UI -->
-<script src="js/i18n.js?v=7"></script>
-<script src="js/tooltip.js?v=7"></script>
-<script src="js/ui.js?v=7"></script>
+<script src="js/i18n.js?v=8"></script>
+<script src="js/tooltip.js?v=8"></script>
+<script src="js/ui.js?v=8"></script>
 <!-- Flashy layer: sounds and motion (optional) -->
-<script src="js/fx.js?v=7"></script>
+<script src="js/fx.js?v=8"></script>
+<script src="js/fx-scenes.js?v=8"></script>
 </body>
 </html>

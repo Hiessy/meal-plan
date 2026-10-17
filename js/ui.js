@@ -12,6 +12,8 @@
                                   complete: its list just got fully ticked
      plan:modal    { open }       the recipe sheet opened or closed
      plan:lang     { lang }       the language changed
+     plan:config   { excluded, experimental }  the recipe choices changed
+     plan:panel    { open }       the recipe-choice panel opened or closed
    js/fx.js turns these into sounds and motion.
    ============================================================ */
 (() => {
@@ -58,6 +60,7 @@ const esc = s => String(s)
 const fmtPct = f => { const p = Math.round(f * 100); return (p >= 0 ? '+' : '') + p + '%'; };
 const money = v => priceConfig.currencySymbol + v.toFixed(2);
 const emit = (name, detail = {}) => document.dispatchEvent(new CustomEvent('plan:' + name, { detail }));
+
 
 /* ============================================================
    Dates — the plan always starts with the current week
@@ -195,6 +198,8 @@ function applyLang() {
 
   byId('hint-text').textContent = t(canHover ? 'hintMouse' : 'hintTouch')(Planner.count);
   byId('hint').hidden = !!store.hint2Off;
+  buildPlanBar();
+  if (draft) renderPanel();
 
   buildTabs();
   [1,2,3,4].forEach(buildWeek);
@@ -288,9 +293,9 @@ function renderModal() {
 
   byId('m-name').textContent = d.name[lang];
   byId('m-meta').innerHTML =
-    `<span class="meal-badge badge-${d.type}">${mt.icon} ${mt.label}</span>` +
+    `<span class="meal-badge badge-${d.type}${d.experimental ? ' badge-exp' : ''}">${d.experimental ? BEAKER : mt.icon} ${mt.label}</span>` +
     `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>` +
-    (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">🧪 ${t('experimental')}</span>` : '');
+    (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">${BEAKER} ${t('experimental')}</span>` : '');
 
   const swapBtn = byId('m-swap');
   swapBtn.innerHTML = `<span class="ico">🔄</span> ${t('swap')}`;
@@ -343,7 +348,12 @@ window.addEventListener('popstate', hideModal);
 modalEl.addEventListener('click', e => { if (e.target === modalEl) closeModal(); });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { Tooltip.hide(); if (modalAt) run('close', byId('m-close')); return; }
+  if (e.key === 'Escape') {
+    Tooltip.hide();
+    if (draft) run('close-panel', byId('p-close'));
+    else if (modalAt) run('close', byId('m-close'));
+    return;
+  }
   if (!modalAt) return;
   if (e.key === 'ArrowLeft' && !byId('m-prev').disabled) run('step', byId('m-prev'));
   else if (e.key === 'ArrowRight' && !byId('m-next').disabled) run('step', byId('m-next'));
@@ -361,7 +371,14 @@ document.addEventListener('keydown', e => {
    (s:{monday}:{ingredient}) share one saved map
    ============================================================ */
 document.addEventListener('change', e => {
-  const input = e.target, key = input.dataset && input.dataset.tick;
+  const input = e.target;
+  if (!input.dataset) return;
+  if (input.dataset.pref === 'experimental') return setExperimental(input.checked);
+  if (input.dataset.pick && draft) {
+    if (input.checked) draft.delete(input.dataset.pick); else draft.add(input.dataset.pick);
+    return updatePanelCounts();
+  }
+  const key = input.dataset.tick;
   if (!key) return;
   if (input.checked) store.ticks[key] = 1;
   else delete store.ticks[key];
@@ -585,7 +602,7 @@ function buildShopList(n) {
       ? `<p class="cat-subtotal">${t('catSubtotal')}: ~${money(catTotal)}</p>`
       : '';
 
-    return `<div class="shop-cat">
+    return `<div class="shop-cat" data-cat="${esc(cat)}">
       <h4>${shopCats[cat] || cat}</h4>
       <ul>${itemsHtml}</ul>
       ${subtotalHtml}
@@ -629,13 +646,169 @@ function buildBalance(meals) {
     egg: range(R.breakfasts.group.egg), fish: range(R.mains.protein.fish), plant: R.mains.protein.plant[0],
     red: R.mains.redMeat[1], fruit: range(R.snacks.group.fruit)
   });
-  if (s.experimental) groups.push([{ html: `<span class="chip chip-exp">🧪 ${s.experimental}</span>` }]);
+  if (s.experimental) groups.push([{ html: `<span class="chip chip-exp">${BEAKER} ${s.experimental}</span>` }]);
   const expLine = s.experimental ? '\n' + t('experimentalCount')(s.experimental, R.experimental[1]) : '';
   return `<div class="balance" data-tip="${esc(tip + expLine)}">
     <span class="balance-label">⚖️ ${t('balance')}</span>
     ${groups.map(g => g.map(c => c.html).join('')).join('<span class="balance-sep" aria-hidden="true"></span>')}
   </div>`;
 }
+
+/* ============================================================
+   Recipe choices — which recipes the random menu may use.
+   Saved on this device; Planner draws again when they change.
+   ============================================================ */
+const recipeIds = new Set(recipes.map(r => r.id));
+store.excluded = (Array.isArray(store.excluded) ? store.excluded : []).filter(id => recipeIds.has(id));
+if (typeof store.useExperimental !== 'boolean') store.useExperimental = true;
+
+const configurePlanner = () => Planner.configure({ exclude: store.excluded, experimental: store.useExperimental });
+configurePlanner();
+
+const usable = (r, excluded) => !excluded.has(r.id) && (store.useExperimental || !r.experimental);
+const usableCount = (excluded, type) =>
+  recipes.filter(r => (!type || r.type === type) && usable(r, excluded)).length;
+const MIN_PER_TYPE = 5;
+
+// Pixel-art beaker: the mark of an experimental recipe
+const BEAKER = (() => {
+  const rows = ['k.....k', 'kg...gk', 'kg...gk', 'kpppppk', 'kpbpppk', 'kpppbpk', 'kpppppk', '.kkkkk.'];
+  const ink = { k: '#4c1d95', g: '#ddd6fe', p: '#8b5cf6', b: '#f5f3ff' };
+  let rects = '';
+  rows.forEach((row, y) => [...row].forEach((ch, x) => {
+    if (ch !== '.') rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${ink[ch]}"/>`;
+  }));
+  return `<svg class="beaker" viewBox="0 0 7 8" aria-hidden="true" shape-rendering="crispEdges">${rects}</svg>`;
+})();
+
+const expToggle = () => `<label class="check toggle" data-tip="${esc(t('tipUseExperimental'))}">
+    <input type="checkbox" data-pref="experimental"${store.useExperimental ? ' checked' : ''}>
+    <span>${BEAKER} ${t('useExperimental')}</span>
+  </label>`;
+
+function buildPlanBar() {
+  byId('plan-bar').innerHTML = expToggle() +
+    `<button type="button" class="tool-btn" data-action="open-panel" data-tip="${esc(t('tipRecipesBtn'))}">
+      <span class="ico">📖</span> ${t('recipesBtn')(usableCount(new Set(store.excluded)), recipes.length)}</button>`;
+}
+
+function applyConfig() {
+  configurePlanner();
+  buildPlanBar();
+  [1,2,3,4].forEach(buildWeek);
+  if (modalAt) renderModal();
+  emit('config', { excluded: store.excluded.length, experimental: store.useExperimental });
+}
+
+function setExperimental(on) {
+  store.useExperimental = on;
+  saveStore();
+  applyConfig();
+  if (draft) renderPanel();
+  showToast(t(on ? 'toastExpOn' : 'toastExpOff'));
+}
+
+/* ── The panel with every recipe ── */
+const panelEl = byId('panel');
+let draft = null;          // recipe ids left out, while the panel is open
+let panelFocus = null;
+
+const iconOf = r => r.type === 'breakfast' ? BREAKFAST_ICONS[r.group]
+  : r.type === 'snack' ? GROUP_ICONS[r.group] : PROTEIN_ICONS[r.protein];
+const plain = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+function renderPanel() {
+  byId('p-row').innerHTML = expToggle() +
+    `<button type="button" class="tool-btn" data-action="use-all"><span class="ico">↺</span> ${t('useAll')}</button>`;
+  byId('p-search').placeholder = t('searchRecipes');
+  byId('p-list').innerHTML = Planner.TYPES.map(type => {
+    const items = recipes.filter(r => r.type === type).map(r => {
+      const off = r.experimental && !store.useExperimental;
+      return `<li data-name="${esc(plain(r.name.en + ' ' + r.name.es))}">
+        <label class="check pick${off ? ' off' : ''}">
+          <input type="checkbox" data-pick="${r.id}"${draft.has(r.id) ? '' : ' checked'}${off ? ' disabled' : ''}>
+          <span>${iconOf(r)} ${r.name[lang]}${r.experimental ? ' ' + BEAKER : ''}</span>
+        </label></li>`;
+    }).join('');
+    return `<section class="pick-group" data-type="${type}">
+      <div class="pick-head">
+        <h3>${t('typeTitles')[type]} <small id="p-n-${type}"></small></h3>
+        <button type="button" class="mini-btn" data-action="pick-all" data-type="${type}">${t('pickAll')}</button>
+        <button type="button" class="mini-btn" data-action="pick-none" data-type="${type}">${t('pickNone')}</button>
+      </div>
+      <ul>${items}</ul>
+    </section>`;
+  }).join('');
+  filterPanel();
+  updatePanelCounts();
+}
+
+function updatePanelCounts() {
+  Planner.TYPES.forEach(type => {
+    const n = usableCount(draft, type), all = recipes.filter(r => r.type === type).length;
+    const el = byId('p-n-' + type);
+    el.textContent = `${n}/${all}`;
+    el.classList.toggle('low', n < MIN_PER_TYPE);
+  });
+  byId('p-count').textContent = t('inUse')(usableCount(draft), recipes.length);
+}
+
+function filterPanel() {
+  const q = plain(byId('p-search').value.trim());
+  panelEl.querySelectorAll('.pick-group').forEach(group => {
+    let shown = 0;
+    group.querySelectorAll('li').forEach(li => {
+      const hit = !q || li.dataset.name.includes(q);
+      li.hidden = !hit;
+      if (hit) shown++;
+    });
+    group.hidden = !shown;
+  });
+}
+
+function openPanel() {
+  draft = new Set(store.excluded);
+  byId('p-search').value = '';
+  renderPanel();
+  panelFocus = document.activeElement;
+  Tooltip.hide();
+  panelEl.classList.add('open');
+  document.body.classList.add('modal-open');
+  byId('p-close').focus({ preventScroll: true });
+  emit('panel', { open: true });
+}
+
+// Saves the choices; refuses while a meal type has fewer than five recipes
+function closePanel() {
+  if (!draft) return;
+  const short = Planner.TYPES.find(type => usableCount(draft, type) < MIN_PER_TYPE);
+  if (short) {
+    showToast(t('needFive')(t('typeTitles')[short].toLowerCase(), MIN_PER_TYPE));
+    panelEl.querySelector(`.pick-group[data-type="${short}"]`).scrollIntoView({ block: 'start' });
+    return;
+  }
+  const changed = draft.size !== store.excluded.length || store.excluded.some(id => !draft.has(id));
+  panelEl.classList.remove('open');
+  if (!modalAt) document.body.classList.remove('modal-open');
+  if (changed) {
+    store.excluded = [...draft];
+    saveStore();
+    applyConfig();
+    showToast(t('toastPlanUpdated'));
+  }
+  draft = null;
+  if (panelFocus && panelFocus.isConnected) panelFocus.focus({ preventScroll: true });
+  emit('panel', { open: false });
+}
+
+function pickType(type, on) {
+  recipes.filter(r => r.type === type).forEach(r => { if (on) draft.delete(r.id); else draft.add(r.id); });
+  panelEl.querySelectorAll(`.pick-group[data-type="${type}"] input[data-pick]`).forEach(cb => { cb.checked = on; });
+  updatePanelCounts();
+}
+
+panelEl.addEventListener('click', e => { if (e.target === panelEl) closePanel(); });
+byId('p-search').addEventListener('input', filterPanel);
 
 /* ============================================================
    Week Renderer
@@ -672,10 +845,9 @@ function buildWeek(n) {
         openHint
       ].filter(Boolean).join('\n');
       return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}"
-        data-day="${di}" data-slot="${slot}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
-        <span class="meal-badge badge-${recipe.type}">${mt.icon} ${mt.label}</span>
-        <span class="meal-name">${recipe.name[lang]}${recipe.experimental
-          ? ` <span class="flask" role="img" aria-label="${esc(t('experimental'))}">🧪</span>` : ''}</span>
+        data-day="${di}" data-slot="${slot}" data-type="${recipe.type}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
+        <span class="meal-badge badge-${recipe.type}${recipe.experimental ? ' badge-exp' : ''}">${recipe.experimental ? BEAKER : mt.icon} ${mt.label}</span>
+        <span class="meal-name">${recipe.name[lang]}</span>
         <span class="chev" aria-hidden="true">›</span>
       </button>`;
     }).join('');
@@ -751,7 +923,12 @@ const actions = {
   copy:        el => copyList(+el.dataset.n),
   share:       el => shareList(+el.dataset.n),
   clear:       el => clearTicks(+el.dataset.n),
-  'hide-hint': () => dismissHint()
+  'hide-hint': () => dismissHint(),
+  'open-panel':  () => openPanel(),
+  'close-panel': () => closePanel(),
+  'pick-all':    el => pickType(el.dataset.type, true),
+  'pick-none':   el => pickType(el.dataset.type, false),
+  'use-all':     () => { draft.clear(); renderPanel(); }
 };
 
 function run(name, el) {
@@ -772,8 +949,6 @@ if (history.state && history.state.modal) {
   try { history.replaceState(null, ''); } catch (e) {}
 }
 
-// Forget ticks of past weeks (and of the old fixed plan) and swaps older than last week —
-// not while previewing another date, which would throw away this week's
 // Menus saved before breakfasts existed (3 meals a day): keep them and add the week's breakfasts
 Object.keys(store.menus).forEach(iso => {
   const old = store.menus[iso];
@@ -786,6 +961,8 @@ Object.keys(store.menus).forEach(iso => {
   else delete store.menus[iso];
 });
 
+// Forget ticks of past weeks (and of the old fixed plan) and swaps older than last week —
+// not while previewing another date, which would throw away this week's
 if (!dateParam) {
   const keepMenusFrom = isoDate(addDays(firstMonday, -7));
   Object.keys(store.ticks).forEach(k => {

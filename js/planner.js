@@ -18,7 +18,8 @@
    3. This is repeated a few times and the cheapest week wins.
 
    The randomness is seeded by the week number, so every device
-   shows the same menu for the same week.
+   shows the same menu for the same week — unless that device has
+   narrowed the recipe list with configure().
    ============================================================ */
 const Planner = (() => {
   const TYPES = ['breakfast', 'lunch', 'snack', 'dinner'];
@@ -48,8 +49,21 @@ const Planner = (() => {
   const COST = { rule: 10, lastWeek: 8, earlierWeek: 4, sameDay: 3 };
   const ATTEMPTS = 12;
 
-  const byId  = Object.fromEntries(recipes.map(r => [r.id, r]));
-  const pools = Object.fromEntries(TYPES.map(type => [type, recipes.filter(r => r.type === type)]));
+  const byId = Object.fromEntries(recipes.map(r => [r.id, r]));
+  let pools = {};                              // the recipes each slot may draw from
+
+  // Which recipes the draw may use: leave out `exclude` (ids) and, if
+  // experimental is false, every experimental recipe. A type that would
+  // be left empty keeps its whole list.
+  function configure({ exclude = [], experimental = true } = {}) {
+    const skip = new Set(exclude);
+    pools = Object.fromEntries(TYPES.map(type => {
+      const all = recipes.filter(r => r.type === type);
+      const allowed = all.filter(r => !skip.has(r.id) && (experimental || !r.experimental));
+      return [type, allowed.length ? allowed : all];
+    }));
+    baseMenus.length = 0;                      // every menu is drawn again
+  }
 
   /* ── Seeded randomness ─────────────────────────────────────── */
   function hash(text) {                       // FNV-1a
@@ -214,6 +228,7 @@ const Planner = (() => {
   const mondayOfWeek = num => new Date(EPOCH.getFullYear(), EPOCH.getMonth(), EPOCH.getDate() + 7 * num);
 
   const baseMenus = [];
+  configure();
   function baseMenu(num) {
     if (num < 0) return draw(hash('week ' + num));
     for (let i = baseMenus.length; i <= num; i++) {
@@ -247,7 +262,7 @@ const Planner = (() => {
   const isMenu = ids => Array.isArray(ids) && ids.length === DAYS * SLOTS && ids.every(id => byId[id]);
 
   return {
-    TYPES, SLOTS, RULES,
+    TYPES, SLOTS, RULES, configure,
     recipe: id => byId[id],
     count: recipes.length,
     weekNumber, mondayOfWeek,

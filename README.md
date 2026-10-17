@@ -19,10 +19,15 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     three soups, two pancake breakfasts…) are kept apart.
   - The draw is seeded by the week, so everyone who opens the page sees the same menu.
   - A ⚖️ balance bar under each week shows its mix of breakfasts, proteins and snacks.
-- **🧪 Experimental recipes**: 12 of the recipes are new ideas the family hasn't tried yet, like
+- **Experimental recipes**: 12 of the recipes are new ideas the family hasn't tried yet, like
   cauliflower-crust pizza, rice-paper rolls and avocado chocolate mousse.
-  - When one comes up, its card shows a 🧪 flask and the tooltip says it is experimental.
-  - At most two land in a week.
+  - When one comes up, its meal-type badge turns purple with a pixel beaker, and the tooltip says
+    it is experimental.
+  - At most two land in a week. Untick **Use experimental recipes** to leave them out.
+- **📖 Choose the recipes**: the Recipes button lists all 160, grouped by meal type, with a search
+  box and All/None per group. Untick any you don't want and the menus are drawn again from the
+  rest. Each type keeps at least 5. The choice is saved in the browser, so other devices keep the
+  shared menu.
 - **Real dates**: the page shows this week and the next three. On Saturday and Sunday it starts
   with the coming week. Today's card is highlighted and past days fade.
 - **🎲 Shuffle** a whole week or **🔄 swap** one meal; both keep the week balanced.
@@ -38,8 +43,18 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
   - Soft synthesized notes when the pointer moves over meals, tabs and buttons.
   - A dice roll when you shuffle, chimes for ticks, and a fanfare with confetti when a list is done.
   - Cards deal in after a shuffle.
-  - A pixel-art kitchen: a pan flipping pancakes and a bubbling soup pot in the header, plus a
-    toaster and a strolling chef above the footer. Hover them for their own sounds.
+  - A pixel-art pan flipping pancakes and a bubbling soup pot in the header. Hover them for their
+    own sounds.
+  - **📺 Kitchen TV**: a little pixel screen in the corner whose scene follows what you look at.
+    - Shopping list: a shopper walks the market, chats, pays, takes the produce, skips a stall and
+      buys again. The stalls sell whatever aisle you hover.
+    - Sunday prep, or an open recipe: a cook chops, blends and fries.
+    - Breakfast: the family at the morning table while the toast pops.
+    - Lunch: from the fridge to the oven to the table.
+    - Snack: a kid grabs an apple and munches.
+    - Dinner: the family eats together under the lamp.
+    - On phones it follows what is in the middle of the screen. The – button tucks it away.
+    - Each scene plays its sounds the first time through: coins, chopping, the blender, sizzling.
   - 🔊 in the header mutes the sounds.
   - Browsers start sound only after your first click or tap.
   - Motion is skipped for visitors who turn on "reduce motion".
@@ -64,12 +79,13 @@ The code is split into four layers. Each one only uses the layers listed above i
 | | `js/tooltip.js` | Tooltips for anything with a `data-tip` |
 | | `js/ui.js` | Draws the page, saves ticks and swaps, and handles every button |
 | | `css/ui.css` | Layout, colours and responsive rules. Edit the CSS variables at the top to retheme |
-| Flashy layer | `js/fx.js` | Sounds, animations, the pixel kitchen and the 🔊 button |
-| | `css/fx.css` | Every animation, transition and hover lift |
+| Flashy layer | `js/fx.js` | Sounds, animations, the header pixel art and the 🔊 button |
+| | `js/fx-scenes.js` | The kitchen TV: pixel scenes drawn on a canvas, picked by what you hover |
+| | `css/fx.css` | Every animation, transition and hover lift, and the kitchen TV's frame |
 
-The flashy layer is optional. Without `js/fx.js` and `css/fx.css`, the page works the same, just
-quietly and without motion. `js/ui.js` sends `plan:*` events (listed at the top of that file), and
-`js/fx.js` listens to them.
+The flashy layer is optional. Without `js/fx.js`, `js/fx-scenes.js` and `css/fx.css`, the page
+works the same, just quietly and without motion. `js/ui.js` sends `plan:*` events (listed at the
+top of that file), and the flashy layer listens to them.
 
 ## Customising
 
@@ -95,6 +111,10 @@ ingredient. The +/− control in the shopping list scales all prices at once.
 **Text**: interface text is in `js/i18n.js`. Recipe text is in `data/recipes.js`.
 
 **Sounds**: each sound is a few lines in the `sounds` object of `js/fx.js`.
+
+**Kitchen TV scenes**: each scene in `js/fx-scenes.js` is a `draw(t)` function that paints one
+frame of a 144 × 54 pixel picture for time `t` in its loop. `sceneFor()` decides which part of
+the page shows which scene.
 
 ## Hosting
 

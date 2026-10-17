@@ -8,9 +8,11 @@
      items, shuffling (a dice roll) and finishing a list.
    - Motion: cards deal in after a shuffle, rise in on a new
      week, pop after a swap; confetti when a list is all ticked.
-   - A pixel-art kitchen: a pan flipping pancakes and a soup pot
-     in the header, a toaster and a strolling chef above the footer.
-     Hover them (or experimental 🧪 meals) for their own sounds.
+   - Pixel art: a pan flipping pancakes and a soup pot in the
+     header (hover them, or an experimental meal, for their own
+     sounds). The animated kitchen TV lives in js/fx-scenes.js.
+
+   Shares window.Fx = { play, sprites, ink } with js/fx-scenes.js.
    - Adds a 🔊 / 🔇 button to the header; the choice is saved.
 
    It reacts to pointer hovers and to the plan:* events that
@@ -151,6 +153,12 @@
       tone(f, { at: t0, dur: 0.08, vol: 0.04, to: f * 2.2 });
     }),
     ding:   () => { tone(2093, { dur: 0.6, vol: 0.03 }); tone(2637.02, { at: 0.02, dur: 0.5, vol: 0.02 }); },
+    coin:   () => { tone(1975.5, { dur: 0.08, vol: 0.035 }); tone(2637.02, { at: 0.07, dur: 0.3, vol: 0.035 }); noise({ dur: 0.05, vol: 0.02, freq: 7000 }); },
+    chop:   () => { noise({ dur: 0.04, vol: 0.05, freq: 900, q: 2 }); tone(180, { dur: 0.05, vol: 0.03, type: 'triangle' }); },
+    whirr:  () => { noise({ dur: 0.9, vol: 0.025, freq: 500, to: 1800, q: 3 }); tone(110, { dur: 0.9, vol: 0.02, type: 'sawtooth', to: 140 }); },
+    thunk:  () => { tone(140, { dur: 0.12, vol: 0.05, type: 'triangle', to: 90 }); noise({ dur: 0.06, vol: 0.02, freq: 400 }); },
+    munch:  () => [0, 0.11, 0.22].forEach(t0 => noise({ at: t0, dur: 0.06, vol: 0.035, freq: 2500, q: 1.5 })),
+    yum:    () => { tone(784, { dur: 0.12, vol: 0.035 }); tone(1046.5, { at: 0.1, dur: 0.25, vol: 0.035 }); },
     bloop:  () => {                       // a lab beaker going "blub-blub"
       tone(330, { dur: 0.12, vol: 0.04, type: 'triangle', to: 880 });
       tone(494, { at: 0.11, dur: 0.12, vol: 0.035, type: 'triangle', to: 1320 });
@@ -171,8 +179,6 @@
     ['.meal-slot', el => sounds.meal(+el.dataset.day || 0, +el.dataset.slot || 0)],
     ['.px-pan', () => sounds.sizzle()],
     ['.px-pot', () => sounds.bubble()],
-    ['.px-toaster', () => sounds.ding()],
-    ['.px-chef', () => sounds.hello()],
     ['.tab-btn',   () => sounds.tab()],
     ['.check',     () => sounds.row()],
     ['button',     () => sounds.button()]
@@ -335,22 +341,8 @@
     return el;
   }
 
-  function buildKitchen() {
-    const head = document.querySelector('header');
-    if (head) head.append(sprite('pot', POT, 3, 0.9), sprite('pan', PAN, 3, 1.5));
-
-    const footer = document.querySelector('.site-footer');
-    if (!footer) return;
-    const strip = document.createElement('div');
-    strip.className = 'px-kitchen';
-    strip.setAttribute('aria-hidden', 'true');
-    const walker = document.createElement('div');
-    walker.className = 'px-walker';
-    walker.append(sprite('chef', CHEF, 3, 0.5));
-    strip.append(sprite('toaster', TOASTER, 3, 2.4), walker);
-    footer.before(strip);
-  }
-  buildKitchen();
+  const head = document.querySelector('header');
+  if (head) head.append(sprite('pot', POT, 3, 0.9), sprite('pan', PAN, 3, 1.5));
 
   /* ── Reacting to the planner ──────────────────────────────── */
   document.addEventListener('plan:action', e => {
@@ -426,4 +418,6 @@
   document.addEventListener('plan:lang', label);
   const header = document.querySelector('header');
   if (header) header.appendChild(toggle);
+
+  window.Fx = { play, sprites: { PAN, POT, TOASTER, CHEF }, ink: INK };
 })();

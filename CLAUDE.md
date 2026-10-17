@@ -15,12 +15,19 @@ above it. The README has the full table.
    - `ui.js` is an IIFE and exposes no globals.
    - Buttons use `data-action` and are handled by one delegated click handler, not inline `onclick`.
    - `ui.js` sends `plan:*` events on `document`.
-4. **Flashy layer** — `js/fx.js` and `css/fx.css`.
+4. **Flashy layer** — `js/fx.js`, `js/fx-scenes.js` and `css/fx.css`.
    - It is optional: the page must keep working without it.
    - It only listens to `plan:*` events and pointer hovers. Never call it from the UI.
    - All motion stays in `fx.css`, inside `prefers-reduced-motion: no-preference`.
    - The pixel sprites are rows of characters in `fx.js` (see `INK` for the colours). Every row of
      every frame must be the same length.
+   - `fx.js` shares `window.Fx = { play, sprites, ink }`. `fx-scenes.js` uses it and does nothing
+     without it.
+   - `fx-scenes.js` draws the kitchen TV on a 144 × 54 canvas. Each scene's `draw(t)` must be a
+     pure function of `t` (ms into its loop), and `cue()` plays a sound once per loop. The scene
+     follows the hovered element via `data-type` on meal slots and `data-cat` on shopping aisles,
+     and on touch screens the element in the middle of the screen.
+   - The canvas is shown at whole multiples (2×, 3× on wide screens) so pixels stay square.
 
 ## Rules worth knowing
 
@@ -30,8 +37,11 @@ above it. The README has the full table.
   - Recipes must be self-contained, with no "leftovers" or "made on Sunday" ingredients, because
     any recipe can land on any day.
   - Make-ahead work goes in `prep`, as keys of `prepTasks`.
-  - `experimental: true` marks a new, not yet family-tested recipe. It shows a 🧪 flask, and
-    `RULES.experimental` caps how many land in a week.
+  - `experimental: true` marks a new, not yet family-tested recipe. Its meal-type badge shows a
+    pixel beaker, and `RULES.experimental` caps how many land in a week.
+- `Planner.configure({ exclude, experimental })` narrows the pools the draw uses. The UI calls
+  it with the visitor's saved choices from the recipe panel and the Use-experimental checkbox,
+  so those choices change that device's menus. The panel keeps at least 5 recipes per type.
 - `data/ingredients.js` is an ordered regex dictionary. The first match on an English ingredient
   line picks its shopping-list row, so specific entries go above general ones. After adding
   recipes, check that each new line matches the intended entry and not "Other".
