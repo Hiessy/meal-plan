@@ -1,51 +1,72 @@
-/* Requires data.js and prices.js to be loaded before this script */
+/* Requires recipes.js and ingredients.js to be loaded before this script */
 /* ============================================================
    i18n — UI translations (EN / ES)
    ============================================================ */
 const i18n = {
   en: {
-    pageTitle:       'Family Meal Plan — May 2026',
+    pageTitle:       'Family Meal Plan',
     subtitle:        '4 people · Lunch + Afternoon Snack + Dinner · Monday–Friday',
-    tabs:            ['Week 1 · May 4–8','Week 2 · May 11–15','Week 3 · May 18–22','Week 4 · May 25–29'],
+    headerDates:     (range, n) => `📅 ${range} · 🎲 random menu from ${n} recipes`,
+    relWeek:         n => n === 0 ? 'This week' : n === 1 ? 'Next week' : `In ${n} weeks`,
     days:            ['Monday','Tuesday','Wednesday','Thursday','Friday'],
+    daysShort:       ['Mon','Tue','Wed','Thu','Fri'],
+    months:          ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    monthsShort:     ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
     mealTypes:       {
       lunch:  { label:'Lunch',     icon:'🥗' },
       snack:  { label:'Snack',     icon:'🍎' },
       dinner: { label:'Dinner',    icon:'🍽' }
     },
-    date:            d => d,
     ingredients:     'Ingredients',
     serves:          '(serves 4)',
     steps:           'Steps',
     prev:            'Previous',
     next:            'Next',
-    shopping:        'Weekly Shopping List',
+    swap:            '🔄 Swap',
+    shuffle:         '🎲 Shuffle',
+    resetMenu:       '↺ Original menu',
+    todayBtn:        '📍 Today',
+    today:           'Today',
+    prepTitle:       d => `Sunday, ${d} — Meal Prep`,
+    prepFor:         'for',
+    shopping:        'Shopping List',
     langBtn:         '🌐 Español',
     offsetLabel:     'Price adjustment',
     priceDisclaimer: 'Estimated prices · adjust to match your market',
-    estimatedTotal:  'Est. Weekly Total',
+    estimatedTotal:  'Est. weekly total',
     leftToBuy:       'Still to buy',
     catSubtotal:     'Subtotal',
     copyList:        'Copy list',
     shareList:       'Share',
     clearTicks:      'Clear ticks',
     allDone:         'All done',
-    footer:          'Prices are estimates. Your ticks and settings are saved only in this browser.',
-    hintMouse:       'Click any meal to see its recipe. Tick off prep tasks and shopping items as you go — they are saved on this device. Hover over anything for a quick tip.',
-    hintTouch:       'Tap any meal to see its recipe. Tick off prep tasks and shopping items as you go — they are saved on this phone. Press and hold any button for a quick tip.',
+    inMeals:         n => `${n} meals`,
+    more:            'more',
+    tagStaple:       'staple',
+    tagOptional:     'optional',
+    footer:          'Menus are drawn at random from the recipe list — the same on every device until you shuffle or swap. Prices are estimates. Ticks, swaps and settings stay in this browser.',
+    hintMouse:       n => `🎲 A random menu every week, picked from ${n} family recipes. Click a meal for its recipe or to 🔄 swap it, and tick off prep and shopping as you go (saved on this device). Hover over anything for a tip.`,
+    hintTouch:       n => `🎲 A random menu every week, picked from ${n} family recipes. Tap a meal for its recipe or to 🔄 swap it, and tick off prep and shopping as you go (saved on this phone). Press and hold any button for a tip.`,
     toastCopied:     'Shopping list copied',
     toastCopyFail:   'Could not copy the list',
     toastCleared:    'Ticks cleared',
     toastNothing:    'Everything is ticked off — nothing left to buy 🎉',
+    toastShuffled:   'New menu for this week 🎲',
+    toastSwapped:    'Meal swapped 🔄',
+    toastReset:      'Back to the original menu',
     kidTip:          /^Toddler tip:\s*/,
     kidTipLabel:     'Toddler tip:',
 
     /* Tooltips */
     tipLang:         'Switch the whole page to Spanish',
-    tipTab:          dates => `Show the meals for ${dates}`,
+    tipTab:          range => `Show the menu for ${range}`,
     tipMeal:         (ing, steps) => `${ing} ingredient${ing === 1 ? '' : 's'} · ${steps} step${steps === 1 ? '' : 's'}`,
     tipMealMouse:    'Click to open the full recipe',
     tipMealTouch:    'Tap to open the full recipe',
+    tipShuffle:      'Draw a new random menu for this week',
+    tipReset:        'Go back to the menu this week started with',
+    tipToday:        'Jump to today’s meals',
+    tipSwap:         { lunch: 'Swap for another random lunch', snack: 'Swap for another random snack', dinner: 'Swap for another random dinner' },
     tipPrep:         'Tick it off once it is done — saved on this device',
     tipPrepToggle:   'Show or hide the prep tasks',
     tipPrepCount:    'Prep tasks ticked off',
@@ -54,8 +75,8 @@ const i18n = {
     tipOffsetInfo:   'Prices are rough estimates in US dollars. If your shops are cheaper or pricier, use − and + and every price updates.',
     tipOffsetDown:   'Lower all prices by 5%',
     tipOffsetUp:     'Raise all prices by 5%',
-    tipPrice:        (base, pct) => `Estimate: ${base} base price, ${pct} price adjustment`,
-    itemAdjusted:    pct => `Includes an extra ${pct} — this item usually runs pricier`,
+    tipPrice:        (n, pct) => `Estimate for ${n} recipe${n === 1 ? '' : 's'}, including the ${pct} price adjustment`,
+    tipStaple:       'Usually already at home — check before buying',
     tipCopy:         'Copy what is still left to buy — paste it into Notes, WhatsApp, etc.',
     tipShare:        'Send what is still left to buy to another app',
     tipClear:        'Untick every item on this week’s list',
@@ -74,21 +95,31 @@ const i18n = {
     }
   },
   es: {
-    pageTitle:       'Plan de Comidas Familiar — Mayo 2026',
+    pageTitle:       'Plan de Comidas Familiar',
     subtitle:        '4 personas · Almuerzo + Merienda + Cena · Lunes–Viernes',
-    tabs:            ['Semana 1 · 4–8 Mayo','Semana 2 · 11–15 Mayo','Semana 3 · 18–22 Mayo','Semana 4 · 25–29 Mayo'],
+    headerDates:     (range, n) => `📅 ${range} · 🎲 menú al azar entre ${n} recetas`,
+    relWeek:         n => n === 0 ? 'Esta semana' : n === 1 ? 'La próxima' : `En ${n} semanas`,
     days:            ['Lunes','Martes','Miércoles','Jueves','Viernes'],
+    daysShort:       ['Lun','Mar','Mié','Jue','Vie'],
+    months:          ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
+    monthsShort:     ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],
     mealTypes:       {
       lunch:  { label:'Almuerzo',  icon:'🥗' },
       snack:  { label:'Merienda',  icon:'🍎' },
       dinner: { label:'Cena',      icon:'🍽' }
     },
-    date:            d => d.replace(/^May (\d+)$/, '$1 de Mayo'),
     ingredients:     'Ingredientes',
     serves:          '(para 4 personas)',
     steps:           'Preparación',
     prev:            'Anterior',
     next:            'Siguiente',
+    swap:            '🔄 Cambiar',
+    shuffle:         '🎲 Mezclar',
+    resetMenu:       '↺ Menú original',
+    todayBtn:        '📍 Hoy',
+    today:           'Hoy',
+    prepTitle:       d => `Domingo ${d} — Preparación`,
+    prepFor:         'para',
     shopping:        'Lista de Compras',
     langBtn:         '🌐 English',
     offsetLabel:     'Ajuste de precios',
@@ -100,22 +131,33 @@ const i18n = {
     shareList:       'Compartir',
     clearTicks:      'Desmarcar todo',
     allDone:         'Listo',
-    footer:          'Los precios son estimados. Tus marcas y ajustes se guardan solo en este navegador.',
-    hintMouse:       'Hacé clic en cualquier comida para ver la receta. Marcá las tareas y las compras a medida que avanzás — se guardan en este dispositivo. Pasá el mouse sobre cualquier cosa para ver una ayuda rápida.',
-    hintTouch:       'Tocá cualquier comida para ver la receta. Marcá las tareas y las compras a medida que avanzás — se guardan en este teléfono. Mantené apretado cualquier botón para ver una ayuda rápida.',
+    inMeals:         n => `${n} comidas`,
+    more:            'más',
+    tagStaple:       'básico',
+    tagOptional:     'opcional',
+    footer:          'Los menús se sortean al azar de la lista de recetas — iguales en todos los dispositivos hasta que mezcles o cambies algo. Los precios son estimados. Las marcas, cambios y ajustes quedan en este navegador.',
+    hintMouse:       n => `🎲 Un menú al azar cada semana, elegido entre ${n} recetas familiares. Hacé clic en una comida para ver la receta o 🔄 cambiarla, y marcá la preparación y las compras a medida que avanzás (se guarda en este dispositivo). Pasá el mouse sobre cualquier cosa para ver una ayuda.`,
+    hintTouch:       n => `🎲 Un menú al azar cada semana, elegido entre ${n} recetas familiares. Tocá una comida para ver la receta o 🔄 cambiarla, y marcá la preparación y las compras a medida que avanzás (se guarda en este teléfono). Mantené apretado cualquier botón para ver una ayuda.`,
     toastCopied:     'Lista de compras copiada',
     toastCopyFail:   'No se pudo copiar la lista',
     toastCleared:    'Lista desmarcada',
     toastNothing:    'Ya está todo marcado — no falta comprar nada 🎉',
+    toastShuffled:   'Nuevo menú para esta semana 🎲',
+    toastSwapped:    'Comida cambiada 🔄',
+    toastReset:      'Volviste al menú original',
     kidTip:          /^Consejo para pequeños:\s*/,
     kidTipLabel:     'Consejo para pequeños:',
 
     /* Tooltips */
     tipLang:         'Ver toda la página en inglés',
-    tipTab:          dates => `Ver las comidas del ${dates}`,
+    tipTab:          range => `Ver el menú del ${range}`,
     tipMeal:         (ing, steps) => `${ing} ingrediente${ing === 1 ? '' : 's'} · ${steps} paso${steps === 1 ? '' : 's'}`,
     tipMealMouse:    'Hacé clic para ver la receta completa',
     tipMealTouch:    'Tocá para ver la receta completa',
+    tipShuffle:      'Sortear un menú nuevo al azar para esta semana',
+    tipReset:        'Volver al menú con el que empezó la semana',
+    tipToday:        'Ir a las comidas de hoy',
+    tipSwap:         { lunch: 'Cambiar por otro almuerzo al azar', snack: 'Cambiar por otra merienda al azar', dinner: 'Cambiar por otra cena al azar' },
     tipPrep:         'Marcala cuando esté lista — se guarda en este dispositivo',
     tipPrepToggle:   'Mostrar u ocultar las tareas de preparación',
     tipPrepCount:    'Tareas de preparación completadas',
@@ -124,8 +166,8 @@ const i18n = {
     tipOffsetInfo:   'Los precios son estimaciones en dólares. Si en tu zona todo sale más barato o más caro, usá − y + y se actualizan todos los precios.',
     tipOffsetDown:   'Bajar todos los precios un 5%',
     tipOffsetUp:     'Subir todos los precios un 5%',
-    tipPrice:        (base, pct) => `Estimado: precio base ${base}, ajuste de precios ${pct}`,
-    itemAdjusted:    pct => `Incluye un ${pct} extra — este producto suele ser más caro`,
+    tipPrice:        (n, pct) => `Estimado para ${n} receta${n === 1 ? '' : 's'}, con el ajuste de precios de ${pct}`,
+    tipStaple:       'Suele haber en casa — revisá antes de comprar',
     tipCopy:         'Copia lo que falta comprar — pegalo en Notas, WhatsApp, etc.',
     tipShare:        'Enviá lo que falta comprar a otra app',
     tipClear:        'Desmarca todos los productos de la lista de esta semana',
@@ -139,28 +181,36 @@ const i18n = {
       'Fruit':           'Frutas',
       'Grains & Bread':  'Cereales y Pan',
       'Pantry':          'Despensa',
-      'Dairy & Fridge':  'Lácteos y Nevera',
+      'Dairy & Fridge':  'Lácteos y Heladera',
       'Other':           'Otros'
     }
   }
 };
 
 /* ============================================================
-   Saved state — language, week, price offset and ticks survive
-   a reload (localStorage, this browser only)
+   Saved state — language, tab, price offset, ticks and menu
+   swaps survive a reload (localStorage, this browser only)
    ============================================================ */
-const STORE_KEY = 'meal-plan-2026-05';
+const STORE_KEY = 'meal-plan';
+const OLD_STORE_KEY = 'meal-plan-2026-05';   // the fixed May plan — language and offset carry over
 
 function readStore() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+  try {
+    const saved = localStorage.getItem(STORE_KEY) || localStorage.getItem(OLD_STORE_KEY);
+    return JSON.parse(saved) || {};
+  }
   catch (e) { return {}; }
 }
 function saveStore() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+    localStorage.removeItem(OLD_STORE_KEY);
+  }
   catch (e) { /* private mode / storage full — the page still works */ }
 }
 
-const store = Object.assign({ ticks: {}, shopOpen: {}, prepOpen: {} }, readStore());
+const store = Object.assign({ ticks: {}, shopOpen: {}, prepOpen: {}, menus: {} }, readStore());
+delete store.hintOff;   // that hint described the old fixed plan
 
 let lang = store.lang ||
   ((navigator.language || '').toLowerCase().startsWith('es') ? 'es' : 'en');
@@ -180,6 +230,199 @@ const fmtPct = f => { const p = Math.round(f * 100); return (p >= 0 ? '+' : '') 
 const money = v => priceConfig.currencySymbol + v.toFixed(2);
 
 /* ============================================================
+   Dates — the plan always starts with the current week
+   (on Saturday and Sunday, with the coming one). Add
+   ?date=2026-12-24 to the address to see another date's plan.
+   ============================================================ */
+const addDays  = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const mondayOf = d => addDays(d, -((d.getDay() + 6) % 7));
+const isoDate  = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const WEEK_MS  = 7 * 864e5;
+
+const dateParam = /^(\d{4})-(\d{2})-(\d{2})$/.exec(new URLSearchParams(location.search).get('date') || '');
+const today = (() => {
+  const d = dateParam ? new Date(+dateParam[1], +dateParam[2] - 1, +dateParam[3]) : new Date();
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+})();
+const todayIso    = isoDate(today);
+const thisMonday  = mondayOf(today);
+const firstMonday = [0, 6].includes(today.getDay()) ? addDays(thisMonday, 7) : thisMonday;
+
+// Menus are numbered by week from this Monday, so every device draws the same ones
+const EPOCH = new Date(2024, 0, 1);
+const weekNumber = monday => Math.round((monday - EPOCH) / WEEK_MS);
+const isoOfWeek  = num => isoDate(addDays(EPOCH, 7 * num));
+
+const weeks = [0, 1, 2, 3].map(i => {
+  const monday = addDays(firstMonday, 7 * i);
+  return { n: i + 1, monday, iso: isoDate(monday), num: weekNumber(monday),
+           rel: Math.round((monday - thisMonday) / WEEK_MS) };
+});
+
+function fmtDay(d) {
+  const mon = t('monthsShort')[d.getMonth()];
+  return lang === 'es' ? `${d.getDate()} ${mon}` : `${mon} ${d.getDate()}`;
+}
+
+// "Oct 12–16" · "Sep 28–Oct 2"  /  "12–16 oct" · "28 sep–2 oct"
+function fmtRangeShort(monday) {
+  const fri = addDays(monday, 4);
+  if (fri.getMonth() === monday.getMonth()) {
+    const mon = t('monthsShort')[monday.getMonth()];
+    return lang === 'es' ? `${monday.getDate()}–${fri.getDate()} ${mon}` : `${mon} ${monday.getDate()}–${fri.getDate()}`;
+  }
+  return fmtDay(monday) + '–' + fmtDay(fri);
+}
+
+// "October 12–16, 2026"  /  "12–16 de octubre de 2026"
+function fmtRangeLong(monday) {
+  const fri = addDays(monday, 4), M = t('months'), es = lang === 'es';
+  const day = (d, year) => es
+    ? `${d.getDate()} de ${M[d.getMonth()]}${year ? ' de ' + d.getFullYear() : ''}`
+    : `${M[d.getMonth()]} ${d.getDate()}${year ? ', ' + d.getFullYear() : ''}`;
+  if (fri.getFullYear() !== monday.getFullYear()) return day(monday, true) + ' – ' + day(fri, true);
+  if (fri.getMonth() !== monday.getMonth()) return day(monday) + ' – ' + day(fri, true);
+  return es ? `${monday.getDate()}–${day(fri, true)}`
+            : `${M[monday.getMonth()]} ${monday.getDate()}–${fri.getDate()}, ${fri.getFullYear()}`;
+}
+
+// The four weeks on screen: "Oct 12 – Nov 6, 2026"
+function fmtPlanRange() {
+  const first = weeks[0].monday, last = addDays(weeks[3].monday, 4);
+  const year = d => (lang === 'es' ? ' ' : ', ') + d.getFullYear();
+  return fmtDay(first) + (first.getFullYear() === last.getFullYear() ? '' : year(first)) +
+         ' – ' + fmtDay(last) + year(last);
+}
+
+/* ============================================================
+   Random menus
+   Each week draws 5 lunches, 5 snacks and 5 dinners, avoiding
+   the two weeks before it and too many similar dishes (a tag
+   can appear at most `cap` times a week). The draw is seeded by
+   the week number, so it is the same on every device.
+   ============================================================ */
+const TYPES = ['lunch', 'snack', 'dinner'];
+const recipeById = Object.fromEntries(recipes.map(r => [r.id, r]));
+const pools = Object.fromEntries(TYPES.map(type => [type, recipes.filter(r => r.type === type)]));
+
+const TAGS = [
+  ['salmon', /salmon/i, 1],             ['tuna', /tuna/i, 1],           ['lentil', /lentil/i, 1],
+  ['bolognese', /bolognese/i, 1],       ['beef-broccoli', /beef & broccoli/i, 1],
+  ['pork-tenderloin', /pork tenderloin/i, 1], ['stew', /stew/i, 1], ['fish', /\bcod\b|fish/i, 1],
+  ['soup', /soup|minestrone/i, 2],      ['pasta', /pasta|bolognese|spaghetti/i, 2],
+  ['apple', /apple slices/i, 1],        ['yogurt', /yogurt/i, 1],       ['smoothie', /smoothie/i, 1],
+  ['rice-cakes', /rice cakes/i, 1],     ['hummus', /hummus/i, 1],       ['almond-butter', /almond butter/i, 1],
+  ['cheese', /cheese/i, 2]
+];
+const TAG_CAP = Object.fromEntries(TAGS.map(([tag, , cap]) => [tag, cap]));
+const recipeTags = Object.fromEntries(recipes.map(r =>
+  [r.id, TAGS.filter(([, re]) => re.test(r.name.en)).map(([tag]) => tag)]));
+
+function hashString(s) {             // FNV-1a
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function seededRandom(seed) {        // mulberry32
+  return () => {
+    seed = (seed + 0x6D2B79F5) >>> 0;
+    let x = Math.imul(seed ^ (seed >>> 15), seed | 1);
+    x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function shuffled(list, random) {
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const tagCounts = ids => {
+  const used = {};
+  ids.forEach(id => recipeTags[id].forEach(tag => { used[tag] = (used[tag] || 0) + 1; }));
+  return used;
+};
+const fitsTags = (r, used) => recipeTags[r.id].every(tag => (used[tag] || 0) < TAG_CAP[tag]);
+
+// → 15 recipe ids: Monday lunch, snack, dinner, Tuesday lunch, …
+function drawMenu(random, avoid) {
+  const used = {}, picks = {};
+  for (const type of TYPES) {
+    const order = shuffled(pools[type], random), chosen = [];
+    // If the pool runs short, drop the variety rule, then the "not recently" rule
+    for (const strict of [2, 1, 0]) for (const r of order) {
+      if (chosen.length === 5) break;
+      if (chosen.includes(r) || (strict > 0 && avoid.has(r.id)) || (strict > 1 && !fitsTags(r, used))) continue;
+      chosen.push(r);
+      recipeTags[r.id].forEach(tag => { used[tag] = (used[tag] || 0) + 1; });
+    }
+    picks[type] = chosen;
+  }
+  return [0, 1, 2, 3, 4].flatMap(d => TYPES.map(type => picks[type][d % picks[type].length].id));
+}
+
+const baseMenus = [];
+function baseMenu(num) {
+  if (num < 0) return drawMenu(seededRandom(hashString('week ' + num)), new Set());
+  for (let i = baseMenus.length; i <= num; i++) {
+    const recent = new Set([...(baseMenus[i - 1] || []), ...(baseMenus[i - 2] || [])]);
+    baseMenus[i] = drawMenu(seededRandom(hashString('week ' + i)), recent);
+  }
+  return baseMenus[num];
+}
+
+function savedMenu(iso) {
+  const ids = store.menus[iso];
+  return Array.isArray(ids) && ids.length === 15 && ids.every(id => recipeById[id]) ? ids : null;
+}
+const menuOf     = num => savedMenu(isoOfWeek(num)) || baseMenu(num);
+const neighbours = num => new Set([...menuOf(num - 1), ...menuOf(num + 1)]);
+
+function weekMeals(w) {
+  return menuOf(w.num).map((id, k) => ({ recipe: recipeById[id], di: Math.floor(k / 3), k }));
+}
+const mealLabel = m => t('daysShort')[m.di] + ' · ' + t('mealTypes')[m.recipe.type].label;
+
+function shuffleWeek(n) {
+  const w = weeks[n - 1];
+  store.menus[w.iso] = drawMenu(Math.random, neighbours(w.num));
+  saveStore();
+  hideTip();
+  buildWeek(n);
+  showToast(t('toastShuffled'));
+}
+
+function resetWeek(n) {
+  delete store.menus[weeks[n - 1].iso];
+  saveStore();
+  hideTip();
+  buildWeek(n);
+  showToast(t('toastReset'));
+}
+
+function swapMeal() {
+  if (!modalAt) return;
+  const w = weeks[modalAt.n - 1], k = modalAt.k;
+  const ids = menuOf(w.num).slice();
+  const inWeek = new Set(ids), avoid = neighbours(w.num);
+  const used = tagCounts(ids.filter((_, i) => i !== k));
+  const order = shuffled(pools[recipeById[ids[k]].type], Math.random);
+  const pick = order.find(r => !inWeek.has(r.id) && !avoid.has(r.id) && fitsTags(r, used))
+            || order.find(r => !inWeek.has(r.id) && !avoid.has(r.id))
+            || order.find(r => !inWeek.has(r.id));
+  if (!pick) return;
+  ids[k] = pick.id;
+  store.menus[w.iso] = ids;
+  saveStore();
+  buildWeek(modalAt.n);
+  renderModal();
+  showToast(t('toastSwapped'));
+}
+
+/* ============================================================
    Language
    ============================================================ */
 function toggleLang() {
@@ -196,7 +439,7 @@ function applyLang() {
   // Static elements with data-i18n
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
-    if (i18n[lang][key] !== undefined) el.textContent = i18n[lang][key];
+    if (typeof i18n[lang][key] === 'string') el.textContent = i18n[lang][key];
   });
 
   // Static elements with a tooltip (data-label → icon-only, needs a spoken name too)
@@ -207,9 +450,10 @@ function applyLang() {
 
   // Lang button
   byId('lang-btn').textContent = t('langBtn');
+  byId('header-dates').textContent = t('headerDates')(fmtPlanRange(), recipes.length);
 
-  byId('hint-text').textContent = '👋 ' + t(canHover ? 'hintMouse' : 'hintTouch');
-  byId('hint').hidden = !!store.hintOff;
+  byId('hint-text').textContent = t(canHover ? 'hintMouse' : 'hintTouch')(recipes.length);
+  byId('hint').hidden = !!store.hint2Off;
 
   buildTabs();
 
@@ -221,7 +465,7 @@ function applyLang() {
 }
 
 function dismissHint() {
-  store.hintOff = true;
+  store.hint2Off = true;
   saveStore();
   hideTip();
   byId('hint').hidden = true;
@@ -234,12 +478,12 @@ const hashWeek = /^#w([1-4])$/.exec(location.hash);
 let currentWeek = hashWeek ? +hashWeek[1] : (store.week >= 1 && store.week <= 4 ? store.week : 1);
 
 function buildTabs() {
-  byId('tabs-nav').innerHTML = t('tabs').map((label, i) => {
-    const [week, dates] = label.split(' · ');
-    const active = i + 1 === currentWeek;
+  byId('tabs-nav').innerHTML = weeks.map(w => {
+    const active = w.n === currentWeek;
+    const range = fmtRangeShort(w.monday);
     return `<button type="button" class="tab-btn${active ? ' active' : ''}" aria-current="${active}"
-      onclick="showWeek(${i + 1})" data-tip="${esc(t('tipTab')(dates))}">
-      <span class="tab-week">${week}</span><span class="tab-dates">${dates}</span>
+      onclick="showWeek(${w.n})" data-tip="${esc(t('tipTab')(fmtRangeLong(w.monday)))}">
+      <span class="tab-top${range.length > 10 ? ' long' : ''}">${range}</span><span class="tab-sub">${t('relWeek')(w.rel)}</span>
     </button>`;
   }).join('');
 }
@@ -267,41 +511,51 @@ window.addEventListener('hashchange', () => {
   if (m && +m[1] !== currentWeek) showWeek(+m[1]);
 });
 
+function jumpToday() {
+  const el = document.querySelector('.week-section.active .day-col.today');
+  if (!el) return;
+  el.scrollIntoView({ block: 'start' });
+  el.classList.remove('flash');
+  void el.offsetWidth;            // restart the highlight
+  el.classList.add('flash');
+}
+
 /* ============================================================
    Modal — recipe sheet with previous / next through the week
    ============================================================ */
 const modalEl = byId('modal');
-let modalAt = null;     // { wk, i } — i indexes weekMeals(wk)
+let modalAt = null;     // { n, k } — week tab and slot (0–14) in its menu
 let lastFocus = null;
 
-function weekMeals(wk) {
-  return data[wk].days.flatMap((day, di) => day.meals.map((meal, mi) => ({ di, mi, meal })));
-}
-
-function openModal(wk, day, mealIdx) {
+function openModal(n, k) {
   const wasOpen = !!modalAt;
-  modalAt = { wk, i: weekMeals(wk).findIndex(m => m.di === day && m.mi === mealIdx) };
+  modalAt = { n, k };
   renderModal();
   if (wasOpen) return;
 
   lastFocus = document.activeElement;
   hideTip();
   modalEl.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.classList.add('modal-open');
   // A history entry lets the phone's Back button close the recipe
   try { history.pushState({ modal: true }, ''); } catch (e) {}
   byId('m-close').focus({ preventScroll: true });
 }
 
 function renderModal() {
-  const meals = weekMeals(modalAt.wk);
-  const { di, meal: d } = meals[modalAt.i];
+  const w = weeks[modalAt.n - 1];
+  const meals = weekMeals(w);
+  const { recipe: d, di } = meals[modalAt.k];
   const mt = t('mealTypes')[d.type];
 
   byId('m-name').textContent = d.name[lang];
   byId('m-meta').innerHTML =
     `<span class="meal-badge badge-${d.type}">${mt.icon} ${mt.label}</span>` +
-    `<span>${t('days')[di]} · ${t('date')(data[modalAt.wk].days[di].date)}</span>`;
+    `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>`;
+
+  const swapBtn = byId('m-swap');
+  swapBtn.textContent = t('swap');
+  swapBtn.dataset.tip = t('tipSwap')[d.type];
 
   byId('m-ing').innerHTML = d.ing[lang].map(i =>
     `<li><label class="check"><input type="checkbox"><span>${i}</span></label></li>`).join('');
@@ -309,24 +563,25 @@ function renderModal() {
     ? `<li class="kid-tip">👶 <strong>${t('kidTipLabel')}</strong> ${s.replace(t('kidTip'), '')}</li>`
     : `<li>${s}</li>`).join('');
 
+  const tip = d.tip && d.tip[lang];
   const tipEl = byId('m-tip');
-  tipEl.textContent = d.tip[lang] ? '💚 ' + d.tip[lang] : '';
-  tipEl.hidden = !d.tip[lang];
+  tipEl.textContent = tip ? '💚 ' + tip : '';
+  tipEl.hidden = !tip;
 
   [['m-prev', -1], ['m-next', 1]].forEach(([id, delta]) => {
     const btn = byId(id);
-    const other = meals[modalAt.i + delta];
+    const other = meals[modalAt.k + delta];
     btn.disabled = !other;
-    if (other) btn.dataset.tip = other.meal.name[lang];
+    if (other) btn.dataset.tip = mealLabel(other) + ': ' + other.recipe.name[lang];
     else delete btn.dataset.tip;
   });
-  byId('m-pos').textContent = (modalAt.i + 1) + ' / ' + meals.length;
+  byId('m-pos').textContent = (modalAt.k + 1) + ' / ' + meals.length;
   byId('m-body').scrollTop = 0;
 }
 
 function stepModal(delta) {
-  if (!modalAt || !weekMeals(modalAt.wk)[modalAt.i + delta]) return;
-  modalAt.i += delta;
+  if (!modalAt || modalAt.k + delta < 0 || modalAt.k + delta > 14) return;
+  modalAt.k += delta;
   hideTip();
   renderModal();
 }
@@ -341,7 +596,7 @@ function hideModal() {
   if (!modalAt) return;
   modalAt = null;
   modalEl.classList.remove('open');
-  document.body.style.overflow = '';
+  document.body.classList.remove('modal-open');
   if (lastFocus && lastFocus.isConnected) lastFocus.focus({ preventScroll: true });
 }
 
@@ -362,8 +617,8 @@ document.addEventListener('keydown', e => {
 });
 
 /* ============================================================
-   Ticks — prep tasks (p{week}-{i}) and shopping items
-   (s{week}-{category}-{i}) share one saved map
+   Ticks — prep tasks (p:{monday}:{task}) and shopping rows
+   (s:{monday}:{ingredient}) share one saved map
    ============================================================ */
 document.addEventListener('change', e => {
   const key = e.target.dataset && e.target.dataset.tick;
@@ -371,7 +626,8 @@ document.addEventListener('change', e => {
   if (e.target.checked) store.ticks[key] = 1;
   else delete store.ticks[key];
   saveStore();
-  updateProgress(+key.slice(1).split('-')[0]);
+  const w = weeks.find(x => key.startsWith(key[0] + ':' + x.iso + ':'));
+  if (w) updateProgress(w.n);
 });
 
 function setPill(id, done, total) {
@@ -382,17 +638,15 @@ function setPill(id, done, total) {
 }
 
 function updateProgress(n) {
-  const w = data[n];
-  const tasks = w.prep.tasks[lang];
-  setPill(`prep-count-${n}`, tasks.filter((_, i) => store.ticks[`p${n}-${i}`]).length, tasks.length);
+  const { w, rows, tasks } = weekData[n];
+  setPill(`prep-count-${n}`, tasks.filter(task => store.ticks[`p:${w.iso}:${task.key}`]).length, tasks.length);
 
-  let total = 0, done = 0, left = 0;
-  w.shopping.forEach((cat, ci) => cat.items[lang].forEach((_, ii) => {
-    total++;
-    if (store.ticks[`s${n}-${ci}-${ii}`]) done++;
-    else left += itemPrice(n, ci, ii) || 0;
-  }));
-  setPill(`shop-count-${n}`, done, total);
+  let done = 0, left = 0;
+  rows.forEach(row => {
+    if (store.ticks[`s:${w.iso}:${row.key}`]) done++;
+    else left += rowPrice(row) || 0;
+  });
+  setPill(`shop-count-${n}`, done, rows.length);
 
   const leftEl = byId(`shop-left-${n}`);
   if (leftEl) {
@@ -443,26 +697,118 @@ function changeOffset(delta) {
   });
 }
 
-function itemPrice(n, ci, ii) {
-  const pd = shopPrices[n] && shopPrices[n][ci];
-  if (!pd || pd.base[ii] == null) return null;
-  const itemOff = (pd.offsets && pd.offsets[ii]) || 0;
-  return pd.base[ii] * (1 + priceConfig.globalOffset) * (1 + itemOff);
+/* ============================================================
+   Shopping list — the week's recipe lines grouped into rows
+   (one per ingredient, see ingredients.js) with summed amounts
+   ============================================================ */
+const ingredientCache = new Map();
+function ingredientFor(line) {
+  if (!ingredientCache.has(line)) ingredientCache.set(line, ingredients.find(e => e.match.test(line)) || null);
+  return ingredientCache.get(line);
+}
+
+function weekShopping(meals) {
+  const rows = new Map();
+  meals.forEach(meal => meal.recipe.ing.en.forEach((en, i) => {
+    const entry = ingredientFor(en);
+    const key = entry ? entry.key : 'other-' + en.toLowerCase();
+    if (!rows.has(key)) rows.set(key, { key, entry, cat: entry ? entry.cat : 'Other', lines: [] });
+    rows.get(key).lines.push({ en, es: meal.recipe.ing.es[i] || en, meal });
+  }));
+  return [...rows.values()];
+}
+
+const FRACTIONS = { '½': 1 / 2, '¼': 1 / 4, '¾': 3 / 4, '⅓': 1 / 3, '⅔': 2 / 3 };
+const UNIT_WORDS = {
+  en: [['lb', /^lbs?\b/i], ['cup', /^cups?\b/i], ['tbsp', /^tbsp\b/i], ['tsp', /^tsp\b/i], ['kg', /^kg\b/i],
+       ['g', /^g\b/i], ['ml', /^ml\b/i], ['l', /^l\b/i], ['can', /^cans?\b/i], ['clove', /^cloves?\b/i],
+       ['head', /^(whole\s+)?heads?\b/i], ['stalk', /^stalks?\b/i], ['bunch', /^bunch(es)?\b/i],
+       ['slice', /^slices?\b/i], ['sprig', /^sprigs?\b/i]],
+  es: [['cup', /^tazas?\b/i], ['tbsp', /^cdas?\b/i], ['tsp', /^cditas?\b/i], ['kg', /^kg\b/i], ['g', /^g\b/i],
+       ['ml', /^ml\b/i], ['l', /^l\b/i], ['can', /^latas?\b/i], ['clove', /^dientes?\b/i], ['head', /^cabezas?\b/i],
+       ['stalk', /^tallos?\b/i], ['bunch', /^atados?\b/i], ['slice', /^rebanadas?\b/i], ['sprig', /^ramas?\b/i]]
+};
+const UNIT_NAMES = {
+  en: { lb: ['lb', 'lbs'], cup: ['cup', 'cups'], tbsp: 'tbsp', tsp: 'tsp', g: 'g', ml: 'ml', can: ['can', 'cans'],
+        clove: ['clove', 'cloves'], head: ['head', 'heads'], stalk: ['stalk', 'stalks'], bunch: ['bunch', 'bunches'],
+        slice: ['slice', 'slices'], sprig: ['sprig', 'sprigs'] },
+  es: { lb: ['lb', 'lbs'], cup: ['taza', 'tazas'], tbsp: ['cda', 'cdas'], tsp: ['cdita', 'cditas'], g: 'g', ml: 'ml',
+        can: ['lata', 'latas'], clove: ['diente', 'dientes'], head: ['cabeza', 'cabezas'], stalk: ['tallo', 'tallos'],
+        bunch: ['atado', 'atados'], slice: ['rebanada', 'rebanadas'], sprig: ['rama', 'ramas'] }
+};
+
+// "1½ cups broccoli florets" → { qty: 1.5, unit: 'cup' } · "Salt" → null
+function parseAmount(text) {
+  let s = text.trim().replace(/^(juice of|jugo de)\s+/i, '');
+  const m = /^(\d+(?:[.,]\d+)?)?\s*([½¼¾⅓⅔])?/.exec(s);
+  if (!m[1] && !m[2]) return null;
+  const qty = (m[1] ? parseFloat(m[1].replace(',', '.')) : 0) + (m[2] ? FRACTIONS[m[2]] : 0);
+  s = s.slice(m[0].length).trim();
+  const hit = UNIT_WORDS[lang].find(([, re]) => re.test(s));
+  const unit = hit ? hit[0] : '';
+  if (unit === 'kg') return { qty: qty * 1000, unit: 'g' };
+  if (unit === 'l') return { qty: qty * 1000, unit: 'ml' };
+  return { qty, unit };
+}
+
+function fmtQty(q) {
+  const whole = Math.floor(q + 0.03), frac = q - whole;
+  if (Math.abs(frac) < 0.03) return String(whole);
+  const sym = Object.keys(FRACTIONS).find(f => Math.abs(FRACTIONS[f] - frac) < 0.03);
+  if (sym) return (whole || '') + sym;
+  const s = String(Math.round(q * 10) / 10);
+  return lang === 'es' ? s.replace('.', ',') : s;
+}
+
+// `each` names what a bare number counts ("5" celery → "5 stalks")
+function fmtAmount({ qty, unit }, each) {
+  if (unit === 'g' && qty >= 1000) return fmtQty(qty / 1000) + ' kg';
+  if (unit === 'ml' && qty >= 1000) return fmtQty(qty / 1000) + ' L';
+  const name = unit ? UNIT_NAMES[lang][unit] : each && each[lang];
+  if (!name) return fmtQty(qty);
+  return fmtQty(qty) + ' ' + (Array.isArray(name) ? name[qty > 1 ? 1 : 0] : name);
+}
+
+const rowName  = row => row.entry ? row.entry[lang] : row.lines[0][lang];
+const rowMeals = row => [...new Map(row.lines.map(l => [l.meal.k, l.meal])).values()];
+const rowPrice = row => row.entry && row.entry.price
+  ? row.entry.price * row.lines.length * (1 + priceConfig.globalOffset) : null;
+const rowOptional = row => row.lines.every(l => /optional|opcional/i.test(l[lang]));
+
+// Same units are added up: "5 cloves + 1 head" · lemons and limes are just counted
+function rowAmount(row) {
+  const kind = row.entry && row.entry.kind;
+  if (!row.entry || kind === 'staple' || kind === 'spice') return '';
+  const totals = [];
+  let unmeasured = false;
+  row.lines.forEach(line => {
+    let a = parseAmount(line[lang]);
+    if (kind === 'count') a = { qty: a && !a.unit && a.qty >= 1 ? a.qty : 1, unit: '' };
+    if (!a) { unmeasured = true; return; }
+    const same = totals.find(x => x.unit === a.unit);
+    if (same) same.qty += a.qty;
+    else totals.push({ qty: a.qty, unit: a.unit });
+  });
+  const text = totals.map(total => fmtAmount(total, row.entry.each)).join(' + ');
+  return text && unmeasured ? text + ' + ' + t('more') : text;
 }
 
 /* ============================================================
    Shopping list actions — copy / share / clear
    ============================================================ */
 function listText(n) {
-  const w = data[n];
+  const { w, rows } = weekData[n];
   const shopCats = t('shopCats');
   const lines = [];
-  w.shopping.forEach((cat, ci) => {
-    const left = cat.items[lang].filter((_, ii) => !store.ticks[`s${n}-${ci}-${ii}`]);
-    if (left.length) lines.push('', (shopCats[cat.cat] || cat.cat).toUpperCase(), ...left.map(i => '☐ ' + i));
+  shopCategories.forEach(cat => {
+    const left = sortedRows(rows, cat).filter(row => !store.ticks[`s:${w.iso}:${row.key}`]);
+    if (left.length) lines.push('', (shopCats[cat] || cat).toUpperCase(), ...left.map(row => {
+      const amount = rowAmount(row);
+      return '☐ ' + rowName(row) + (amount ? ' — ' + amount : '');
+    }));
   });
   if (!lines.length) return '';
-  return `🛒 ${t('shopping')} — ${w.title[lang]} (${w.dates[lang]})\n` + lines.join('\n');
+  return `🛒 ${t('shopping')} — ${t('relWeek')(w.rel)} (${fmtRangeShort(w.monday)})\n` + lines.join('\n');
 }
 
 function copyList(n) {
@@ -491,7 +837,8 @@ function shareList(n) {
 }
 
 function clearTicks(n) {
-  Object.keys(store.ticks).forEach(k => { if (k.startsWith(`s${n}-`)) delete store.ticks[k]; });
+  const prefix = `s:${weeks[n - 1].iso}:`;
+  Object.keys(store.ticks).forEach(k => { if (k.startsWith(prefix)) delete store.ticks[k]; });
   saveStore();
   document.querySelectorAll(`#shop-list-${n} input[data-tick]`).forEach(cb => { cb.checked = false; });
   updateProgress(n);
@@ -510,7 +857,7 @@ function showToast(msg) {
 /* ============================================================
    Shopping section builders
    buildShopTools → price control + actions (built once per render)
-   buildShopList  → items, subtotals and totals (rebuilt on offset change)
+   buildShopList  → rows, subtotals and totals (rebuilt on offset change)
    ============================================================ */
 function buildShopTools(n) {
   const btn = (fn, icon, label, tipKey) =>
@@ -535,47 +882,60 @@ function buildShopTools(n) {
   </div>`;
 }
 
+const sortedRows = (rows, cat) => rows.filter(row => row.cat === cat)
+  .sort((a, b) => rowName(a).localeCompare(rowName(b), lang));
+
 function buildShopList(n) {
-  const w         = data[n];
+  const { w, rows } = weekData[n];
   const shopCats  = t('shopCats');
-  const weekPrices = shopPrices[n];
   const globalPct = fmtPct(priceConfig.globalOffset);
   let grandTotal  = 0;
 
-  const shopHtml = w.shopping.map((cat, ci) => {
-    const pd = weekPrices ? weekPrices[ci] : null;
+  const shopHtml = shopCategories.map(cat => {
+    const catRows = sortedRows(rows, cat);
+    if (!catRows.length) return '';
     let catTotal = 0;
 
-    const itemsHtml = cat.items[lang].map((item, ii) => {
-      const key = `s${n}-${ci}-${ii}`;
-      const price = itemPrice(n, ci, ii);
+    const itemsHtml = catRows.map(row => {
+      const key = `s:${w.iso}:${row.key}`;
+      const price = rowPrice(row);
+      const amount = rowAmount(row);
+      const meals = rowMeals(row);
+      const kind = row.entry && row.entry.kind;
+
+      const detail = row.lines.map(l => mealLabel(l.meal) + ': ' + l[lang]);
+      if (row.entry && row.entry.note) detail.push('ℹ️ ' + row.entry.note[lang]);
+      if (kind === 'staple') detail.push(t('tipStaple'));
+
       let priceSpan = '';
       if (price != null) {
-        const itemOff  = (pd.offsets && pd.offsets[ii]) || 0;
-        catTotal      += price;
-        grandTotal    += price;
-        let tip = t('tipPrice')(money(pd.base[ii]), globalPct);
-        if (itemOff) tip += '\n' + t('itemAdjusted')(fmtPct(itemOff));
-        priceSpan = `<span class="item-price${itemOff ? ' adjusted' : ''}" data-tip="${esc(tip)}">~${money(price)}</span>`;
+        catTotal   += price;
+        grandTotal += price;
+        priceSpan = `<span class="item-price" data-tip="${esc(t('tipPrice')(row.lines.length, globalPct))}">~${money(price)}</span>`;
       }
+      const tags = (kind === 'staple' ? `<span class="item-tag">${t('tagStaple')}</span>` : '') +
+                   (rowOptional(row) ? `<span class="item-tag">${t('tagOptional')}</span>` : '');
       return `<li><label class="check">
-        <input type="checkbox" data-tick="${key}"${store.ticks[key] ? ' checked' : ''}>
-        <span class="item-name">${item}</span>${priceSpan}
+        <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
+        <span class="item-main" data-tip="${esc(detail.join('\n'))}">
+          <span class="item-name">${rowName(row)}</span>${amount ? ` <span class="item-amount">${amount}</span>` : ''}${tags}
+          <span class="item-meals">${meals.length > 2 ? t('inMeals')(meals.length) : meals.map(mealLabel).join(', ')}</span>
+        </span>${priceSpan}
       </label></li>`;
     }).join('');
 
-    const subtotalHtml = pd
+    const subtotalHtml = catTotal
       ? `<p class="cat-subtotal">${t('catSubtotal')}: ~${money(catTotal)}</p>`
       : '';
 
     return `<div class="shop-cat">
-      <h4>${shopCats[cat.cat] || cat.cat}</h4>
+      <h4>${shopCats[cat] || cat}</h4>
       <ul>${itemsHtml}</ul>
       ${subtotalHtml}
     </div>`;
   }).join('');
 
-  const totalHtml = weekPrices
+  const totalHtml = grandTotal
     ? `<div class="week-total">
         <div data-tip="${esc(t('tipTotal'))}">
           <span>${t('estimatedTotal')}</span>
@@ -592,57 +952,92 @@ function buildShopList(n) {
 }
 
 /* ============================================================
+   Sunday prep — the make-ahead tasks of the week's recipes,
+   each listed once with the meals that need it
+   ============================================================ */
+function weekPrep(meals) {
+  const tasks = [{ key: 'chop-veg', meals: [] }];
+  meals.forEach(meal => (meal.recipe.prep || []).forEach(key => {
+    if (!prepTasks[key]) return;
+    let task = tasks.find(x => x.key === key);
+    if (!task) tasks.push(task = { key, meals: [] });
+    task.meals.push(meal);
+  }));
+  return tasks;
+}
+
+/* ============================================================
    Week Renderer
    ============================================================ */
+const weekData = {};    // n → { w, meals, rows, tasks } of the last render
+
 function buildWeek(n) {
-  const w = data[n];
+  const w = weeks[n - 1];
+  const meals = weekMeals(w);
+  const rows = weekShopping(meals);
+  const tasks = weekPrep(meals);
+  weekData[n] = { w, meals, rows, tasks };
+
   const section = byId('w' + n);
   const days = t('days');
   const mealTypes = t('mealTypes');
-
-  const title    = w.title[lang];
-  const dates    = w.dates[lang];
-  const prepDate = w.prep.date[lang];
   const shopOpen = store.shopOpen[n] ? ' open' : '';
   // Prep starts folded on phones so Monday's meals are not a long scroll away
   const prepOpen = n in store.prepOpen ? store.prepOpen[n] : !isPhone;
   const openHint = t(canHover ? 'tipMealMouse' : 'tipMealTouch');
+  const hasToday = w.rel === 0 && today >= w.monday && today <= addDays(w.monday, 4);
 
-  const daysHtml = w.days.map((day, di) => {
-    const mealsHtml = day.meals.map((meal, mi) => {
-      const mt = mealTypes[meal.type];
+  const daysHtml = days.map((dayName, di) => {
+    const date = addDays(w.monday, di);
+    const iso = isoDate(date);
+    const state = iso === todayIso ? ' today' : iso < todayIso ? ' past' : '';
+    const mealsHtml = meals.filter(m => m.di === di).map(({ recipe, k }) => {
+      const mt = mealTypes[recipe.type];
       const tip = [
-        t('tipMeal')(meal.ing[lang].length, meal.steps[lang].length),
-        meal.tip[lang] && '💚 ' + meal.tip[lang],
+        t('tipMeal')(recipe.ing[lang].length, recipe.steps[lang].length),
+        recipe.tip && recipe.tip[lang] && '💚 ' + recipe.tip[lang],
         openHint
       ].filter(Boolean).join('\n');
-      return `<button type="button" class="meal-slot" onclick="openModal(${n},${di},${mi})" data-tip="${esc(tip)}">
-        <span class="meal-badge badge-${meal.type}">${mt.icon} ${mt.label}</span>
-        <span class="meal-name">${meal.name[lang]}</span>
+      return `<button type="button" class="meal-slot" onclick="openModal(${n},${k})" data-tip="${esc(tip)}">
+        <span class="meal-badge badge-${recipe.type}">${mt.icon} ${mt.label}</span>
+        <span class="meal-name">${recipe.name[lang]}</span>
         <span class="chev" aria-hidden="true">›</span>
       </button>`;
     }).join('');
 
-    return `<div class="day-col">
-      <div class="day-header">${days[di]}<span>${t('date')(day.date)}</span></div>
+    return `<div class="day-col${state}">
+      <div class="day-header">${dayName}${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}<span>${fmtDay(date)}</span></div>
       ${mealsHtml}
     </div>`;
   }).join('');
 
-  const prepHtml = w.prep.tasks[lang].map((task, i) => {
-    const key = `p${n}-${i}`;
+  const prepHtml = tasks.map(task => {
+    const key = `p:${w.iso}:${task.key}`;
+    const forText = task.meals.length
+      ? `<small class="task-for">${t('prepFor')} ${task.meals.map(mealLabel).join(', ')}</small>` : '';
     return `<li><label class="check" data-tip="${esc(t('tipPrep'))}">
-      <input type="checkbox" data-tick="${key}"${store.ticks[key] ? ' checked' : ''}>
-      <span>${task}</span>
+      <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
+      <span>${prepTasks[task.key][lang]}${forText}</span>
     </label></li>`;
   }).join('');
 
+  const saved = !!savedMenu(w.iso);
+  const tool = (fn, label, tipKey) =>
+    `<button type="button" class="tool-btn" onclick="${fn}(${n})" data-tip="${esc(t(tipKey))}">${t(label)}</button>`;
+
   section.innerHTML = `
-    <h2 class="week-header">${title} <span>${dates}</span></h2>
+    <div class="week-head">
+      <h2 class="week-header">${t('relWeek')(w.rel)} <span>${fmtRangeLong(w.monday)}</span></h2>
+      <div class="week-tools">
+        ${hasToday ? tool('jumpToday', 'todayBtn', 'tipToday') : ''}
+        ${tool('shuffleWeek', 'shuffle', 'tipShuffle')}
+        ${saved ? tool('resetWeek', 'resetMenu', 'tipReset') : ''}
+      </div>
+    </div>
     <div class="sunday-prep">
       <button type="button" class="prep-head${prepOpen ? ' open' : ''}" id="prep-toggle-${n}" onclick="togglePrep(${n})"
         aria-expanded="${prepOpen}" aria-controls="prep-list-${n}" data-tip="${esc(t('tipPrepToggle'))}">
-        <span class="prep-title">📋 ${prepDate}</span>
+        <span class="prep-title">📋 ${t('prepTitle')(fmtDay(addDays(w.monday, -1)))}</span>
         <span class="progress-pill" id="prep-count-${n}" data-tip="${esc(t('tipPrepCount'))}"></span>
         <span class="arrow" aria-hidden="true">▼</span>
       </button>
@@ -775,6 +1170,19 @@ window.addEventListener('resize', hideTip);
   if (history.state && history.state.modal) {
     try { history.replaceState(null, ''); } catch (e) {}
   }
+
+  // Forget ticks of past weeks (and of the old fixed plan) and swaps older than last week —
+  // not while previewing another date, which would throw away this week's
+  if (!dateParam) {
+    const keepMenusFrom = isoDate(addDays(firstMonday, -7));
+    Object.keys(store.ticks).forEach(k => {
+      const m = /^[ps]:(\d{4}-\d{2}-\d{2}):/.exec(k);
+      if (!m || m[1] < weeks[0].iso) delete store.ticks[k];
+    });
+    Object.keys(store.menus).forEach(iso => { if (iso < keepMenusFrom) delete store.menus[iso]; });
+    saveStore();
+  }
+
   applyLang();
   showWeek(currentWeek, true);
 })();

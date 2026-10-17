@@ -143,6 +143,17 @@ header p {
   opacity: .95;
   position: relative;
 }
+header .header-dates {
+  display: inline-block;
+  margin-top: .75rem;
+  padding: .3rem .95rem;
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: var(--r-pill);
+  background: rgba(255,255,255,.16);
+  font-size: .85rem;
+  font-weight: 600;
+  opacity: 1;
+}
 
 /* Language toggle */
 .lang-btn {
@@ -195,8 +206,9 @@ header p {
   transition: all var(--dur) var(--ease);
   white-space: nowrap;
 }
-.tab-week  { font-weight: 800; font-size: .875rem; }
-.tab-dates { font-weight: 600; font-size: .72rem; opacity: .8; }
+.tab-btn span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.tab-top { font-weight: 800; font-size: .875rem; }
+.tab-sub { font-weight: 600; font-size: .72rem; opacity: .8; }
 .tab-btn.active {
   background: linear-gradient(135deg, var(--primary), var(--color-text-muted));
   border-color: transparent;
@@ -253,14 +265,27 @@ main {
 .week-section { display: none; padding: 1.5rem 0 2rem; }
 .week-section.active { display: block; }
 
+.week-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .6rem 1rem;
+  margin-bottom: 1.25rem;
+}
+.week-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
 .week-header {
+  flex: 1 1 auto;
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--text-head);
-  margin-bottom: 1.25rem;
   display: flex;
   align-items: baseline;
-  gap: .75rem;
+  flex-wrap: wrap;
+  gap: .2rem .75rem;
 }
 .week-header span {
   font-size: .95rem;
@@ -271,6 +296,7 @@ main {
 .week-header::after {
   content: '';
   flex: 1;
+  min-width: 2rem;
   align-self: center;
   height: 2px;
   background: linear-gradient(90deg, var(--primary-light), transparent);
@@ -371,6 +397,13 @@ main {
   transition: background var(--dur) var(--ease);
 }
 .sunday-prep .check input { border-color: #d97706; }
+.task-for {
+  display: block;
+  margin-top: .15rem;
+  font-size: .75rem;
+  color: #92400e;
+  opacity: .85;
+}
 .sunday-prep .check input:checked { border-color: #b45309; background-color: #b45309; }
 
 /* ============================================================
@@ -387,6 +420,7 @@ main {
 @media (max-width: 520px)  { .calendar { grid-template-columns: 1fr; gap: .85rem; } }
 
 .day-col {
+  scroll-margin-top: 80px;
   background: var(--surface);
   border-radius: var(--r-md);
   overflow: hidden;
@@ -411,6 +445,31 @@ main {
   font-size: .78rem;
   opacity: .9;
   white-space: nowrap;
+}
+.today-pill {
+  margin: 0 auto 0 .1rem;
+  padding: .05rem .5rem;
+  border-radius: var(--r-pill);
+  background: #fff;
+  color: var(--color-primary-darker);
+  font-size: .66rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  align-self: center;
+}
+.day-col.today {
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(183, 121, 63, .18), var(--sh-md);
+}
+.day-col.today .day-header {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-dark) 100%);
+}
+.day-col.past { opacity: .6; }
+.day-col.flash { animation: flash 1.2s var(--ease); }
+@keyframes flash {
+  30% { box-shadow: 0 0 0 10px rgba(183, 121, 63, .45), var(--sh-md); }
 }
 
 /* ============================================================
@@ -631,8 +690,33 @@ main {
   color: var(--text-body);
   padding: .5rem 0;
 }
-.shop-cat .item-name {
+.shop-cat .item-main {
   flex: 1;
+  min-width: 0;
+}
+.shop-cat .item-name { font-weight: 600; }
+.shop-cat .item-amount {
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+.shop-cat .item-meals {
+  display: block;
+  margin-top: .1rem;
+  font-size: .72rem;
+  color: var(--text-muted);
+}
+.item-tag {
+  display: inline-block;
+  margin-left: .4rem;
+  padding: 0 .45rem;
+  border-radius: var(--r-pill);
+  background: var(--color-bg-soft);
+  color: var(--text-muted);
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  vertical-align: 1px;
 }
 .shop-cat .item-price {
   font-size: .78rem;
@@ -735,6 +819,26 @@ main {
   color: var(--text-muted);
   margin-bottom: .4rem;
 }
+.modal-when {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .35rem .6rem;
+}
+.swap-btn {
+  min-height: 30px;
+  padding: .2rem .75rem;
+  border: 1.5px solid var(--color-primary-light);
+  border-radius: var(--r-pill);
+  background: var(--color-bg-light);
+  color: var(--color-primary-darker);
+  font-size: .75rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.swap-btn:active { background: var(--color-primary-light); }
 .modal h2 {
   font-size: 1.25rem;
   font-weight: 800;
@@ -939,6 +1043,10 @@ main {
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* With a recipe open: no page scroll behind it, toast above its footer */
+body.modal-open { overflow: hidden; }
+body.modal-open .toast { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+
 /* ============================================================
    Hover effects — only where a real pointer can hover, so
    nothing "sticks" after a tap on a phone
@@ -960,7 +1068,8 @@ main {
   .shopping-toggle:hover { background: var(--color-bg-light); }
   .shop-cat .check:hover .item-name { color: var(--color-primary-dark); }
   .offset-btn:hover { background: var(--primary); color: #fff; }
-  .tool-btn:hover { background: var(--color-bg-soft); border-color: var(--color-primary); }
+  .tool-btn:hover,
+  .swap-btn:hover { background: var(--color-bg-soft); border-color: var(--color-primary); }
   .info-btn:hover { background: var(--color-bg-soft); }
   .hint-close:hover,
   .modal-close:hover { background: var(--color-primary-light); }
@@ -987,12 +1096,16 @@ main {
 
   .tabs { gap: .35rem; padding-top: .5rem; padding-bottom: .5rem; }
   .tab-btn { flex: 1 1 0; min-width: 0; padding: .35rem .2rem; }
-  .tab-week  { font-size: .82rem; }
-  .tab-dates { font-size: .7rem; }
+  .tab-top      { font-size: .82rem; }
+  .tab-top.long { font-size: .7rem; }
+  .tab-sub      { font-size: .68rem; }
 
   main { padding: 0 max(.85rem, env(safe-area-inset-right)) 0 max(.85rem, env(safe-area-inset-left)); }
   .week-section { padding-top: 1.1rem; }
-  .week-header { font-size: 1.3rem; margin-bottom: 1rem; }
+  .week-head { margin-bottom: 1rem; }
+  .week-header { font-size: 1.3rem; }
+  .week-tools { width: 100%; }
+  .week-tools .tool-btn { flex: 1; min-height: 44px; }
 
   .sunday-prep { border-radius: var(--r-md); }
   .prep-head { padding: .9rem 1rem; }
@@ -1029,6 +1142,7 @@ main {
   .modal ul .check { font-size: .975rem; padding: .65rem 0; }
   .modal ol li { font-size: .975rem; }
   .nav-btn { flex: 1; }
+  .swap-btn { min-height: 36px; }
   .modal-pos { padding: 0 .4rem; }
 }
 
@@ -1045,7 +1159,7 @@ main {
 @media print {
   body { background: #fff; }
   header { background: none; color: #000; padding: 0 0 .5rem; }
-  header::before, .lang-btn, .tabs, .hint, .shop-tools, .arrow, .chev,
+  header::before, .lang-btn, .tabs, .hint, .shop-tools, .arrow, .chev, .week-tools,
   .modal-overlay, .tooltip, .toast, .site-footer { display: none !important; }
   .shopping-body { display: block !important; }
   .sunday-prep ul[hidden] { display: grid !important; }

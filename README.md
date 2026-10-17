@@ -1,42 +1,61 @@
-# Family Meal Plan — May 2026
+# Family Meal Plan
 
-Responsive, interactive weekly meal planner for a family of 4.
-Covers **Lunch + Afternoon Snack + Dinner** every weekday across all 4 weeks of May 2026,
-with pregnancy-friendly nutrition notes and toddler tips throughout.
+**Live:** https://hiessy.github.io/meal-plan/
+
+Weekly meal planner for a family of 4: **lunch, afternoon snack and dinner, Monday–Friday**.
+Every week gets a random menu drawn from the recipe list and dated with the real calendar.
+The recipes include pregnancy-friendly nutrition notes and toddler tips.
 
 ## Features
 
-- 4 weeks of curated meals (Mon–Fri · 3 meals/day)
-- Click any meal card to view the full recipe, ingredients, and steps
-- Weekly Sunday meal-prep checklist
-- Collapsible weekly shopping list organised by category
-- **🌐 English / Español** language toggle — switches all UI labels and day names
-- Fully responsive — mobile, tablet, and desktop
-- Zero dependencies — pure HTML, CSS, and JavaScript
+- **A random menu every week**: 5 lunches, 5 snacks and 5 dinners picked from 58 recipes.
+  - The draw is seeded by the week, so everyone who opens the page sees the same menu.
+  - No recipe repeats within a week or from the two weeks before.
+  - Similar dishes (salmon, tuna, soups, pasta…) are capped per week.
+- **Real dates**: the page shows this week and the next three. On Saturday and Sunday it starts
+  with the coming week. Today's card is highlighted and past days fade.
+- **🎲 Shuffle** a whole week or **🔄 swap** one meal. **↺ Original menu** undoes it.
+- **Recipe sheet** with ingredients, steps and toddler tips, plus previous/next through the week.
+- **Sunday prep**: the make-ahead tasks of that week's recipes, each with the meals it is for.
+- **Shopping list built from the week's meals**:
+  - one row per ingredient, with the amounts added up
+  - grouped by aisle
+  - estimated prices, with a market adjustment
+  - tick off items as you shop; copy or share what is left
+- 🌐 English / Español and tooltips everywhere. Hover, focus with the keyboard, or press and hold on a phone.
+- Built for phones as well as desktop.
+- Ticks, swaps and settings are saved in the browser.
+- No dependencies: plain HTML, CSS and JavaScript.
 
-## Hosting on GitHub Pages
+To see the plan for another date, add `?date=2026-12-24` to the address.
 
-1. Push this repo to GitHub
-2. Go to **Settings → Pages**
-3. Under *Source*: **Deploy from a branch → main (root)**
-4. Click **Save** — live at `https://<username>.github.io/<repo>/`
-
-## File Structure
+## Files
 
 | File | Purpose |
 |------|---------|
-| `index.html` | HTML shell — structure only, no inline styles or scripts |
-| `style.css` | All styles; edit **CSS variables at the top** to retheme |
-| `app.js` | Meal data, EN/ES translations, and all UI logic |
-| `README.md` | This file |
+| `index.html` | Page shell |
+| `style.css` | All styles. Edit the CSS variables at the top to retheme |
+| `app.js` | Translations, menu drawing, shopping list and all UI logic |
+| `recipes.js` | The recipe list (EN/ES) and the Sunday prep tasks |
+| `ingredients.js` | Ingredient dictionary: shopping-list rows, categories and price estimates |
 
 ## Customising
 
-**Colors** — open `style.css` and edit the `:root` block at the top.
-Every color in the app flows from those variables; one change, whole site updates.
+**Recipes**: add one to `recipes.js` by copying a recipe of the same type and editing it.
+- Keep every recipe self-contained, because any recipe can land on any day. Avoid lines like
+  "leftover chicken from Monday".
+- Keep at least 5 recipes of each type.
+- Changing the list reshuffles the menus.
 
-**Meals / Recipes** — edit the `data` object in `app.js`.
-Each week has `days[]` with `meals[]`, each meal has `ing`, `steps`, and an optional `tip`.
+**Shopping list**: each English ingredient line is matched against `ingredients.js` from top to
+bottom. The first match decides which row it joins. Lines that match nothing are listed under
+"Other" exactly as written.
 
-**Translations** — edit the `i18n` object at the top of `app.js`.
-Add more languages by extending the object and updating `toggleLang()`.
+**Prices**: `price` in `ingredients.js` is a rough USD estimate per recipe that uses the ingredient.
+The +/− control in the shopping list scales all prices at once.
+
+**Translations**: edit the `i18n` object at the top of `app.js`.
+
+## Hosting
+
+GitHub Pages serves the root of the `master` branch. Push to `master` and the site updates within a minute or two.
