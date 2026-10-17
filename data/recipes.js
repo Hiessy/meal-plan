@@ -1,24 +1,38 @@
 /* ============================================================
-   Recipe list — each week's menu is drawn at random from here
+   Meals & recipes — the list each week's menu is drawn from
    (5 lunches, 5 snacks and 5 dinners, Monday–Friday).
 
    Text fields are bilingual: field[lang], lang = 'en' | 'es'
-   id    : unique and stable — saved swaps refer to it
-   type  : 'lunch' | 'snack' | 'dinner'
-   ing   : ingredients for 4 people; the shopping list is built from
-           these lines (see ingredients.js)
-   steps : a step starting "Toddler tip:" / "Consejo para pequeños:"
-           is shown as a highlighted note
-   tip   : optional nutrition note ("" for none)
-   prep  : optional make-ahead tasks for the Sunday prep card, as keys
-           of prepTasks at the bottom of this file
+   id      : unique and stable — saved swaps refer to it
+   type    : 'lunch' | 'snack' | 'dinner'
 
-   To add a recipe, copy one of the same type and change it.
+   Balance facts — js/planner.js uses these to keep each week varied:
+   protein : lunches & dinners — 'fish' | 'poultry' | 'beef' | 'pork'
+             | 'plant' (vegetarian) | 'egg'
+   base    : lunches & dinners — main starch: 'rice' | 'pasta' |
+             'bread' (incl. tortillas, wraps, buns) | 'potato' |
+             'grain' (quinoa, couscous) | 'none'
+   group   : snacks — 'fruit' | 'dairy' | 'veg' | 'grain'
+   tags    : optional; recipes sharing a tag are similar dishes, so a
+             week gets at most one of each ("soup": at most two)
+
+   ing     : ingredients for 4 people; the shopping list is built from
+             these lines (see data/ingredients.js)
+   steps   : a step starting "Toddler tip:" / "Consejo para pequeños:"
+             is shown as a highlighted note
+   tip     : optional nutrition note ("" for none)
+   prep    : optional make-ahead tasks for the Sunday prep card, as keys
+             of prepTasks at the bottom of this file
+
+   To add a recipe, copy one of the same type and change it. Keep it
+   self-contained: any recipe can land on any day.
    ============================================================ */
 const recipes = [
   {
     "id": "chicken-stir-fry-rice-bowl",
     "type": "lunch",
+    "protein": "poultry",
+    "base": "rice",
     "name": {
       "en": "Chicken Stir-Fry Rice Bowl",
       "es": "Bowl de Arroz con Pollo Salteado"
@@ -77,6 +91,11 @@ const recipes = [
   {
     "id": "pasta-bolognese",
     "type": "lunch",
+    "protein": "beef",
+    "base": "pasta",
+    "tags": [
+      "bolognese"
+    ],
     "name": {
       "en": "Pasta Bolognese",
       "es": "Pasta Boloñesa"
@@ -134,6 +153,8 @@ const recipes = [
   {
     "id": "chicken-rice-bowl-with-avocado",
     "type": "lunch",
+    "protein": "poultry",
+    "base": "rice",
     "name": {
       "en": "Chicken Rice Bowl with Avocado",
       "es": "Bowl de Arroz con Pollo y Palta"
@@ -188,6 +209,12 @@ const recipes = [
   {
     "id": "red-lentil-and-spinach-soup",
     "type": "lunch",
+    "protein": "plant",
+    "base": "bread",
+    "tags": [
+      "soup",
+      "lentil"
+    ],
     "name": {
       "en": "Red Lentil & Spinach Soup",
       "es": "Sopa de Lentejas Rojas y Espinaca"
@@ -250,6 +277,8 @@ const recipes = [
   {
     "id": "fish-tacos-with-slaw",
     "type": "lunch",
+    "protein": "fish",
+    "base": "bread",
     "name": {
       "en": "Fish Tacos with Slaw",
       "es": "Tacos de Pescado con Ensalada de Repollo"
@@ -304,6 +333,11 @@ const recipes = [
   {
     "id": "chicken-vegetable-soup",
     "type": "lunch",
+    "protein": "poultry",
+    "base": "none",
+    "tags": [
+      "soup"
+    ],
     "name": {
       "en": "Chicken Vegetable Soup",
       "es": "Sopa de Pollo con Verduras"
@@ -365,6 +399,8 @@ const recipes = [
   {
     "id": "quinoa-bowl-with-roasted-veggies-and-chickpeas",
     "type": "lunch",
+    "protein": "plant",
+    "base": "grain",
     "name": {
       "en": "Quinoa Bowl with Roasted Veggies & Chickpeas",
       "es": "Bowl de Quinoa con Verduras Asadas y Garbanzos"
@@ -423,6 +459,11 @@ const recipes = [
   {
     "id": "tuna-pasta-salad",
     "type": "lunch",
+    "protein": "fish",
+    "base": "pasta",
+    "tags": [
+      "tuna"
+    ],
     "name": {
       "en": "Tuna Pasta Salad",
       "es": "Ensalada de Pasta con Atún"
@@ -473,6 +514,11 @@ const recipes = [
   {
     "id": "white-bean-and-vegetable-stew",
     "type": "lunch",
+    "protein": "plant",
+    "base": "bread",
+    "tags": [
+      "stew"
+    ],
     "name": {
       "en": "White Bean & Vegetable Stew",
       "es": "Guiso de Alubias Blancas y Verduras"
@@ -531,6 +577,8 @@ const recipes = [
   {
     "id": "pork-fried-rice",
     "type": "lunch",
+    "protein": "pork",
+    "base": "rice",
     "name": {
       "en": "Pork Fried Rice",
       "es": "Arroz Frito con Cerdo"
@@ -590,6 +638,8 @@ const recipes = [
   {
     "id": "caesar-chicken-wraps",
     "type": "lunch",
+    "protein": "poultry",
+    "base": "bread",
     "name": {
       "en": "Caesar Chicken Wraps",
       "es": "Wraps de Pollo César"
@@ -641,6 +691,12 @@ const recipes = [
   {
     "id": "red-lentil-soup",
     "type": "lunch",
+    "protein": "plant",
+    "base": "bread",
+    "tags": [
+      "soup",
+      "lentil"
+    ],
     "name": {
       "en": "Red Lentil Soup",
       "es": "Sopa de Lentejas Rojas"
@@ -699,6 +755,8 @@ const recipes = [
   {
     "id": "chicken-pasta-with-pesto",
     "type": "lunch",
+    "protein": "poultry",
+    "base": "pasta",
     "name": {
       "en": "Chicken Pasta with Pesto",
       "es": "Pasta con Pollo y Pesto"
@@ -754,6 +812,11 @@ const recipes = [
   {
     "id": "tuna-salad-sandwiches",
     "type": "lunch",
+    "protein": "fish",
+    "base": "bread",
+    "tags": [
+      "tuna"
+    ],
     "name": {
       "en": "Tuna Salad Sandwiches",
       "es": "Sándwiches de Ensalada de Atún"
@@ -806,6 +869,11 @@ const recipes = [
   {
     "id": "minestrone-soup-with-bread",
     "type": "lunch",
+    "protein": "plant",
+    "base": "bread",
+    "tags": [
+      "soup"
+    ],
     "name": {
       "en": "Minestrone Soup with Bread",
       "es": "Sopa Minestrone con Pan"
@@ -872,6 +940,11 @@ const recipes = [
   {
     "id": "beef-and-vegetable-stew-with-rice",
     "type": "lunch",
+    "protein": "beef",
+    "base": "rice",
+    "tags": [
+      "stew"
+    ],
     "name": {
       "en": "Beef & Vegetable Stew with Rice",
       "es": "Guiso de Carne y Verduras con Arroz"
@@ -936,6 +1009,8 @@ const recipes = [
   {
     "id": "spinach-and-egg-frittata-with-green-salad",
     "type": "lunch",
+    "protein": "egg",
+    "base": "none",
     "name": {
       "en": "Spinach & Egg Frittata with Green Salad",
       "es": "Frittata de Espinaca y Huevo con Ensalada Verde"
@@ -990,6 +1065,11 @@ const recipes = [
   {
     "id": "chicken-noodle-soup",
     "type": "lunch",
+    "protein": "poultry",
+    "base": "pasta",
+    "tags": [
+      "soup"
+    ],
     "name": {
       "en": "Chicken Noodle Soup",
       "es": "Sopa de Pollo con Fideos"
@@ -1051,6 +1131,8 @@ const recipes = [
   {
     "id": "bean-burrito-bowls",
     "type": "lunch",
+    "protein": "plant",
+    "base": "rice",
     "name": {
       "en": "Bean Burrito Bowls",
       "es": "Bowls de Burrito de Legumbres"
@@ -1114,6 +1196,11 @@ const recipes = [
   {
     "id": "tuna-and-pasta-bake",
     "type": "lunch",
+    "protein": "fish",
+    "base": "pasta",
+    "tags": [
+      "tuna"
+    ],
     "name": {
       "en": "Tuna & Pasta Bake",
       "es": "Gratinado de Atún y Pasta"
@@ -1166,6 +1253,10 @@ const recipes = [
   {
     "id": "apple-slices-with-peanut-butter-and-cheese",
     "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "apple"
+    ],
     "name": {
       "en": "Apple Slices with Peanut Butter & Cheese",
       "es": "Manzana con Mantequilla de Maní y Queso"
@@ -1204,6 +1295,10 @@ const recipes = [
   {
     "id": "yogurt-parfait-with-berries",
     "type": "snack",
+    "group": "dairy",
+    "tags": [
+      "yogurt"
+    ],
     "name": {
       "en": "Yogurt Parfait with Berries",
       "es": "Parfait de Yogur con Frutas del Bosque"
@@ -1242,6 +1337,10 @@ const recipes = [
   {
     "id": "hummus-and-veggie-sticks",
     "type": "snack",
+    "group": "veg",
+    "tags": [
+      "hummus"
+    ],
     "name": {
       "en": "Hummus & Veggie Sticks",
       "es": "Hummus con Bastones de Verdura"
@@ -1282,6 +1381,10 @@ const recipes = [
   {
     "id": "banana-with-almond-butter",
     "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "nut-butter"
+    ],
     "name": {
       "en": "Banana with Almond Butter",
       "es": "Banana con Mantequilla de Almendras"
@@ -1316,6 +1419,7 @@ const recipes = [
   {
     "id": "fresh-fruit-salad",
     "type": "snack",
+    "group": "fruit",
     "name": {
       "en": "Fresh Fruit Salad",
       "es": "Ensalada de Frutas Frescas"
@@ -1358,6 +1462,10 @@ const recipes = [
   {
     "id": "cheese-crackers-and-grapes",
     "type": "snack",
+    "group": "dairy",
+    "tags": [
+      "cheese-plate"
+    ],
     "name": {
       "en": "Cheese, Crackers & Grapes",
       "es": "Queso, Galletas y Uvas"
@@ -1396,6 +1504,10 @@ const recipes = [
   {
     "id": "green-power-smoothie",
     "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "smoothie"
+    ],
     "name": {
       "en": "Green Power Smoothie",
       "es": "Batido Verde Energizante"
@@ -1441,6 +1553,10 @@ const recipes = [
   {
     "id": "rice-cakes-with-cream-cheese-and-cucumber",
     "type": "snack",
+    "group": "grain",
+    "tags": [
+      "rice-cakes"
+    ],
     "name": {
       "en": "Rice Cakes with Cream Cheese & Cucumber",
       "es": "Galletas de Arroz con Queso Crema y Pepino"
@@ -1481,6 +1597,10 @@ const recipes = [
   {
     "id": "orange-slices-and-cheese",
     "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "cheese-plate"
+    ],
     "name": {
       "en": "Orange Slices & Cheese",
       "es": "Gajos de Naranja y Queso"
@@ -1517,6 +1637,10 @@ const recipes = [
   {
     "id": "yogurt-with-honey-and-nuts",
     "type": "snack",
+    "group": "dairy",
+    "tags": [
+      "yogurt"
+    ],
     "name": {
       "en": "Yogurt with Honey & Nuts",
       "es": "Yogur con Miel y Nueces"
@@ -1561,6 +1685,10 @@ const recipes = [
   {
     "id": "apple-slices-and-cheddar",
     "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "apple"
+    ],
     "name": {
       "en": "Apple Slices & Cheddar",
       "es": "Manzana y Queso Cheddar"
@@ -1597,6 +1725,7 @@ const recipes = [
   {
     "id": "banana-oat-muffins",
     "type": "snack",
+    "group": "grain",
     "name": {
       "en": "Banana Oat Muffins",
       "es": "Muffins de Banana y Avena"
@@ -1654,6 +1783,10 @@ const recipes = [
   {
     "id": "hummus-and-warm-pita-with-cucumber",
     "type": "snack",
+    "group": "veg",
+    "tags": [
+      "hummus"
+    ],
     "name": {
       "en": "Hummus & Warm Pita with Cucumber",
       "es": "Hummus con Pita Tibia y Pepino"
@@ -1694,6 +1827,7 @@ const recipes = [
   {
     "id": "watermelon-and-strawberry-skewers",
     "type": "snack",
+    "group": "fruit",
     "name": {
       "en": "Watermelon & Strawberry Skewers",
       "es": "Brochetas de Sandía y Frutillas"
@@ -1734,6 +1868,10 @@ const recipes = [
   {
     "id": "cheese-and-fruit-plate",
     "type": "snack",
+    "group": "dairy",
+    "tags": [
+      "cheese-plate"
+    ],
     "name": {
       "en": "Cheese & Fruit Plate",
       "es": "Tabla de Quesos y Frutas"
@@ -1774,6 +1912,10 @@ const recipes = [
   {
     "id": "pear-with-almond-butter",
     "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "nut-butter"
+    ],
     "name": {
       "en": "Pear with Almond Butter",
       "es": "Pera con Mantequilla de Almendras"
@@ -1808,6 +1950,10 @@ const recipes = [
   {
     "id": "rice-cakes-with-avocado-smash",
     "type": "snack",
+    "group": "grain",
+    "tags": [
+      "rice-cakes"
+    ],
     "name": {
       "en": "Rice Cakes with Avocado Smash",
       "es": "Galletas de Arroz con Palta Aplastada"
@@ -1852,6 +1998,10 @@ const recipes = [
   {
     "id": "berry-banana-smoothie",
     "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "smoothie"
+    ],
     "name": {
       "en": "Berry Banana Smoothie",
       "es": "Batido de Frutas del Bosque y Banana"
@@ -1897,6 +2047,12 @@ const recipes = [
   {
     "id": "beef-and-lentil-soup-with-bread",
     "type": "dinner",
+    "protein": "beef",
+    "base": "bread",
+    "tags": [
+      "soup",
+      "lentil"
+    ],
     "name": {
       "en": "Beef & Lentil Soup with Bread",
       "es": "Sopa de Carne y Lentejas con Pan"
@@ -1960,6 +2116,11 @@ const recipes = [
   {
     "id": "baked-salmon-sweet-potato-and-broccoli",
     "type": "dinner",
+    "protein": "fish",
+    "base": "potato",
+    "tags": [
+      "salmon"
+    ],
     "name": {
       "en": "Baked Salmon, Sweet Potato & Broccoli",
       "es": "Salmón al Horno con Batata y Brócoli"
@@ -2014,6 +2175,11 @@ const recipes = [
   {
     "id": "pork-tenderloin-mashed-potatoes-and-green-beans",
     "type": "dinner",
+    "protein": "pork",
+    "base": "potato",
+    "tags": [
+      "pork-tenderloin"
+    ],
     "name": {
       "en": "Pork Tenderloin, Mashed Potatoes & Green Beans",
       "es": "Lomo de Cerdo con Puré de Papas y Chauchas"
@@ -2072,6 +2238,11 @@ const recipes = [
   {
     "id": "paprika-chicken-thighs-and-roasted-veggies",
     "type": "dinner",
+    "protein": "poultry",
+    "base": "potato",
+    "tags": [
+      "traybake"
+    ],
     "name": {
       "en": "Paprika Chicken Thighs & Roasted Veggies",
       "es": "Muslos de Pollo al Pimentón con Verduras Asadas"
@@ -2126,6 +2297,11 @@ const recipes = [
   {
     "id": "beef-and-broccoli-noodles",
     "type": "dinner",
+    "protein": "beef",
+    "base": "pasta",
+    "tags": [
+      "beef-broccoli"
+    ],
     "name": {
       "en": "Beef & Broccoli Noodles",
       "es": "Fideos con Carne y Brócoli"
@@ -2180,6 +2356,8 @@ const recipes = [
   {
     "id": "pork-chops-with-apple-sauce-and-roasted-potatoes",
     "type": "dinner",
+    "protein": "pork",
+    "base": "potato",
     "name": {
       "en": "Pork Chops with Apple Sauce & Roasted Potatoes",
       "es": "Chuletas de Cerdo con Compota de Manzana y Papas Asadas"
@@ -2235,6 +2413,11 @@ const recipes = [
   {
     "id": "hearty-beef-stew-with-bread",
     "type": "dinner",
+    "protein": "beef",
+    "base": "bread",
+    "tags": [
+      "stew"
+    ],
     "name": {
       "en": "Hearty Beef Stew with Bread",
       "es": "Guiso de Carne con Pan"
@@ -2300,6 +2483,8 @@ const recipes = [
   {
     "id": "chicken-curry-with-rice",
     "type": "dinner",
+    "protein": "poultry",
+    "base": "rice",
     "name": {
       "en": "Chicken Curry with Rice",
       "es": "Curry de Pollo con Arroz"
@@ -2365,6 +2550,8 @@ const recipes = [
   {
     "id": "baked-cod-with-quinoa-and-asparagus",
     "type": "dinner",
+    "protein": "fish",
+    "base": "grain",
     "name": {
       "en": "Baked Cod with Quinoa & Asparagus",
       "es": "Bacalao al Horno con Quinoa y Espárragos"
@@ -2420,6 +2607,8 @@ const recipes = [
   {
     "id": "beef-burgers-and-sweet-potato-fries",
     "type": "dinner",
+    "protein": "beef",
+    "base": "bread",
     "name": {
       "en": "Beef Burgers & Sweet Potato Fries",
       "es": "Hamburguesas con Papas Fritas de Batata"
@@ -2482,6 +2671,11 @@ const recipes = [
   {
     "id": "salmon-with-couscous-and-roasted-vegetables",
     "type": "dinner",
+    "protein": "fish",
+    "base": "grain",
+    "tags": [
+      "salmon"
+    ],
     "name": {
       "en": "Salmon with Couscous & Roasted Vegetables",
       "es": "Salmón con Cuscús y Verduras Asadas"
@@ -2540,6 +2734,8 @@ const recipes = [
   {
     "id": "pork-ribs-with-coleslaw-and-corn",
     "type": "dinner",
+    "protein": "pork",
+    "base": "none",
     "name": {
       "en": "Pork Ribs with Coleslaw & Corn",
       "es": "Costillas de Cerdo con Ensalada de Repollo y Choclo"
@@ -2599,6 +2795,11 @@ const recipes = [
   {
     "id": "beef-bolognese-with-spaghetti",
     "type": "dinner",
+    "protein": "beef",
+    "base": "pasta",
+    "tags": [
+      "bolognese"
+    ],
     "name": {
       "en": "Beef Bolognese with Spaghetti",
       "es": "Spaghetti Boloñés"
@@ -2665,6 +2866,8 @@ const recipes = [
   {
     "id": "chicken-and-mushroom-risotto",
     "type": "dinner",
+    "protein": "poultry",
+    "base": "rice",
     "name": {
       "en": "Chicken & Mushroom Risotto",
       "es": "Risotto de Pollo y Champiñones"
@@ -2730,6 +2933,8 @@ const recipes = [
   {
     "id": "baked-fish-and-chips",
     "type": "dinner",
+    "protein": "fish",
+    "base": "potato",
     "name": {
       "en": "Baked Fish & Chips",
       "es": "Pescado Rebozado al Horno con Papas"
@@ -2788,6 +2993,8 @@ const recipes = [
   {
     "id": "chicken-enchiladas",
     "type": "dinner",
+    "protein": "poultry",
+    "base": "bread",
     "name": {
       "en": "Chicken Enchiladas",
       "es": "Enchiladas de Pollo"
@@ -2851,6 +3058,11 @@ const recipes = [
   {
     "id": "pork-tenderloin-with-roasted-root-vegetables",
     "type": "dinner",
+    "protein": "pork",
+    "base": "potato",
+    "tags": [
+      "pork-tenderloin"
+    ],
     "name": {
       "en": "Pork Tenderloin with Roasted Root Vegetables",
       "es": "Lomo de Cerdo con Verduras de Raíz Asadas"
@@ -2912,6 +3124,11 @@ const recipes = [
   {
     "id": "baked-salmon-quinoa-and-asparagus",
     "type": "dinner",
+    "protein": "fish",
+    "base": "grain",
+    "tags": [
+      "salmon"
+    ],
     "name": {
       "en": "Baked Salmon, Quinoa & Asparagus",
       "es": "Salmón al Horno con Quinoa y Espárragos"
@@ -2969,6 +3186,11 @@ const recipes = [
   {
     "id": "beef-and-broccoli-stir-fry-with-rice",
     "type": "dinner",
+    "protein": "beef",
+    "base": "rice",
+    "tags": [
+      "beef-broccoli"
+    ],
     "name": {
       "en": "Beef & Broccoli Stir-Fry with Rice",
       "es": "Salteado de Carne y Brócoli con Arroz"
@@ -3030,6 +3252,11 @@ const recipes = [
   {
     "id": "chicken-and-potato-traybake",
     "type": "dinner",
+    "protein": "poultry",
+    "base": "potato",
+    "tags": [
+      "traybake"
+    ],
     "name": {
       "en": "Chicken & Potato Traybake",
       "es": "Pollo y Papas al Horno"

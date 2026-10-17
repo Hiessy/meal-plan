@@ -1,5 +1,6 @@
 /* ============================================================
-   Ingredient dictionary — turns recipe lines into a shopping list
+   Ingredients — the dictionary js/lists.js uses to turn recipe
+   lines into a shopping list
 
    Every ingredient line of the week's recipes (English text) is
    checked against `match`, top to bottom; the first hit decides the

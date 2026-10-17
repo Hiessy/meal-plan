@@ -1,0 +1,168 @@
+/* ============================================================
+   Fx — the flashy layer: motion, glow, confetti and the sound
+   button. The page works the same without this file and
+   js/fx.js. Everything that moves sits inside the
+   prefers-reduced-motion block, so it only runs for visitors
+   who haven't asked their device to cut down on motion.
+   ============================================================ */
+
+/* ── Sound on / off (added to the header by js/fx.js) ─────── */
+.fx-sound {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  left: max(1rem, env(safe-area-inset-left));
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(255,255,255,.6);
+  border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  backdrop-filter: blur(8px);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.fx-sound[aria-pressed="false"] { opacity: .7; }
+@media (hover: hover) { .fx-sound:hover { background: rgba(255,255,255,.38); } }
+@media print { .fx-sound { display: none; } }
+
+/* ── Confetti when a list is fully ticked (js/fx.js) ──────── */
+.fx-confetti {
+  position: fixed;
+  z-index: 450;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.fx-confetti i {
+  position: absolute;
+  left: -4px;
+  top: -6px;
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  animation: fx-confetti 1.2s cubic-bezier(.15,.7,.35,1) forwards;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* ── Always on ──────────────────────────────────────────── */
+  /* A light sweep across the header */
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.12) 50%, transparent 70%);
+    background-size: 200% 100%;
+    animation: fx-shimmer 6s linear infinite;
+    pointer-events: none;
+  }
+  /* Today's card breathes */
+  .day-col.today { animation: fx-glow 3s ease-in-out infinite; }
+
+  /* ── Smooth changes ─────────────────────────────────────── */
+  .lang-btn, .fx-sound, .tab-btn, .day-col, .tool-btn, .swap-btn, .offset-btn, .nav-btn,
+  .modal-close, .info-btn, .hint-close, .prep-head, .shopping-toggle, .sunday-prep .check, .chip {
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease),
+                box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .meal-slot { transition: background var(--dur) var(--ease); }
+  .chev, .arrow { transition: transform var(--dur) var(--ease); }
+  .check input { transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+  .progress-pill { transition: background var(--dur) var(--ease), color var(--dur) var(--ease); }
+
+  /* Recipe sheet: zooms in on wide screens, slides up on phones */
+  .modal-overlay { transition: opacity .22s var(--ease), visibility .22s var(--ease); }
+  .modal {
+    transform: scale(.95) translateY(18px);
+    transition: transform .3s cubic-bezier(.2,.9,.3,1.15);
+  }
+  .modal-overlay.open .modal { transform: none; }
+  @media (max-width: 600px) {
+    .modal { transform: translateY(100%); transition-timing-function: cubic-bezier(.2,.9,.3,1); }
+  }
+
+  .toast {
+    transform: translate(-50%, 16px);
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .toast.show { transform: translate(-50%, 0); }
+  .tooltip { transition: opacity .12s var(--ease), visibility .12s var(--ease); }
+
+  /* ── Hover lifts, shine and wiggles (real pointers only) ── */
+  @media (hover: hover) {
+    .lang-btn:hover, .fx-sound:hover { transform: scale(1.06); }
+    .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(197, 140, 34, .38); }
+    .day-col:hover { transform: translateY(-4px); box-shadow: var(--sh-green); }
+    .day-col.today:hover { box-shadow: 0 0 0 4px rgba(183, 121, 63, .3), var(--sh-green); }
+
+    /* a streak of light runs across a meal */
+    .meal-slot { position: relative; overflow: hidden; }
+    .meal-slot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,.75) 50%, transparent 65%);
+      transform: translateX(-100%);
+      pointer-events: none;
+    }
+    .meal-slot:hover::after { transform: translateX(100%); transition: transform .65s var(--ease); }
+    .meal-slot:hover .chev { transform: translateX(4px); }
+
+    .tool-btn:hover, .swap-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(139, 94, 60, .18); }
+    .tool-btn:hover .ico, .swap-btn:hover .ico { animation: fx-wiggle .5s var(--ease); }
+    [data-action="shuffle"]:hover .ico, .swap-btn:hover .ico { animation: fx-roll .6s var(--ease); }
+    .offset-btn:hover { transform: scale(1.08); }
+    .nav-btn:not(:disabled):hover { transform: translateY(-1px); }
+    .modal-close:hover { transform: rotate(90deg) scale(1.08); }
+    .chip:hover { transform: translateY(-1px); border-color: var(--color-primary); }
+  }
+
+  /* ── Moments — classes added by js/fx.js ────────────────── */
+  .meal-slot.fx-deal { animation: fx-deal .45s cubic-bezier(.2,.8,.3,1.15) both; animation-delay: calc(var(--fx-i, 0) * 28ms); }
+  .day-col.fx-rise, .day-col.today.fx-rise { animation: fx-rise .4s var(--ease) both; animation-delay: calc(var(--fx-i, 0) * 50ms); }
+  .fx-pop, .day-col.today.fx-pop { animation: fx-pop .5s cubic-bezier(.2,.9,.3,1.4); }
+  .day-col.fx-flash, .day-col.today.fx-flash { animation: fx-flash 1.2s var(--ease); }
+  .check input.fx-check { animation: fx-check .32s cubic-bezier(.2,.9,.3,1.6); }
+}
+
+@keyframes fx-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+@keyframes fx-glow {
+  50% { box-shadow: 0 0 0 7px rgba(183, 121, 63, .28), var(--sh-md); }
+}
+@keyframes fx-deal {
+  from { opacity: 0; transform: perspective(600px) rotateX(-75deg) translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fx-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fx-pop {
+  40% { transform: scale(1.06); box-shadow: 0 0 0 4px rgba(183, 121, 63, .35); }
+}
+@keyframes fx-flash {
+  30% { box-shadow: 0 0 0 10px rgba(183, 121, 63, .45), var(--sh-md); }
+}
+@keyframes fx-check {
+  0%   { transform: scale(.6); }
+  60%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+@keyframes fx-wiggle {
+  25% { transform: rotate(-14deg); }
+  75% { transform: rotate(14deg); }
+}
+@keyframes fx-roll {
+  to { transform: rotate(360deg); }
+}
+@keyframes fx-confetti {
+  0%   { transform: translate(0, 0) rotate(0) scale(.6); opacity: 1; }
+  45%  { transform: translate(var(--x), var(--y)) rotate(calc(var(--r) / 2)); opacity: 1; }
+  100% { transform: translate(calc(var(--x) * 1.15), calc(var(--y) + 140px)) rotate(var(--r)); opacity: 0; }
+}
