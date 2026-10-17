@@ -28,6 +28,30 @@
 @media (hover: hover) { .fx-sound:hover { background: rgba(255,255,255,.38); } }
 @media print { .fx-sound { display: none; } }
 
+/* ── Pixel kitchen (built by js/fx.js) ────────────────────── */
+.px { overflow: hidden; pointer-events: auto; cursor: default; }
+.px svg { display: block; }
+header .px { position: absolute; z-index: 0; bottom: 14px; }
+header .px-pot { left: 7%; }
+header .px-pan { right: 7%; }
+.px-kitchen {
+  position: relative;
+  max-width: 1440px;
+  height: 56px;
+  margin: 0 auto;
+  pointer-events: none;
+}
+.px-kitchen .px-toaster { position: absolute; left: 1.25rem; bottom: 0; }
+.px-walker { position: absolute; bottom: 0; left: 50%; }
+.px-chef { filter: drop-shadow(0 0 1px rgba(59, 42, 31, .7)); }
+@media (max-width: 600px) {
+  header .px { bottom: auto; top: 12px; transform: scale(.67); transform-origin: top center; }
+  header .px-pot { left: calc(50% - 64px); }
+  header .px-pan { right: auto; left: calc(50% + 4px); }
+  .px-kitchen .px-toaster { left: .85rem; }
+}
+@media print { .px, .px-kitchen { display: none; } }
+
 /* ── Confetti when a list is fully ticked (js/fx.js) ──────── */
 .fx-confetti {
   position: fixed;
@@ -120,6 +144,14 @@
     .chip:hover { transform: translateY(-1px); border-color: var(--color-primary); }
   }
 
+  /* ── Pixel kitchen: step through the frames; the chef strolls ── */
+  .px svg { animation: px-play var(--px-time, 1s) steps(var(--frames, 1)) infinite; }
+  .px-walker { animation: px-stroll 26s linear infinite; }
+  @media (hover: hover) {
+    header .px:hover, .px-toaster:hover { translate: 0 -3px; transition: translate .15s; }
+  }
+  .meal-slot:hover .flask { display: inline-block; animation: fx-flask .9s ease-in-out infinite; }
+
   /* ── Moments — classes added by js/fx.js ────────────────── */
   .meal-slot.fx-deal { animation: fx-deal .45s cubic-bezier(.2,.8,.3,1.15) both; animation-delay: calc(var(--fx-i, 0) * 28ms); }
   .day-col.fx-rise, .day-col.today.fx-rise { animation: fx-rise .4s var(--ease) both; animation-delay: calc(var(--fx-i, 0) * 50ms); }
@@ -128,6 +160,22 @@
   .check input.fx-check { animation: fx-check .32s cubic-bezier(.2,.9,.3,1.6); }
 }
 
+@keyframes px-play {
+  to { transform: translateX(-100%); }
+}
+/* Walk to the right edge, turn around, walk back */
+@keyframes px-stroll {
+  0%     { left: 80px;               transform: scaleX(1); }
+  49.9%  { left: calc(100% - 52px);  transform: scaleX(1); }
+  50%    { left: calc(100% - 52px);  transform: scaleX(-1); }
+  99.9%  { left: 80px;               transform: scaleX(-1); }
+  100%   { left: 80px;               transform: scaleX(1); }
+}
+@keyframes fx-flask {
+  0%, 100% { transform: rotate(0) translateY(0); }
+  25%      { transform: rotate(-12deg) translateY(-2px); }
+  75%      { transform: rotate(12deg) translateY(-1px); }
+}
 @keyframes fx-shimmer {
   from { background-position: 200% 0; }
   to   { background-position: -200% 0; }

@@ -289,7 +289,8 @@ function renderModal() {
   byId('m-name').textContent = d.name[lang];
   byId('m-meta').innerHTML =
     `<span class="meal-badge badge-${d.type}">${mt.icon} ${mt.label}</span>` +
-    `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>`;
+    `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>` +
+    (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">🧪 ${t('experimental')}</span>` : '');
 
   const swapBtn = byId('m-swap');
   swapBtn.innerHTML = `<span class="ico">🔄</span> ${t('swap')}`;
@@ -628,7 +629,9 @@ function buildBalance(meals) {
     egg: range(R.breakfasts.group.egg), fish: range(R.mains.protein.fish), plant: R.mains.protein.plant[0],
     red: R.mains.redMeat[1], fruit: range(R.snacks.group.fruit)
   });
-  return `<div class="balance" data-tip="${esc(tip)}">
+  if (s.experimental) groups.push([{ html: `<span class="chip chip-exp">🧪 ${s.experimental}</span>` }]);
+  const expLine = s.experimental ? '\n' + t('experimentalCount')(s.experimental, R.experimental[1]) : '';
+  return `<div class="balance" data-tip="${esc(tip + expLine)}">
     <span class="balance-label">⚖️ ${t('balance')}</span>
     ${groups.map(g => g.map(c => c.html).join('')).join('<span class="balance-sep" aria-hidden="true"></span>')}
   </div>`;
@@ -663,14 +666,16 @@ function buildWeek(n) {
       const slot = k % Planner.SLOTS;
       const mt = mealTypes[recipe.type];
       const tip = [
+        recipe.experimental && t('tipExperimental'),
         t('tipMeal')(recipe.ing[lang].length, recipe.steps[lang].length),
         recipe.tip && recipe.tip[lang] && '💚 ' + recipe.tip[lang],
         openHint
       ].filter(Boolean).join('\n');
       return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}"
-        data-day="${di}" data-slot="${slot}" data-tip="${esc(tip)}">
+        data-day="${di}" data-slot="${slot}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
         <span class="meal-badge badge-${recipe.type}">${mt.icon} ${mt.label}</span>
-        <span class="meal-name">${recipe.name[lang]}</span>
+        <span class="meal-name">${recipe.name[lang]}${recipe.experimental
+          ? ` <span class="flask" role="img" aria-label="${esc(t('experimental'))}">🧪</span>` : ''}</span>
         <span class="chev" aria-hidden="true">›</span>
       </button>`;
     }).join('');

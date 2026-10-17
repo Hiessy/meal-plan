@@ -32,6 +32,8 @@ const i18n = {
     todayBtn:        'Today',
     today:           'Today',
     balance:         'Balance',
+    experimental:    'Experimental',
+    experimentalCount: (n, max) => `🧪 Experimental recipes this week: ${n} (never more than ${max})`,
     prepTitle:       d => `Sunday, ${d} — Meal Prep`,
     prepFor:         'for',
     shopping:        'Shopping List',
@@ -64,6 +66,7 @@ const i18n = {
 
     /* Tooltips */
     tipLang:         'Switch the whole page to Spanish',
+    tipExperimental: '🧪 Experimental — a new recipe the family has not tried yet. Tell us how it went!',
     tipTab:          range => `Show the menu for ${range}`,
     tipMeal:         (ing, steps) => `${ing} ingredient${ing === 1 ? '' : 's'} · ${steps} step${steps === 1 ? '' : 's'}`,
     tipMealMouse:    'Click to open the full recipe',
@@ -134,6 +137,8 @@ const i18n = {
     todayBtn:        'Hoy',
     today:           'Hoy',
     balance:         'Equilibrio',
+    experimental:    'Experimental',
+    experimentalCount: (n, max) => `🧪 Recetas experimentales esta semana: ${n} (nunca más de ${max})`,
     prepTitle:       d => `Domingo ${d} — Preparación`,
     prepFor:         'para',
     shopping:        'Lista de Compras',
@@ -166,6 +171,7 @@ const i18n = {
 
     /* Tooltips */
     tipLang:         'Ver toda la página en inglés',
+    tipExperimental: '🧪 Experimental — una receta nueva que la familia todavía no probó. ¡Contanos cómo salió!',
     tipTab:          range => `Ver el menú del ${range}`,
     tipMeal:         (ing, steps) => `${ing} ingrediente${ing === 1 ? '' : 's'} · ${steps} paso${steps === 1 ? '' : 's'}`,
     tipMealMouse:    'Hacé clic para ver la receta completa',

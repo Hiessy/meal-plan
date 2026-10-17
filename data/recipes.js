@@ -25,6 +25,8 @@
    tip     : optional nutrition note ("" for none)
    prep    : optional make-ahead tasks for the Sunday prep card, as keys
              of prepTasks at the bottom of this file
+   experimental : true for a new, not yet family-tested recipe — shown
+             with a 🧪 flask; at most two land in a week
 
    To add a recipe, copy one of the same type and change it. Keep it
    self-contained: any recipe can land on any day.
@@ -132,6 +134,9 @@ const recipes = [
     "id": "breakfast-burritos",
     "type": "breakfast",
     "group": "egg",
+    "tags": [
+      "tortilla"
+    ],
     "name": {
       "en": "Breakfast Burritos",
       "es": "Burritos de Desayuno"
@@ -835,6 +840,937 @@ const recipes = [
     }
   },
   {
+    "id": "egg-in-a-hole-toast",
+    "type": "breakfast",
+    "group": "egg",
+    "name": {
+      "en": "Egg-in-a-Hole Toast",
+      "es": "Huevo en la Ventana"
+    },
+    "ing": {
+      "en": [
+        "8 slices whole-grain bread",
+        "8 eggs",
+        "2 tbsp butter",
+        "1 cup cherry tomatoes, halved",
+        "Salt & pepper"
+      ],
+      "es": [
+        "8 rebanadas de pan integral",
+        "8 huevos",
+        "2 cdas manteca",
+        "1 taza tomates cherry en mitades",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Cut a hole in the middle of each slice with a glass.",
+        "Melt a little butter in a pan; add the bread and crack an egg into each hole.",
+        "Cook 3 min, flip, and cook 2–3 min more until the yolk is firm.",
+        "Toast the cut-out circles in the pan for dipping; serve with tomatoes.",
+        "Toddler tip: cut into small squares once cooled."
+      ],
+      "es": [
+        "Hacer un agujero en el centro de cada rebanada con un vaso.",
+        "Derretir un poco de manteca en una sartén; poner el pan y cascar un huevo en cada agujero.",
+        "Cocinar 3 min, dar vuelta y cocinar 2–3 min más hasta que la yema esté firme.",
+        "Tostar los círculos recortados para mojar; servir con los tomates.",
+        "Consejo para pequeños: cortar en cuadraditos cuando se enfríe."
+      ]
+    },
+    "tip": {
+      "en": "Kids love the \"window\" — and it is a sneaky way to get a whole egg in.",
+      "es": "A los chicos les encanta la \"ventana\" — y es una forma fácil de que coman un huevo entero."
+    }
+  },
+  {
+    "id": "breakfast-shakshuka",
+    "type": "breakfast",
+    "group": "egg",
+    "name": {
+      "en": "Breakfast Shakshuka",
+      "es": "Shakshuka de Desayuno"
+    },
+    "ing": {
+      "en": [
+        "1 onion, diced",
+        "1 red bell pepper, diced",
+        "2 cloves garlic, minced",
+        "1 can (400g) crushed tomatoes",
+        "1 tsp cumin",
+        "1 tsp paprika",
+        "6 eggs",
+        "2 tbsp olive oil",
+        "4 slices whole-grain bread, to serve"
+      ],
+      "es": [
+        "1 cebolla picada",
+        "1 morrón rojo picado",
+        "2 dientes de ajo picados",
+        "1 lata (400 g) tomates triturados",
+        "1 cdita comino",
+        "1 cdita pimentón",
+        "6 huevos",
+        "2 cdas aceite de oliva",
+        "4 rebanadas de pan integral, para acompañar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sauté onion and pepper in olive oil 5 min; add garlic, cumin, and paprika.",
+        "Add tomatoes and simmer 8 min until thick.",
+        "Make 6 wells and crack in the eggs; cover and cook 8–10 min until the eggs are fully set.",
+        "Serve straight from the pan with toast for dipping.",
+        "Toddler tip: mash an egg into a little sauce and serve with toast fingers."
+      ],
+      "es": [
+        "Saltear la cebolla y el morrón en aceite de oliva 5 min; agregar el ajo, el comino y el pimentón.",
+        "Agregar los tomates y cocinar 8 min hasta que espese.",
+        "Hacer 6 huecos y cascar los huevos; tapar y cocinar 8–10 min hasta que estén bien cocidos.",
+        "Servir directo de la sartén con tostadas para mojar.",
+        "Consejo para pequeños: pisar un huevo con un poco de salsa y servir con bastones de tostada."
+      ]
+    },
+    "tip": {
+      "en": "Tomatoes add lycopene and vitamin C; keep the lid on until every yolk is firm for mom.",
+      "es": "El tomate aporta licopeno y vitamina C; dejar la tapa hasta que todas las yemas estén firmes para mamá."
+    }
+  },
+  {
+    "id": "egg-and-cheese-quesadillas",
+    "type": "breakfast",
+    "group": "egg",
+    "tags": [
+      "tortilla"
+    ],
+    "name": {
+      "en": "Egg & Cheese Quesadillas",
+      "es": "Quesadillas de Huevo y Queso"
+    },
+    "ing": {
+      "en": [
+        "6 eggs",
+        "4 large flour tortillas",
+        "1 cup shredded cheese",
+        "1 cup fresh spinach, chopped",
+        "1 tbsp butter",
+        "1 avocado, sliced, to serve"
+      ],
+      "es": [
+        "6 huevos",
+        "4 tortillas de harina grandes",
+        "1 taza queso rallado",
+        "1 taza espinaca fresca picada",
+        "1 cda manteca",
+        "1 palta en rodajas, para acompañar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Scramble the eggs with the spinach in butter until fully cooked.",
+        "Spread eggs and cheese over half of each tortilla; fold.",
+        "Toast in a dry pan 2 min per side until the cheese melts.",
+        "Cut into wedges and serve with avocado.",
+        "Toddler tip: cut into thin strips once slightly cooled."
+      ],
+      "es": [
+        "Revolver los huevos con la espinaca en manteca hasta que estén bien cocidos.",
+        "Repartir el huevo y el queso sobre media tortilla; doblar.",
+        "Dorar en sartén seca 2 min por lado hasta que el queso se derrita.",
+        "Cortar en triángulos y servir con palta.",
+        "Consejo para pequeños: cortar en tiras finas cuando se entibie."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "boiled-eggs-with-toast-soldiers",
+    "type": "breakfast",
+    "group": "egg",
+    "name": {
+      "en": "Boiled Eggs with Toast Soldiers",
+      "es": "Huevos Duros con Soldaditos de Pan"
+    },
+    "ing": {
+      "en": [
+        "8 eggs",
+        "8 slices whole-grain bread",
+        "2 tbsp butter",
+        "2 oranges, cut into wedges",
+        "Salt"
+      ],
+      "es": [
+        "8 huevos",
+        "8 rebanadas de pan integral",
+        "2 cdas manteca",
+        "2 naranjas en gajos",
+        "Sal"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Lower the eggs into boiling water and cook 9–10 min for firm yolks.",
+        "Cool in cold water for 1 min, then peel or serve in egg cups.",
+        "Toast and butter the bread; cut into strips (\"soldiers\").",
+        "Serve with a pinch of salt and orange wedges.",
+        "Toddler tip: chop the egg finely and mix with a little butter on toast."
+      ],
+      "es": [
+        "Poner los huevos en agua hirviendo y cocinar 9–10 min para que la yema quede firme.",
+        "Enfriar 1 min en agua fría; pelar o servir en hueveras.",
+        "Tostar el pan, untar con manteca y cortar en tiras (\"soldaditos\").",
+        "Servir con una pizca de sal y gajos de naranja.",
+        "Consejo para pequeños: picar el huevo bien fino y mezclar con un poco de manteca sobre la tostada."
+      ]
+    },
+    "tip": {
+      "en": "Firm-cooked eggs are the safe choice in pregnancy — and still full of choline.",
+      "es": "Los huevos bien cocidos son la opción segura en el embarazo — y siguen llenos de colina."
+    }
+  },
+  {
+    "id": "blueberry-oat-muffins",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "muffin"
+    ],
+    "name": {
+      "en": "Blueberry Oat Muffins",
+      "es": "Muffins de Avena y Arándanos"
+    },
+    "ing": {
+      "en": [
+        "2 cups rolled oats",
+        "1 cup flour",
+        "2 tsp baking powder",
+        "2 eggs",
+        "1 cup milk",
+        "¼ cup honey",
+        "3 tbsp butter, melted",
+        "1 cup blueberries (fresh or frozen)"
+      ],
+      "es": [
+        "2 tazas avena arrollada",
+        "1 taza harina",
+        "2 cditas polvo para hornear",
+        "2 huevos",
+        "1 taza leche",
+        "¼ taza miel",
+        "3 cdas manteca derretida",
+        "1 taza arándanos (frescos o congelados)"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to 180°C / 350°F; line a 12-cup muffin tin.",
+        "Mix oats, flour, and baking powder; whisk in eggs, milk, honey, and butter.",
+        "Fold in the blueberries and fill the cups.",
+        "Bake 20–22 min until golden; cool on a rack.",
+        "Toddler tip: crumble into small pieces; for babies under 1, bake a few without honey."
+      ],
+      "es": [
+        "Precalentar el horno a 180 °C; forrar un molde de 12 muffins.",
+        "Mezclar la avena, la harina y el polvo para hornear; incorporar los huevos, la leche, la miel y la manteca.",
+        "Agregar los arándanos con movimientos suaves y llenar los moldes.",
+        "Hornear 20–22 min hasta dorar; enfriar sobre rejilla.",
+        "Consejo para pequeños: desmenuzar en trocitos; para menores de 1 año, hornear algunos sin miel."
+      ]
+    },
+    "tip": {
+      "en": "Bake once, eat twice — they keep 3 days in a tin or freeze well.",
+      "es": "Se hornean una vez y rinden dos desayunos — duran 3 días en lata o se congelan."
+    },
+    "prep": [
+      "blueberry-muffins"
+    ]
+  },
+  {
+    "id": "granola-bowls-with-milk-and-fruit",
+    "type": "breakfast",
+    "group": "grain",
+    "name": {
+      "en": "Granola Bowls with Milk & Fruit",
+      "es": "Bowls de Granola con Leche y Fruta"
+    },
+    "ing": {
+      "en": [
+        "2 cups granola",
+        "3 cups milk",
+        "2 bananas, sliced",
+        "1 cup strawberries, chopped",
+        "2 tbsp mixed nuts, chopped (optional)"
+      ],
+      "es": [
+        "2 tazas granola",
+        "3 tazas leche",
+        "2 bananas en rodajas",
+        "1 taza frutillas picadas",
+        "2 cdas frutos secos picados (opcional)"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Divide granola among 4 bowls.",
+        "Top with banana and strawberries.",
+        "Pour over cold milk and sprinkle with nuts.",
+        "Toddler tip: soak their granola in milk for 5 min to soften; no whole nuts."
+      ],
+      "es": [
+        "Repartir la granola en 4 bols.",
+        "Cubrir con banana y frutillas.",
+        "Agregar leche fría y espolvorear con frutos secos.",
+        "Consejo para pequeños: remojar la granola en leche 5 min para ablandarla; sin frutos secos enteros."
+      ]
+    },
+    "tip": {
+      "en": "Pick a granola with little added sugar — the fruit brings the sweetness.",
+      "es": "Elegí una granola con poca azúcar agregada — la fruta aporta el dulzor."
+    }
+  },
+  {
+    "id": "peanut-butter-banana-oatmeal",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "oats",
+      "nut-butter"
+    ],
+    "name": {
+      "en": "Peanut Butter Banana Oatmeal",
+      "es": "Avena con Mantequilla de Maní y Banana"
+    },
+    "ing": {
+      "en": [
+        "1½ cups rolled oats",
+        "3 cups milk",
+        "2 bananas, mashed",
+        "3 tbsp peanut butter",
+        "½ tsp cinnamon"
+      ],
+      "es": [
+        "1½ tazas avena arrollada",
+        "3 tazas leche",
+        "2 bananas pisadas",
+        "3 cdas mantequilla de maní",
+        "½ cdita canela"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Simmer oats and milk 5 min, stirring.",
+        "Stir in mashed banana and cinnamon.",
+        "Serve with a swirl of peanut butter on top.",
+        "Toddler tip: stir the peanut butter in well rather than serving a thick dollop."
+      ],
+      "es": [
+        "Cocinar la avena con la leche 5 min, revolviendo.",
+        "Incorporar la banana pisada y la canela.",
+        "Servir con un remolino de mantequilla de maní por encima.",
+        "Consejo para pequeños: mezclar bien la mantequilla de maní en lugar de servir un pegote."
+      ]
+    },
+    "tip": {
+      "en": "Protein from milk and peanuts keeps everyone going until lunch.",
+      "es": "La proteína de la leche y el maní deja a todos con energía hasta el almuerzo."
+    }
+  },
+  {
+    "id": "ricotta-and-pear-toast",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "toast"
+    ],
+    "name": {
+      "en": "Ricotta & Pear Toast",
+      "es": "Tostadas con Ricota y Pera"
+    },
+    "ing": {
+      "en": [
+        "8 slices whole-grain bread",
+        "250g ricotta",
+        "2 pears, thinly sliced",
+        "1 tbsp honey",
+        "½ tsp cinnamon"
+      ],
+      "es": [
+        "8 rebanadas de pan integral",
+        "250 g ricota",
+        "2 peras en láminas finas",
+        "1 cda miel",
+        "½ cdita canela"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Toast the bread.",
+        "Spread generously with ricotta.",
+        "Top with pear slices, a drizzle of honey, and cinnamon.",
+        "Toddler tip: no honey under 1 — the fruit sweetens it enough."
+      ],
+      "es": [
+        "Tostar el pan.",
+        "Untar generosamente con ricota.",
+        "Cubrir con las peras, un hilo de miel y canela.",
+        "Consejo para pequeños: sin miel antes del año — la fruta endulza lo suficiente."
+      ]
+    },
+    "tip": {
+      "en": "Ricotta is a mild, pasteurised cheese rich in calcium — great in pregnancy.",
+      "es": "La ricota es un queso suave y pasteurizado, rico en calcio — ideal en el embarazo."
+    }
+  },
+  {
+    "id": "banana-bread-slices",
+    "type": "breakfast",
+    "group": "grain",
+    "name": {
+      "en": "Banana Bread Slices",
+      "es": "Budín de Banana"
+    },
+    "ing": {
+      "en": [
+        "3 ripe bananas",
+        "2 eggs",
+        "⅓ cup honey",
+        "3 tbsp butter, melted",
+        "1½ cups flour",
+        "1 tsp baking powder",
+        "1 tsp cinnamon",
+        "2 cups milk, to drink"
+      ],
+      "es": [
+        "3 bananas maduras",
+        "2 huevos",
+        "⅓ taza miel",
+        "3 cdas manteca derretida",
+        "1½ tazas harina",
+        "1 cdita polvo para hornear",
+        "1 cdita canela",
+        "2 tazas leche, para tomar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to 175°C / 350°F; line a loaf tin.",
+        "Mash bananas; whisk in eggs, honey, and butter.",
+        "Fold in flour, baking powder, and cinnamon.",
+        "Bake 50–55 min until a skewer comes out clean; cool before slicing.",
+        "Serve slices with a glass of milk."
+      ],
+      "es": [
+        "Precalentar el horno a 175 °C; forrar un molde de budín.",
+        "Pisar las bananas; incorporar los huevos, la miel y la manteca.",
+        "Agregar la harina, el polvo para hornear y la canela, mezclando suave.",
+        "Hornear 50–55 min hasta que un palillo salga limpio; enfriar antes de cortar.",
+        "Servir las porciones con un vaso de leche."
+      ]
+    },
+    "tip": {
+      "en": "A great way to use spotty bananas — it keeps 4 days wrapped.",
+      "es": "Ideal para usar bananas muy maduras — dura 4 días envuelto."
+    },
+    "prep": [
+      "banana-bread"
+    ]
+  },
+  {
+    "id": "apple-cinnamon-pancakes",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "pancakes"
+    ],
+    "name": {
+      "en": "Apple Cinnamon Pancakes",
+      "es": "Pancakes de Manzana y Canela"
+    },
+    "ing": {
+      "en": [
+        "1½ cups flour",
+        "2 tsp baking powder",
+        "1 tsp cinnamon",
+        "2 eggs",
+        "1¼ cups milk",
+        "2 apples, grated",
+        "1 tbsp butter, for the pan",
+        "Maple syrup, to serve"
+      ],
+      "es": [
+        "1½ tazas harina",
+        "2 cditas polvo para hornear",
+        "1 cdita canela",
+        "2 huevos",
+        "1¼ tazas leche",
+        "2 manzanas ralladas",
+        "1 cda manteca, para la sartén",
+        "Jarabe de arce, para servir"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Whisk flour, baking powder, and cinnamon; add eggs and milk and mix until just smooth.",
+        "Stir in the grated apple.",
+        "Cook small ladlefuls in a buttered pan, 2 min per side.",
+        "Serve with a little maple syrup.",
+        "Toddler tip: cut into strips; skip the syrup."
+      ],
+      "es": [
+        "Batir la harina, el polvo para hornear y la canela; agregar los huevos y la leche y mezclar apenas.",
+        "Incorporar la manzana rallada.",
+        "Cocinar cucharones chicos en sartén con manteca, 2 min por lado.",
+        "Servir con un poco de jarabe de arce.",
+        "Consejo para pequeños: cortar en tiras; sin jarabe."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "arroz-con-leche",
+    "type": "breakfast",
+    "group": "dairy",
+    "name": {
+      "en": "Arroz con Leche (Creamy Rice Pudding)",
+      "es": "Arroz con Leche"
+    },
+    "ing": {
+      "en": [
+        "1 cup short-grain rice",
+        "5 cups milk",
+        "1 cinnamon stick or 1 tsp cinnamon",
+        "3 tbsp sugar",
+        "1 tsp vanilla",
+        "Zest of 1 orange"
+      ],
+      "es": [
+        "1 taza arroz de grano corto",
+        "5 tazas leche",
+        "1 rama de canela o 1 cdita canela",
+        "3 cdas azúcar",
+        "1 cdita vainilla",
+        "Ralladura de 1 naranja"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Simmer rice, milk, cinnamon, and orange zest over low heat 35–40 min, stirring often.",
+        "Stir in sugar and vanilla when the rice is soft and creamy.",
+        "Serve warm, or chill overnight for a quick breakfast.",
+        "Toddler tip: perfect soft texture — serve lukewarm."
+      ],
+      "es": [
+        "Cocinar el arroz con la leche, la canela y la ralladura de naranja a fuego bajo 35–40 min, revolviendo seguido.",
+        "Agregar el azúcar y la vainilla cuando el arroz esté tierno y cremoso.",
+        "Servir tibio, o enfriar toda la noche para un desayuno rápido.",
+        "Consejo para pequeños: textura blanda ideal — servir tibio."
+      ]
+    },
+    "tip": {
+      "en": "A classic Argentine comfort breakfast, full of calcium from the milk.",
+      "es": "Un clásico argentino reconfortante, lleno de calcio gracias a la leche."
+    },
+    "prep": [
+      "arroz-con-leche"
+    ]
+  },
+  {
+    "id": "ricotta-bowls-with-peaches",
+    "type": "breakfast",
+    "group": "dairy",
+    "name": {
+      "en": "Ricotta Bowls with Peaches & Granola",
+      "es": "Bowls de Ricota con Duraznos y Granola"
+    },
+    "ing": {
+      "en": [
+        "500g ricotta",
+        "3 peaches, sliced (or canned in juice)",
+        "1 cup granola",
+        "2 tbsp honey",
+        "1 tsp vanilla"
+      ],
+      "es": [
+        "500 g ricota",
+        "3 duraznos en gajos (o en lata al natural)",
+        "1 taza granola",
+        "2 cdas miel",
+        "1 cdita vainilla"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Stir vanilla and half the honey into the ricotta.",
+        "Spoon into bowls and top with peaches and granola.",
+        "Drizzle with the rest of the honey.",
+        "Toddler tip: no honey under 1 — the fruit sweetens it enough."
+      ],
+      "es": [
+        "Mezclar la ricota con la vainilla y la mitad de la miel.",
+        "Servir en bols y cubrir con los duraznos y la granola.",
+        "Rociar con el resto de la miel.",
+        "Consejo para pequeños: sin miel antes del año — la fruta endulza lo suficiente."
+      ]
+    },
+    "tip": {
+      "en": "Creamy, high in protein and calcium — a nice change from yogurt.",
+      "es": "Cremoso, con mucha proteína y calcio — un lindo cambio frente al yogur."
+    }
+  },
+  {
+    "id": "caprese-toast",
+    "type": "breakfast",
+    "group": "dairy",
+    "tags": [
+      "toast"
+    ],
+    "name": {
+      "en": "Caprese Toast",
+      "es": "Tostadas Caprese"
+    },
+    "ing": {
+      "en": [
+        "8 slices whole-grain bread",
+        "250g mozzarella, sliced",
+        "3 tomatoes, sliced",
+        "Fresh basil leaves",
+        "1 tbsp olive oil",
+        "Salt & pepper"
+      ],
+      "es": [
+        "8 rebanadas de pan integral",
+        "250 g mozzarella en rodajas",
+        "3 tomates en rodajas",
+        "Hojas de albahaca fresca",
+        "1 cda aceite de oliva",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Toast the bread.",
+        "Layer mozzarella and tomato on each slice.",
+        "Grill 2–3 min until the cheese softens.",
+        "Finish with basil, olive oil, salt, and pepper.",
+        "Toddler tip: cut into small squares; remove tomato skin if they prefer."
+      ],
+      "es": [
+        "Tostar el pan.",
+        "Acomodar la mozzarella y el tomate sobre cada rebanada.",
+        "Gratinar 2–3 min hasta que el queso se ablande.",
+        "Terminar con albahaca, aceite de oliva, sal y pimienta.",
+        "Consejo para pequeños: cortar en cuadraditos; sacar la piel del tomate si prefieren."
+      ]
+    },
+    "tip": {
+      "en": "Use pasteurised mozzarella in pregnancy — warm and melty is even safer.",
+      "es": "Usá mozzarella pasteurizada en el embarazo — tibia y derretida es aún más segura."
+    }
+  },
+  {
+    "id": "tropical-smoothie-bowl",
+    "type": "breakfast",
+    "group": "fruit",
+    "tags": [
+      "smoothie"
+    ],
+    "name": {
+      "en": "Tropical Smoothie Bowl",
+      "es": "Smoothie Bowl Tropical"
+    },
+    "ing": {
+      "en": [
+        "1½ cups frozen mango",
+        "1 cup pineapple chunks",
+        "2 frozen bananas",
+        "1 cup Greek yogurt",
+        "1 cup milk",
+        "½ cup granola"
+      ],
+      "es": [
+        "1½ tazas mango congelado",
+        "1 taza ananá en trozos",
+        "2 bananas congeladas",
+        "1 taza yogur griego",
+        "1 taza leche",
+        "½ taza granola"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Blend mango, pineapple, bananas, yogurt, and milk until thick.",
+        "Pour into bowls and top with granola.",
+        "Serve right away.",
+        "Toddler tip: serve as a smoothie in a cup, without the granola."
+      ],
+      "es": [
+        "Licuar el mango, el ananá, las bananas, el yogur y la leche hasta que quede espeso.",
+        "Servir en bols y cubrir con granola.",
+        "Servir enseguida.",
+        "Consejo para pequeños: servir como licuado en vaso, sin la granola."
+      ]
+    },
+    "tip": {
+      "en": "A sunny bowl packed with vitamin C and fibre.",
+      "es": "Un bol soleado lleno de vitamina C y fibra."
+    },
+    "prep": [
+      "freeze-bananas"
+    ]
+  },
+  {
+    "id": "fruit-salad-with-yogurt",
+    "type": "breakfast",
+    "group": "fruit",
+    "tags": [
+      "yogurt"
+    ],
+    "name": {
+      "en": "Fruit Salad with Yogurt & Honey",
+      "es": "Ensalada de Frutas con Yogur y Miel"
+    },
+    "ing": {
+      "en": [
+        "2 apples, diced",
+        "2 bananas, sliced",
+        "1 cup grapes, halved",
+        "2 kiwis, diced",
+        "2 cups Greek yogurt",
+        "2 tbsp honey"
+      ],
+      "es": [
+        "2 manzanas en cubos",
+        "2 bananas en rodajas",
+        "1 taza uvas en mitades",
+        "2 kiwis en cubos",
+        "2 tazas yogur griego",
+        "2 cdas miel"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mix all the fruit in a bowl.",
+        "Spoon over yogurt in 4 bowls.",
+        "Drizzle with honey.",
+        "Toddler tip: quarter the grapes lengthwise (choking risk); no honey under 1."
+      ],
+      "es": [
+        "Mezclar toda la fruta en un bol.",
+        "Servir sobre el yogur en 4 bols.",
+        "Rociar con miel.",
+        "Consejo para pequeños: cortar las uvas en cuartos a lo largo (riesgo de atragantamiento); sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "baked-apples-with-oats",
+    "type": "breakfast",
+    "group": "fruit",
+    "name": {
+      "en": "Baked Apples with Oat Crumble",
+      "es": "Manzanas Asadas con Crumble de Avena"
+    },
+    "ing": {
+      "en": [
+        "4 apples, cored",
+        "½ cup rolled oats",
+        "2 tbsp butter, softened",
+        "2 tbsp honey",
+        "1 tsp cinnamon",
+        "2 tbsp raisins",
+        "1 cup Greek yogurt, to serve"
+      ],
+      "es": [
+        "4 manzanas sin el centro",
+        "½ taza avena arrollada",
+        "2 cdas manteca blanda",
+        "2 cdas miel",
+        "1 cdita canela",
+        "2 cdas pasas de uva",
+        "1 taza yogur griego, para servir"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to 190°C / 375°F.",
+        "Mix oats, butter, honey, cinnamon, and raisins; stuff into the apples.",
+        "Bake 25–30 min until the apples are soft.",
+        "Serve warm with a spoonful of yogurt.",
+        "Toddler tip: scoop out the soft apple and mash with yogurt; skip the raisins."
+      ],
+      "es": [
+        "Precalentar el horno a 190 °C.",
+        "Mezclar la avena, la manteca, la miel, la canela y las pasas; rellenar las manzanas.",
+        "Hornear 25–30 min hasta que las manzanas estén tiernas.",
+        "Servir tibias con una cucharada de yogur.",
+        "Consejo para pequeños: sacar la manzana blanda y pisarla con yogur; sin pasas."
+      ]
+    },
+    "tip": {
+      "en": "Like dessert for breakfast — but with fibre, fruit, and oats.",
+      "es": "Como un postre en el desayuno — pero con fibra, fruta y avena."
+    }
+  },
+  {
+    "id": "savory-oatmeal-with-egg",
+    "type": "breakfast",
+    "group": "egg",
+    "tags": [
+      "oats"
+    ],
+    "experimental": true,
+    "name": {
+      "en": "Savory Oatmeal with Egg & Spinach",
+      "es": "Avena Salada con Huevo y Espinaca"
+    },
+    "ing": {
+      "en": [
+        "1½ cups rolled oats",
+        "3 cups vegetable broth",
+        "2 cups fresh spinach",
+        "4 eggs",
+        "½ cup grated parmesan",
+        "1 tbsp olive oil",
+        "Salt & pepper"
+      ],
+      "es": [
+        "1½ tazas avena arrollada",
+        "3 tazas caldo de verduras",
+        "2 tazas espinaca fresca",
+        "4 huevos",
+        "½ taza parmesano rallado",
+        "1 cda aceite de oliva",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Simmer oats in broth 5 min; stir in spinach and parmesan.",
+        "Fry the eggs in olive oil until the yolks are firm.",
+        "Spoon oats into bowls, top each with an egg, and season.",
+        "Toddler tip: chop the egg into the oats."
+      ],
+      "es": [
+        "Cocinar la avena en el caldo 5 min; agregar la espinaca y el parmesano.",
+        "Freír los huevos en aceite de oliva hasta que la yema esté firme.",
+        "Servir la avena en bols, poner un huevo encima y condimentar.",
+        "Consejo para pequeños: picar el huevo dentro de la avena."
+      ]
+    },
+    "tip": {
+      "en": "Like a risotto for breakfast — oats don’t have to be sweet!",
+      "es": "Como un risotto para el desayuno — ¡la avena no tiene por qué ser dulce!"
+    }
+  },
+  {
+    "id": "sweet-potato-toast",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "toast",
+      "nut-butter"
+    ],
+    "experimental": true,
+    "name": {
+      "en": "Sweet Potato \"Toast\" with Almond Butter & Banana",
+      "es": "\"Tostadas\" de Batata con Mantequilla de Almendras y Banana"
+    },
+    "ing": {
+      "en": [
+        "2 large sweet potatoes, cut lengthwise into 1 cm slices",
+        "4 tbsp almond butter",
+        "2 bananas, sliced",
+        "1 tsp cinnamon",
+        "1 tbsp chia seeds"
+      ],
+      "es": [
+        "2 batatas grandes en láminas de 1 cm a lo largo",
+        "4 cdas mantequilla de almendras",
+        "2 bananas en rodajas",
+        "1 cdita canela",
+        "1 cda semillas de chía"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Toast the sweet potato slices in a toaster (2–3 rounds) or bake at 200°C / 400°F for 20 min until tender.",
+        "Spread with almond butter.",
+        "Top with banana, cinnamon, and chia.",
+        "Toddler tip: thin layer of almond butter; cut into small pieces."
+      ],
+      "es": [
+        "Tostar las láminas de batata en la tostadora (2–3 veces) u hornear a 200 °C 20 min hasta que estén tiernas.",
+        "Untar con mantequilla de almendras.",
+        "Cubrir con banana, canela y chía.",
+        "Consejo para pequeños: capa fina de mantequilla de almendras; cortar en trocitos."
+      ]
+    },
+    "tip": {
+      "en": "The sweet potato is the bread — extra vitamin A and fibre.",
+      "es": "La batata hace de pan — más vitamina A y fibra."
+    }
+  },
+  {
+    "id": "chocolate-banana-chia-pudding",
+    "type": "breakfast",
+    "group": "dairy",
+    "experimental": true,
+    "name": {
+      "en": "Chocolate Banana Chia Pudding",
+      "es": "Pudín de Chía con Chocolate y Banana"
+    },
+    "ing": {
+      "en": [
+        "½ cup chia seeds",
+        "2 cups milk",
+        "2 ripe bananas, mashed",
+        "2 tbsp cocoa powder",
+        "1 tbsp honey",
+        "1 cup strawberries, sliced"
+      ],
+      "es": [
+        "½ taza semillas de chía",
+        "2 tazas leche",
+        "2 bananas maduras pisadas",
+        "2 cdas cacao en polvo",
+        "1 cda miel",
+        "1 taza frutillas en rodajas"
+      ]
+    },
+    "steps": {
+      "en": [
+        "The evening before: whisk chia, milk, banana, cocoa, and honey.",
+        "Whisk again after 10 min, cover, and chill overnight.",
+        "Serve topped with strawberries.",
+        "Toddler tip: blend smooth; no honey under 1."
+      ],
+      "es": [
+        "La noche anterior: batir la chía, la leche, la banana, el cacao y la miel.",
+        "Volver a batir a los 10 min, tapar y enfriar toda la noche.",
+        "Servir con frutillas por encima.",
+        "Consejo para pequeños: licuar para que quede liso; sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "Tastes like dessert, but it is fibre, omega-3s, and calcium.",
+      "es": "Sabe a postre, pero es fibra, omega-3 y calcio."
+    },
+    "prep": [
+      "chia-pudding"
+    ]
+  },
+  {
     "id": "chicken-stir-fry-rice-bowl",
     "type": "lunch",
     "protein": "poultry",
@@ -1085,6 +2021,9 @@ const recipes = [
     "type": "lunch",
     "protein": "fish",
     "base": "bread",
+    "tags": [
+      "tacos"
+    ],
     "name": {
       "en": "Fish Tacos with Slaw",
       "es": "Tacos de Pescado con Ensalada de Repollo"
@@ -1385,6 +2324,9 @@ const recipes = [
     "type": "lunch",
     "protein": "pork",
     "base": "rice",
+    "tags": [
+      "fried-rice"
+    ],
     "name": {
       "en": "Pork Fried Rice",
       "es": "Arroz Frito con Cerdo"
@@ -2057,6 +2999,1336 @@ const recipes = [
     }
   },
   {
+    "id": "baked-chicken-milanesa-with-mash",
+    "type": "lunch",
+    "protein": "poultry",
+    "base": "potato",
+    "tags": [
+      "milanesa"
+    ],
+    "name": {
+      "en": "Baked Chicken Milanesa with Mash",
+      "es": "Milanesas de Pollo al Horno con Puré"
+    },
+    "ing": {
+      "en": [
+        "4 chicken breasts, butterflied thin",
+        "2 eggs, beaten",
+        "1½ cups breadcrumbs",
+        "1 tsp dried oregano",
+        "4 large potatoes, peeled & cubed",
+        "½ cup warm milk",
+        "2 tbsp butter",
+        "2 tbsp olive oil",
+        "1 lemon, in wedges",
+        "Salt & pepper"
+      ],
+      "es": [
+        "4 pechugas de pollo abiertas y finas",
+        "2 huevos batidos",
+        "1½ tazas pan rallado",
+        "1 cdita orégano seco",
+        "4 papas grandes peladas y en cubos",
+        "½ taza leche tibia",
+        "2 cdas manteca",
+        "2 cdas aceite de oliva",
+        "1 limón en gajos",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to 200°C / 400°F; oil a large tray.",
+        "Dip the chicken in seasoned egg, then in breadcrumbs mixed with oregano.",
+        "Bake 20–25 min, flipping once, until golden and cooked through.",
+        "Boil potatoes 15 min; mash with warm milk, butter, and salt.",
+        "Serve with lemon wedges.",
+        "Toddler tip: cut the milanesa into thin strips; mash is perfect as is."
+      ],
+      "es": [
+        "Precalentar el horno a 200 °C; aceitar una bandeja grande.",
+        "Pasar el pollo por el huevo condimentado y luego por el pan rallado con orégano.",
+        "Hornear 20–25 min, dando vuelta una vez, hasta que esté dorado y bien cocido.",
+        "Hervir las papas 15 min; pisar con la leche tibia, la manteca y sal.",
+        "Servir con gajos de limón.",
+        "Consejo para pequeños: cortar la milanesa en tiras finas; el puré está perfecto así."
+      ]
+    },
+    "tip": {
+      "en": "An Argentine favourite made lighter in the oven — lean protein and potassium.",
+      "es": "Un clásico argentino más liviano al horno — proteína magra y potasio."
+    }
+  },
+  {
+    "id": "zucchini-tart",
+    "type": "lunch",
+    "protein": "egg",
+    "base": "bread",
+    "tags": [
+      "tart"
+    ],
+    "name": {
+      "en": "Zucchini & Cheese Tart (Tarta de Zapallitos)",
+      "es": "Tarta de Zapallitos"
+    },
+    "ing": {
+      "en": [
+        "1 ready-made pie crust",
+        "4 zucchini, grated",
+        "1 onion, diced",
+        "4 eggs",
+        "1 cup shredded cheese",
+        "2 tbsp grated parmesan",
+        "1 tbsp olive oil",
+        "Mixed greens for salad",
+        "Salt & pepper"
+      ],
+      "es": [
+        "1 tapa de tarta",
+        "4 zapallitos rallados",
+        "1 cebolla picada",
+        "4 huevos",
+        "1 taza queso rallado",
+        "2 cdas parmesano rallado",
+        "1 cda aceite de oliva",
+        "Hojas verdes variadas para la ensalada",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to 190°C / 375°F; line a tart tin with the crust.",
+        "Sauté onion and zucchini 8 min until the liquid evaporates.",
+        "Mix with eggs, cheese, salt, and pepper; pour into the crust and top with parmesan.",
+        "Bake 35 min until set and golden; rest 10 min.",
+        "Serve warm with a green salad.",
+        "Toddler tip: soft filling only, in small pieces."
+      ],
+      "es": [
+        "Precalentar el horno a 190 °C; forrar una tartera con la masa.",
+        "Saltear la cebolla y los zapallitos 8 min hasta que se evapore el líquido.",
+        "Mezclar con los huevos, el queso, sal y pimienta; volcar en la tarta y cubrir con parmesano.",
+        "Hornear 35 min hasta que cuaje y se dore; reposar 10 min.",
+        "Servir tibia con una ensalada verde.",
+        "Consejo para pequeños: solo el relleno blando, en trocitos."
+      ]
+    },
+    "tip": {
+      "en": "A tarta is great cold too — pack leftovers for tomorrow.",
+      "es": "La tarta también es rica fría — guardá lo que sobre para mañana."
+    }
+  },
+  {
+    "id": "lentil-stew-guiso",
+    "type": "lunch",
+    "protein": "plant",
+    "base": "bread",
+    "tags": [
+      "stew",
+      "lentil"
+    ],
+    "name": {
+      "en": "Hearty Lentil Stew (Guiso de Lentejas)",
+      "es": "Guiso de Lentejas"
+    },
+    "ing": {
+      "en": [
+        "1½ cups brown lentils",
+        "1 onion, diced",
+        "1 red bell pepper, diced",
+        "2 carrots, diced",
+        "2 potatoes, cubed",
+        "2 cloves garlic, minced",
+        "1 can (400g) crushed tomatoes",
+        "1L vegetable broth",
+        "1 tsp paprika",
+        "1 bay leaf",
+        "2 tbsp olive oil",
+        "Crusty bread"
+      ],
+      "es": [
+        "1½ tazas lentejas",
+        "1 cebolla picada",
+        "1 morrón rojo picado",
+        "2 zanahorias picadas",
+        "2 papas en cubos",
+        "2 dientes de ajo picados",
+        "1 lata (400 g) tomates triturados",
+        "1 L caldo de verduras",
+        "1 cdita pimentón",
+        "1 hoja de laurel",
+        "2 cdas aceite de oliva",
+        "Pan de campo"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sauté onion, pepper, and garlic in olive oil 5 min.",
+        "Add carrots, potatoes, lentils, tomatoes, broth, paprika, and bay leaf.",
+        "Simmer 35–40 min until the lentils are tender; season.",
+        "Remove the bay leaf and serve with crusty bread.",
+        "Toddler tip: mash a portion slightly so the lentils are easy to swallow."
+      ],
+      "es": [
+        "Saltear la cebolla, el morrón y el ajo en aceite de oliva 5 min.",
+        "Agregar las zanahorias, las papas, las lentejas, los tomates, el caldo, el pimentón y el laurel.",
+        "Cocinar a fuego lento 35–40 min hasta que las lentejas estén tiernas; condimentar.",
+        "Retirar el laurel y servir con pan de campo.",
+        "Consejo para pequeños: pisar un poco una porción para que las lentejas sean fáciles de tragar."
+      ]
+    },
+    "tip": {
+      "en": "Lentils plus the vitamin C in peppers and tomato = better iron absorption.",
+      "es": "Lentejas más la vitamina C del morrón y el tomate = mejor absorción del hierro."
+    }
+  },
+  {
+    "id": "turkey-meatballs-with-rice",
+    "type": "lunch",
+    "protein": "poultry",
+    "base": "rice",
+    "tags": [
+      "meatballs"
+    ],
+    "name": {
+      "en": "Turkey & Veggie Meatballs with Rice",
+      "es": "Albóndigas de Pavo y Verduras con Arroz"
+    },
+    "ing": {
+      "en": [
+        "500g ground turkey",
+        "1 zucchini, finely grated",
+        "1 egg",
+        "½ cup breadcrumbs",
+        "1 can (400g) crushed tomatoes",
+        "2 cloves garlic, minced",
+        "1 tsp dried basil",
+        "3 cups cooked rice",
+        "1 tbsp olive oil",
+        "Salt & pepper"
+      ],
+      "es": [
+        "500 g carne picada de pavo",
+        "1 zapallito rallado fino",
+        "1 huevo",
+        "½ taza pan rallado",
+        "1 lata (400 g) tomates triturados",
+        "2 dientes de ajo picados",
+        "1 cdita albahaca seca",
+        "3 tazas arroz cocido",
+        "1 cda aceite de oliva",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mix turkey, zucchini, egg, breadcrumbs, salt, and pepper; roll into small balls.",
+        "Brown the meatballs in olive oil 5 min.",
+        "Add garlic, tomatoes, and basil; cover and simmer 15 min until cooked through.",
+        "Serve over rice.",
+        "Toddler tip: halve the meatballs and mash into the sauce."
+      ],
+      "es": [
+        "Mezclar el pavo, el zapallito, el huevo, el pan rallado, sal y pimienta; formar bolitas.",
+        "Dorar las albóndigas en aceite de oliva 5 min.",
+        "Agregar el ajo, los tomates y la albahaca; tapar y cocinar 15 min hasta que estén bien cocidas.",
+        "Servir sobre el arroz.",
+        "Consejo para pequeños: cortar las albóndigas a la mitad y pisarlas con la salsa."
+      ]
+    },
+    "tip": {
+      "en": "Hidden zucchini keeps the meatballs juicy and adds a vegetable serving.",
+      "es": "El zapallito escondido mantiene jugosas las albóndigas y suma una porción de verdura."
+    },
+    "prep": [
+      "rice"
+    ]
+  },
+  {
+    "id": "salmon-fishcakes-with-salad",
+    "type": "lunch",
+    "protein": "fish",
+    "base": "potato",
+    "tags": [
+      "salmon"
+    ],
+    "name": {
+      "en": "Salmon Fishcakes with Green Salad",
+      "es": "Croquetas de Salmón con Ensalada Verde"
+    },
+    "ing": {
+      "en": [
+        "2 salmon fillets (180g each)",
+        "3 large potatoes, peeled & cubed",
+        "2 spring onions, sliced",
+        "1 egg, beaten",
+        "1 cup breadcrumbs",
+        "1 lemon (zest + wedges)",
+        "2 tbsp olive oil",
+        "Mixed greens for salad",
+        "Salt & pepper"
+      ],
+      "es": [
+        "2 filetes de salmón (180 g c/u)",
+        "3 papas grandes peladas y en cubos",
+        "2 cebollas de verdeo en rodajas",
+        "1 huevo batido",
+        "1 taza pan rallado",
+        "1 limón (ralladura + gajos)",
+        "2 cdas aceite de oliva",
+        "Hojas verdes variadas para la ensalada",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Boil potatoes until soft; mash. Bake or poach salmon 12–15 min until cooked through; flake.",
+        "Mix salmon, potato, spring onion, lemon zest, salt, and pepper; shape 8 cakes.",
+        "Dip in egg, then breadcrumbs.",
+        "Pan-fry in olive oil 3–4 min per side until golden and hot through.",
+        "Serve with salad and lemon wedges.",
+        "Toddler tip: break a fishcake into soft pieces, checking for bones."
+      ],
+      "es": [
+        "Hervir las papas hasta que estén blandas; pisar. Hornear o pochar el salmón 12–15 min hasta que esté cocido; desmenuzar.",
+        "Mezclar el salmón, la papa, el verdeo, la ralladura de limón, sal y pimienta; formar 8 croquetas.",
+        "Pasar por el huevo y luego por el pan rallado.",
+        "Dorar en aceite de oliva 3–4 min por lado hasta que estén calientes por dentro.",
+        "Servir con ensalada y gajos de limón.",
+        "Consejo para pequeños: desarmar una croqueta en trocitos blandos, revisando que no haya espinas."
+      ]
+    },
+    "tip": {
+      "en": "Salmon is low in mercury and rich in omega-3 DHA for baby’s brain and eyes.",
+      "es": "El salmón tiene poco mercurio y mucho omega-3 DHA para el cerebro y los ojos del bebé."
+    }
+  },
+  {
+    "id": "shrimp-fried-rice",
+    "type": "lunch",
+    "protein": "fish",
+    "base": "rice",
+    "tags": [
+      "fried-rice"
+    ],
+    "name": {
+      "en": "Shrimp Fried Rice",
+      "es": "Arroz Frito con Langostinos"
+    },
+    "ing": {
+      "en": [
+        "300g peeled shrimp",
+        "3 cups cooked rice (day-old works best)",
+        "2 eggs",
+        "1 cup frozen peas & carrots mix, thawed",
+        "3 spring onions, sliced",
+        "2 cloves garlic, minced",
+        "3 tbsp soy sauce",
+        "1 tbsp sesame oil",
+        "2 tbsp cooking oil"
+      ],
+      "es": [
+        "300 g langostinos pelados",
+        "3 tazas arroz cocido (de uno o dos días, mejor)",
+        "2 huevos",
+        "1 taza arvejas y zanahorias congeladas descongeladas",
+        "3 cebollas de verdeo en rodajas",
+        "2 dientes de ajo picados",
+        "3 cdas salsa de soja",
+        "1 cda aceite de sésamo",
+        "2 cdas aceite para cocinar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Stir-fry shrimp in hot oil 2–3 min until pink and cooked through; set aside.",
+        "Scramble the eggs in the same pan; push aside.",
+        "Add rice, peas & carrots, and garlic; stir-fry 3 min.",
+        "Return the shrimp; add soy sauce, sesame oil, and spring onions.",
+        "Toddler tip: chop the shrimp small and serve with soft rice."
+      ],
+      "es": [
+        "Saltear los langostinos en aceite caliente 2–3 min hasta que estén rosados y cocidos; reservar.",
+        "Revolver los huevos en la misma sartén; correrlos a un costado.",
+        "Agregar el arroz, las arvejas y zanahorias y el ajo; saltear 3 min.",
+        "Volver a poner los langostinos; agregar la salsa de soja, el aceite de sésamo y el verdeo.",
+        "Consejo para pequeños: picar los langostinos chiquitos y servir con arroz blando."
+      ]
+    },
+    "tip": {
+      "en": "Cooked shrimp is a safe, low-mercury seafood in pregnancy.",
+      "es": "Los langostinos bien cocidos son un marisco seguro y bajo en mercurio en el embarazo."
+    },
+    "prep": [
+      "rice"
+    ]
+  },
+  {
+    "id": "black-bean-quesadillas",
+    "type": "lunch",
+    "protein": "plant",
+    "base": "bread",
+    "tags": [
+      "tortilla"
+    ],
+    "name": {
+      "en": "Black Bean & Corn Quesadillas",
+      "es": "Quesadillas de Porotos Negros y Choclo"
+    },
+    "ing": {
+      "en": [
+        "1 can black beans, drained",
+        "1 cup frozen corn, thawed",
+        "1 red bell pepper, diced",
+        "1½ cups shredded cheese",
+        "8 small flour tortillas",
+        "1 tsp cumin",
+        "½ cup sour cream, to serve",
+        "1 avocado, sliced"
+      ],
+      "es": [
+        "1 lata porotos negros escurridos",
+        "1 taza choclo congelado descongelado",
+        "1 morrón rojo picado",
+        "1½ tazas queso rallado",
+        "8 tortillas de harina pequeñas",
+        "1 cdita comino",
+        "½ taza crema agria, para servir",
+        "1 palta en rodajas"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mash half the beans; mix with the rest, corn, pepper, and cumin.",
+        "Spread over 4 tortillas, top with cheese and another tortilla.",
+        "Toast 3 min per side in a dry pan until crisp and melted.",
+        "Cut into wedges; serve with sour cream and avocado.",
+        "Toddler tip: cut into thin strips once cooled a little."
+      ],
+      "es": [
+        "Pisar la mitad de los porotos; mezclar con el resto, el choclo, el morrón y el comino.",
+        "Untar sobre 4 tortillas, cubrir con queso y otra tortilla.",
+        "Dorar 3 min por lado en sartén seca hasta que esté crocante y derretido.",
+        "Cortar en triángulos; servir con crema agria y palta.",
+        "Consejo para pequeños: cortar en tiras finas cuando se entibie."
+      ]
+    },
+    "tip": {
+      "en": "Beans bring fibre, folate, and plant protein.",
+      "es": "Los porotos aportan fibra, folato y proteína vegetal."
+    }
+  },
+  {
+    "id": "pasta-primavera",
+    "type": "lunch",
+    "protein": "plant",
+    "base": "pasta",
+    "name": {
+      "en": "Pasta Primavera",
+      "es": "Pasta Primavera"
+    },
+    "ing": {
+      "en": [
+        "400g penne pasta",
+        "1 zucchini, sliced",
+        "1 cup broccoli florets",
+        "1 cup cherry tomatoes, halved",
+        "1 cup frozen peas",
+        "2 cloves garlic, minced",
+        "3 tbsp olive oil",
+        "½ cup grated parmesan",
+        "Fresh basil leaves"
+      ],
+      "es": [
+        "400 g pasta penne",
+        "1 zapallito en rodajas",
+        "1 taza floretes de brócoli",
+        "1 taza tomates cherry en mitades",
+        "1 taza arvejas congeladas",
+        "2 dientes de ajo picados",
+        "3 cdas aceite de oliva",
+        "½ taza parmesano rallado",
+        "Hojas de albahaca fresca"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Cook pasta; add broccoli and peas for the last 3 min. Reserve a cup of pasta water; drain.",
+        "Sauté zucchini and garlic in olive oil 4 min; add tomatoes for 2 min.",
+        "Toss everything with parmesan and a splash of pasta water.",
+        "Finish with torn basil.",
+        "Toddler tip: use small pasta and chop the veggies small."
+      ],
+      "es": [
+        "Cocinar la pasta; agregar el brócoli y las arvejas los últimos 3 min. Reservar una taza del agua; escurrir.",
+        "Saltear el zapallito y el ajo en aceite de oliva 4 min; agregar los tomates 2 min.",
+        "Mezclar todo con el parmesano y un chorrito del agua de la pasta.",
+        "Terminar con albahaca.",
+        "Consejo para pequeños: usar pasta chica y picar las verduras chiquitas."
+      ]
+    },
+    "tip": {
+      "en": "Five vegetables in one bowl — colourful and quick.",
+      "es": "Cinco verduras en un plato — colorido y rápido."
+    }
+  },
+  {
+    "id": "greek-chicken-pita-pockets",
+    "type": "lunch",
+    "protein": "poultry",
+    "base": "bread",
+    "name": {
+      "en": "Greek Chicken Pita Pockets",
+      "es": "Pitas Rellenas de Pollo a la Griega"
+    },
+    "ing": {
+      "en": [
+        "600g chicken breast, cut into strips",
+        "1 tsp dried oregano",
+        "Juice of 1 lemon",
+        "2 tbsp olive oil",
+        "4 pita breads",
+        "1 cucumber, diced",
+        "2 tomatoes, diced",
+        "1 cup Greek yogurt",
+        "Fresh mint, chopped",
+        "Salt"
+      ],
+      "es": [
+        "600 g pechuga de pollo en tiras",
+        "1 cdita orégano seco",
+        "Jugo de 1 limón",
+        "2 cdas aceite de oliva",
+        "4 panes pita",
+        "1 pepino en cubos",
+        "2 tomates picados",
+        "1 taza yogur griego",
+        "Menta fresca picada",
+        "Sal"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Marinate chicken in lemon, oregano, olive oil, and salt for 10 min.",
+        "Pan-fry 6–8 min until golden and cooked through.",
+        "Mix yogurt with mint and a pinch of salt.",
+        "Warm the pitas, open them, and fill with chicken, cucumber, tomato, and yogurt sauce.",
+        "Toddler tip: serve the filling deconstructed with pita strips."
+      ],
+      "es": [
+        "Marinar el pollo con limón, orégano, aceite de oliva y sal 10 min.",
+        "Dorar en sartén 6–8 min hasta que esté bien cocido.",
+        "Mezclar el yogur con la menta y una pizca de sal.",
+        "Calentar las pitas, abrirlas y rellenar con pollo, pepino, tomate y la salsa de yogur.",
+        "Consejo para pequeños: servir el relleno por separado con tiras de pita."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "pumpkin-soup-with-toast",
+    "type": "lunch",
+    "protein": "plant",
+    "base": "bread",
+    "tags": [
+      "soup"
+    ],
+    "name": {
+      "en": "Pumpkin Soup with Cheese Toast",
+      "es": "Sopa de Zapallo con Tostadas de Queso"
+    },
+    "ing": {
+      "en": [
+        "1 kg pumpkin or butternut squash, peeled & cubed",
+        "1 onion, diced",
+        "1 carrot, diced",
+        "1L vegetable broth",
+        "½ cup milk",
+        "Pinch of nutmeg",
+        "2 tbsp olive oil",
+        "4 slices whole-grain bread",
+        "1 cup shredded cheese"
+      ],
+      "es": [
+        "1 kg zapallo o calabaza pelado y en cubos",
+        "1 cebolla picada",
+        "1 zanahoria picada",
+        "1 L caldo de verduras",
+        "½ taza leche",
+        "Pizca de nuez moscada",
+        "2 cdas aceite de oliva",
+        "4 rebanadas de pan integral",
+        "1 taza queso rallado"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sauté onion and carrot in olive oil 5 min.",
+        "Add pumpkin and broth; simmer 20 min until soft.",
+        "Blend smooth with milk and nutmeg; season.",
+        "Grill bread topped with cheese until bubbly; serve alongside.",
+        "Toddler tip: naturally sweet and smooth — perfect as is."
+      ],
+      "es": [
+        "Saltear la cebolla y la zanahoria en aceite de oliva 5 min.",
+        "Agregar el zapallo y el caldo; cocinar 20 min hasta que esté blando.",
+        "Licuar con la leche y la nuez moscada; condimentar.",
+        "Gratinar el pan con queso hasta que burbujee; servir al costado.",
+        "Consejo para pequeños: dulce y suave naturalmente — perfecta así."
+      ]
+    },
+    "tip": {
+      "en": "Pumpkin is packed with vitamin A for baby’s growing eyes.",
+      "es": "El zapallo está lleno de vitamina A para los ojos del bebé."
+    }
+  },
+  {
+    "id": "beef-tacos",
+    "type": "lunch",
+    "protein": "beef",
+    "base": "bread",
+    "tags": [
+      "tacos"
+    ],
+    "name": {
+      "en": "Beef Tacos",
+      "es": "Tacos de Carne"
+    },
+    "ing": {
+      "en": [
+        "500g ground beef",
+        "1 onion, diced",
+        "1 tsp cumin",
+        "1 tsp paprika",
+        "8 corn tortillas",
+        "2 cups shredded lettuce",
+        "2 tomatoes, diced",
+        "1 cup shredded cheese",
+        "½ cup sour cream",
+        "1 tbsp olive oil"
+      ],
+      "es": [
+        "500 g carne picada",
+        "1 cebolla picada",
+        "1 cdita comino",
+        "1 cdita pimentón",
+        "8 tortillas de maíz",
+        "2 tazas lechuga en tiras",
+        "2 tomates picados",
+        "1 taza queso rallado",
+        "½ taza crema agria",
+        "1 cda aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Brown beef and onion in olive oil 8 min until fully cooked.",
+        "Add cumin, paprika, and a splash of water; simmer 3 min.",
+        "Warm the tortillas in a dry pan.",
+        "Fill with beef, lettuce, tomato, cheese, and sour cream.",
+        "Toddler tip: serve the filling in a bowl with soft tortilla pieces."
+      ],
+      "es": [
+        "Dorar la carne y la cebolla en aceite de oliva 8 min hasta que esté bien cocida.",
+        "Agregar el comino, el pimentón y un chorrito de agua; cocinar 3 min.",
+        "Calentar las tortillas en una sartén seca.",
+        "Rellenar con carne, lechuga, tomate, queso y crema agria.",
+        "Consejo para pequeños: servir el relleno en un bol con trocitos de tortilla blanda."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "hake-with-potato-salad",
+    "type": "lunch",
+    "protein": "fish",
+    "base": "potato",
+    "name": {
+      "en": "Hake with Lemony Potato Salad",
+      "es": "Merluza con Ensalada de Papas"
+    },
+    "ing": {
+      "en": [
+        "4 hake fillets (150g each)",
+        "4 medium potatoes, cubed",
+        "1 cup green beans, cut",
+        "2 eggs",
+        "2 tbsp mayonnaise",
+        "1 lemon (zest + wedges)",
+        "Fresh parsley",
+        "2 tbsp olive oil",
+        "Salt & pepper"
+      ],
+      "es": [
+        "4 filetes de merluza (150 g c/u)",
+        "4 papas medianas en cubos",
+        "1 taza chauchas cortadas",
+        "2 huevos",
+        "2 cdas mayonesa",
+        "1 limón (ralladura + gajos)",
+        "Perejil fresco",
+        "2 cdas aceite de oliva",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Boil potatoes 12 min, adding green beans for the last 4 min; hard-boil the eggs alongside.",
+        "Toss potatoes, beans, and chopped egg with mayonnaise, lemon zest, and parsley.",
+        "Season the hake and pan-fry in olive oil 3–4 min per side until it flakes.",
+        "Serve with lemon wedges.",
+        "Toddler tip: flake the fish carefully, checking for bones."
+      ],
+      "es": [
+        "Hervir las papas 12 min, agregando las chauchas los últimos 4 min; hervir los huevos al mismo tiempo.",
+        "Mezclar las papas, las chauchas y el huevo picado con mayonesa, ralladura de limón y perejil.",
+        "Condimentar la merluza y dorar en aceite de oliva 3–4 min por lado hasta que se desmenuce.",
+        "Servir con gajos de limón.",
+        "Consejo para pequeños: desmenuzar el pescado con cuidado, revisando las espinas."
+      ]
+    },
+    "tip": {
+      "en": "Hake is a mild, low-mercury white fish loved by kids.",
+      "es": "La merluza es un pescado blanco suave y bajo en mercurio que les gusta a los chicos."
+    }
+  },
+  {
+    "id": "chicken-and-corn-empanadas",
+    "type": "lunch",
+    "protein": "poultry",
+    "base": "bread",
+    "tags": [
+      "empanadas"
+    ],
+    "name": {
+      "en": "Baked Chicken & Corn Empanadas",
+      "es": "Empanadas de Pollo y Choclo al Horno"
+    },
+    "ing": {
+      "en": [
+        "12 empanada discs",
+        "400g chicken breast, finely diced",
+        "1 onion, diced",
+        "1 red bell pepper, diced",
+        "1 cup frozen corn, thawed",
+        "1 tsp paprika",
+        "1 tsp cumin",
+        "1 egg, beaten",
+        "1 tbsp olive oil",
+        "Mixed greens for salad"
+      ],
+      "es": [
+        "12 tapas de empanadas",
+        "400 g pechuga de pollo picada fina",
+        "1 cebolla picada",
+        "1 morrón rojo picado",
+        "1 taza choclo congelado descongelado",
+        "1 cdita pimentón",
+        "1 cdita comino",
+        "1 huevo batido",
+        "1 cda aceite de oliva",
+        "Hojas verdes variadas para la ensalada"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sauté onion and pepper 5 min; add chicken, paprika, and cumin; cook 8 min until cooked through.",
+        "Stir in corn and let the filling cool.",
+        "Fill each disc, fold, and seal the edges; brush with egg.",
+        "Bake at 200°C / 400°F for 18–20 min until golden.",
+        "Serve with a green salad.",
+        "Toddler tip: open one up to cool and serve the filling with pastry pieces."
+      ],
+      "es": [
+        "Saltear la cebolla y el morrón 5 min; agregar el pollo, el pimentón y el comino; cocinar 8 min.",
+        "Incorporar el choclo y dejar enfriar el relleno.",
+        "Rellenar cada tapa, cerrar y repulgar; pincelar con huevo.",
+        "Hornear a 200 °C 18–20 min hasta que se doren.",
+        "Servir con una ensalada verde.",
+        "Consejo para pequeños: abrir una para que se enfríe y servir el relleno con trocitos de masa."
+      ]
+    },
+    "tip": {
+      "en": "Make a double batch and freeze half for a busy day.",
+      "es": "Hacé el doble y congelá la mitad para un día complicado."
+    }
+  },
+  {
+    "id": "gnocchi-with-tomato-sauce",
+    "type": "lunch",
+    "protein": "plant",
+    "base": "pasta",
+    "tags": [
+      "gnocchi"
+    ],
+    "name": {
+      "en": "Gnocchi with Tomato & Basil Sauce",
+      "es": "Ñoquis con Salsa de Tomate y Albahaca"
+    },
+    "ing": {
+      "en": [
+        "1 kg potato gnocchi",
+        "1 can (400g) crushed tomatoes",
+        "1 onion, finely diced",
+        "2 cloves garlic, minced",
+        "2 tbsp olive oil",
+        "Fresh basil leaves",
+        "½ cup grated parmesan",
+        "2 cups fresh spinach"
+      ],
+      "es": [
+        "1 kg ñoquis de papa",
+        "1 lata (400 g) tomates triturados",
+        "1 cebolla picada fina",
+        "2 dientes de ajo picados",
+        "2 cdas aceite de oliva",
+        "Hojas de albahaca fresca",
+        "½ taza parmesano rallado",
+        "2 tazas espinaca fresca"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sauté onion and garlic in olive oil 5 min; add tomatoes and simmer 15 min.",
+        "Stir the spinach into the sauce until wilted.",
+        "Boil gnocchi until they float, about 2–3 min; drain.",
+        "Toss with sauce; top with basil and parmesan.",
+        "Toddler tip: halve the gnocchi — soft and easy to chew."
+      ],
+      "es": [
+        "Saltear la cebolla y el ajo en aceite de oliva 5 min; agregar los tomates y cocinar 15 min.",
+        "Incorporar la espinaca a la salsa hasta que se achique.",
+        "Hervir los ñoquis hasta que suban, unos 2–3 min; escurrir.",
+        "Mezclar con la salsa; terminar con albahaca y parmesano.",
+        "Consejo para pequeños: cortar los ñoquis a la mitad — blandos y fáciles de masticar."
+      ]
+    },
+    "tip": {
+      "en": "Ñoquis on the 29th is an Argentine tradition — any day works too!",
+      "es": "Los ñoquis del 29 son tradición argentina — ¡pero cualquier día vienen bien!"
+    }
+  },
+  {
+    "id": "tuna-and-white-bean-salad",
+    "type": "lunch",
+    "protein": "fish",
+    "base": "bread",
+    "tags": [
+      "tuna"
+    ],
+    "name": {
+      "en": "Tuna & White Bean Salad",
+      "es": "Ensalada de Atún y Alubias"
+    },
+    "ing": {
+      "en": [
+        "2 cans (160g) tuna, drained",
+        "1 can cannellini beans, drained",
+        "1 cup cherry tomatoes, halved",
+        "1 cucumber, diced",
+        "1 red onion, finely diced",
+        "Juice of 1 lemon",
+        "3 tbsp olive oil",
+        "Fresh parsley",
+        "4 slices whole-grain bread, to serve"
+      ],
+      "es": [
+        "2 latas (160 g) atún escurrido",
+        "1 lata alubias cannellini escurridas",
+        "1 taza tomates cherry en mitades",
+        "1 pepino en cubos",
+        "1 cebolla morada picada fina",
+        "Jugo de 1 limón",
+        "3 cdas aceite de oliva",
+        "Perejil fresco",
+        "4 rebanadas de pan integral, para acompañar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Whisk lemon juice, olive oil, salt, and pepper.",
+        "Toss beans, tomatoes, cucumber, onion, and parsley with the dressing.",
+        "Fold in the tuna in chunks.",
+        "Serve with toasted bread.",
+        "Toddler tip: mash beans and tuna together on soft bread."
+      ],
+      "es": [
+        "Batir el jugo de limón con el aceite de oliva, sal y pimienta.",
+        "Mezclar las alubias, los tomates, el pepino, la cebolla y el perejil con el aliño.",
+        "Agregar el atún en trozos.",
+        "Servir con pan tostado.",
+        "Consejo para pequeños: pisar las alubias con el atún sobre pan blando."
+      ]
+    },
+    "tip": {
+      "en": "Keep tuna to about twice a week in pregnancy (mercury).",
+      "es": "Limitar el atún a unas dos veces por semana en el embarazo (mercurio)."
+    }
+  },
+  {
+    "id": "pork-and-pineapple-rice-bowls",
+    "type": "lunch",
+    "protein": "pork",
+    "base": "rice",
+    "name": {
+      "en": "Pork & Pineapple Rice Bowls",
+      "es": "Bowls de Cerdo y Ananá con Arroz"
+    },
+    "ing": {
+      "en": [
+        "500g pork tenderloin, thin strips",
+        "1½ cups pineapple chunks",
+        "1 red bell pepper, sliced",
+        "3 tbsp soy sauce",
+        "1 tbsp honey",
+        "1 tsp fresh ginger, grated",
+        "3 cups cooked rice",
+        "2 tbsp cooking oil",
+        "2 spring onions, sliced"
+      ],
+      "es": [
+        "500 g lomo de cerdo en tiras finas",
+        "1½ tazas ananá en trozos",
+        "1 morrón rojo en tiras",
+        "3 cdas salsa de soja",
+        "1 cda miel",
+        "1 cdita jengibre fresco rallado",
+        "3 tazas arroz cocido",
+        "2 cdas aceite para cocinar",
+        "2 cebollas de verdeo en rodajas"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Stir-fry pork in hot oil 4–5 min until cooked through.",
+        "Add pepper and pineapple; cook 3 min.",
+        "Stir in soy sauce, honey, and ginger until glossy.",
+        "Serve over rice with spring onions.",
+        "Toddler tip: chop pork and pineapple small; serve over soft rice."
+      ],
+      "es": [
+        "Saltear el cerdo en aceite caliente 4–5 min hasta que esté bien cocido.",
+        "Agregar el morrón y el ananá; cocinar 3 min.",
+        "Incorporar la salsa de soja, la miel y el jengibre hasta que brille.",
+        "Servir sobre el arroz con verdeo.",
+        "Consejo para pequeños: picar el cerdo y el ananá chiquitos; servir sobre arroz blando."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    },
+    "prep": [
+      "rice"
+    ]
+  },
+  {
+    "id": "egg-fried-noodles-with-veggies",
+    "type": "lunch",
+    "protein": "egg",
+    "base": "pasta",
+    "name": {
+      "en": "Egg Fried Noodles with Veggies",
+      "es": "Fideos Salteados con Huevo y Verduras"
+    },
+    "ing": {
+      "en": [
+        "300g egg noodles",
+        "4 eggs",
+        "2 carrots, julienned",
+        "2 cups shredded cabbage",
+        "1 red bell pepper, sliced",
+        "3 tbsp soy sauce",
+        "1 tbsp sesame oil",
+        "2 cloves garlic, minced",
+        "2 tbsp cooking oil"
+      ],
+      "es": [
+        "300 g fideos de huevo",
+        "4 huevos",
+        "2 zanahorias en juliana",
+        "2 tazas repollo rallado",
+        "1 morrón rojo en tiras",
+        "3 cdas salsa de soja",
+        "1 cda aceite de sésamo",
+        "2 dientes de ajo picados",
+        "2 cdas aceite para cocinar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Cook the noodles; drain and toss with a little sesame oil.",
+        "Scramble the eggs in hot oil until set; remove.",
+        "Stir-fry carrots, cabbage, pepper, and garlic 4 min.",
+        "Add noodles, egg, and soy sauce; toss well.",
+        "Toddler tip: cut the noodles short with scissors."
+      ],
+      "es": [
+        "Cocinar los fideos; escurrir y mezclar con un poco de aceite de sésamo.",
+        "Revolver los huevos en aceite caliente hasta que cuajen; retirar.",
+        "Saltear las zanahorias, el repollo, el morrón y el ajo 4 min.",
+        "Agregar los fideos, el huevo y la salsa de soja; mezclar bien.",
+        "Consejo para pequeños: cortar los fideos cortitos con tijera."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "chickpea-and-spinach-curry",
+    "type": "lunch",
+    "protein": "plant",
+    "base": "rice",
+    "tags": [
+      "curry"
+    ],
+    "name": {
+      "en": "Chickpea & Spinach Curry",
+      "es": "Curry de Garbanzos y Espinaca"
+    },
+    "ing": {
+      "en": [
+        "2 cans (400g each) chickpeas, drained",
+        "1 can (400ml) coconut milk",
+        "1 can (400g) diced tomatoes",
+        "1 onion, diced",
+        "2 cloves garlic, minced",
+        "1 tbsp fresh ginger, grated",
+        "2 tbsp curry powder",
+        "3 cups fresh spinach",
+        "3 cups cooked rice",
+        "1 tbsp cooking oil"
+      ],
+      "es": [
+        "2 latas (400 g c/u) garbanzos escurridos",
+        "1 lata (400 ml) leche de coco",
+        "1 lata (400 g) tomates picados",
+        "1 cebolla picada",
+        "2 dientes de ajo picados",
+        "1 cda jengibre fresco rallado",
+        "2 cdas curry en polvo",
+        "3 tazas espinaca fresca",
+        "3 tazas arroz cocido",
+        "1 cda aceite para cocinar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sauté onion, garlic, and ginger 5 min; stir in curry powder for 1 min.",
+        "Add chickpeas, tomatoes, and coconut milk; simmer 15 min.",
+        "Stir in spinach until wilted.",
+        "Serve over rice.",
+        "Toddler tip: mild curry powder only; mash some chickpeas."
+      ],
+      "es": [
+        "Saltear la cebolla, el ajo y el jengibre 5 min; agregar el curry 1 min.",
+        "Agregar los garbanzos, los tomates y la leche de coco; cocinar 15 min.",
+        "Incorporar la espinaca hasta que se achique.",
+        "Servir sobre el arroz.",
+        "Consejo para pequeños: usar curry suave; pisar algunos garbanzos."
+      ]
+    },
+    "tip": {
+      "en": "A creamy, iron- and folate-rich vegetarian lunch.",
+      "es": "Un almuerzo vegetariano cremoso, rico en hierro y folato."
+    },
+    "prep": [
+      "rice"
+    ]
+  },
+  {
+    "id": "homemade-fish-fingers-with-peas",
+    "type": "lunch",
+    "protein": "fish",
+    "base": "potato",
+    "tags": [
+      "breaded-fish"
+    ],
+    "name": {
+      "en": "Homemade Fish Fingers with Peas & Wedges",
+      "es": "Bastones de Pescado Caseros con Arvejas y Papas"
+    },
+    "ing": {
+      "en": [
+        "500g white fish fillets (cod or hake), cut into fingers",
+        "2 eggs, beaten",
+        "1 cup breadcrumbs",
+        "4 medium potatoes, cut into wedges",
+        "2 cups frozen peas",
+        "2 tbsp olive oil",
+        "1 lemon, in wedges",
+        "Salt"
+      ],
+      "es": [
+        "500 g filetes de pescado blanco (bacalao o merluza) en bastones",
+        "2 huevos batidos",
+        "1 taza pan rallado",
+        "4 papas medianas en gajos",
+        "2 tazas arvejas congeladas",
+        "2 cdas aceite de oliva",
+        "1 limón en gajos",
+        "Sal"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Toss wedges in oil and salt; roast at 220°C / 425°F for 30 min.",
+        "Dip fish in egg, then breadcrumbs; bake on an oiled tray for the last 15 min.",
+        "Boil the peas 3 min and lightly crush.",
+        "Serve with lemon wedges.",
+        "Toddler tip: flaky inside, crunchy outside — check for bones."
+      ],
+      "es": [
+        "Mezclar los gajos con aceite y sal; asar a 220 °C 30 min.",
+        "Pasar el pescado por huevo y pan rallado; hornear en bandeja aceitada los últimos 15 min.",
+        "Hervir las arvejas 3 min y pisarlas un poco.",
+        "Servir con gajos de limón.",
+        "Consejo para pequeños: blandito por dentro y crocante por fuera — revisar espinas."
+      ]
+    },
+    "tip": {
+      "en": "Way better than frozen — real fish, little oil.",
+      "es": "Mucho mejor que los congelados — pescado de verdad y poco aceite."
+    }
+  },
+  {
+    "id": "polenta-with-beef-ragu",
+    "type": "lunch",
+    "protein": "beef",
+    "base": "grain",
+    "tags": [
+      "bolognese"
+    ],
+    "name": {
+      "en": "Creamy Polenta with Beef Ragù",
+      "es": "Polenta Cremosa con Tuco de Carne"
+    },
+    "ing": {
+      "en": [
+        "1½ cups polenta",
+        "500g ground beef",
+        "1 onion, diced",
+        "1 carrot, diced",
+        "1 can (400g) crushed tomatoes",
+        "2 tbsp tomato paste",
+        "1 tsp dried oregano",
+        "1 bay leaf",
+        "2 tbsp butter",
+        "½ cup grated parmesan",
+        "1 tbsp olive oil"
+      ],
+      "es": [
+        "1½ tazas polenta",
+        "500 g carne picada",
+        "1 cebolla picada",
+        "1 zanahoria picada",
+        "1 lata (400 g) tomates triturados",
+        "2 cdas extracto de tomate",
+        "1 cdita orégano seco",
+        "1 hoja de laurel",
+        "2 cdas manteca",
+        "½ taza parmesano rallado",
+        "1 cda aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Brown beef with onion and carrot in olive oil 8 min.",
+        "Add tomatoes, tomato paste, oregano, and bay leaf; simmer 25 min.",
+        "Cook polenta in 6 cups salted boiling water, whisking, 5–8 min; stir in butter and parmesan.",
+        "Serve polenta topped with ragù.",
+        "Toddler tip: soft polenta is ideal — mix a little sauce in."
+      ],
+      "es": [
+        "Dorar la carne con la cebolla y la zanahoria en aceite de oliva 8 min.",
+        "Agregar los tomates, el extracto, el orégano y el laurel; cocinar 25 min.",
+        "Cocinar la polenta en 6 tazas de agua hirviendo con sal, batiendo, 5–8 min; agregar la manteca y el parmesano.",
+        "Servir la polenta con el tuco por encima.",
+        "Consejo para pequeños: la polenta blanda es ideal — mezclar con un poco de salsa."
+      ]
+    },
+    "tip": {
+      "en": "Comforting and iron-rich — a winter favourite.",
+      "es": "Reconfortante y rico en hierro — un favorito de invierno."
+    }
+  },
+  {
+    "id": "rainbow-rice-paper-rolls",
+    "type": "lunch",
+    "protein": "poultry",
+    "base": "rice",
+    "experimental": true,
+    "name": {
+      "en": "Rainbow Rice-Paper Rolls with Peanut Dip",
+      "es": "Rollitos de Papel de Arroz Arcoíris con Dip de Maní"
+    },
+    "ing": {
+      "en": [
+        "12 rice paper sheets",
+        "100g rice noodles",
+        "2 cups cooked chicken, sliced",
+        "2 carrots, julienned",
+        "1 cucumber, cut into sticks",
+        "1 red bell pepper, cut into strips",
+        "Fresh mint leaves",
+        "3 tbsp peanut butter",
+        "2 tbsp soy sauce",
+        "Juice of 1 lime"
+      ],
+      "es": [
+        "12 hojas de papel de arroz",
+        "100 g fideos de arroz",
+        "2 tazas pollo cocido en rodajas",
+        "2 zanahorias en juliana",
+        "1 pepino en bastones",
+        "1 morrón rojo en tiras",
+        "Hojas de menta fresca",
+        "3 cdas mantequilla de maní",
+        "2 cdas salsa de soja",
+        "Jugo de 1 lima"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Soak the rice noodles in hot water 5 min; drain.",
+        "Dip a rice paper sheet in warm water for 10 seconds and lay it flat.",
+        "Fill with noodles, chicken, vegetables, and mint; roll up tightly like a burrito.",
+        "Whisk peanut butter, soy sauce, lime, and 3 tbsp warm water for the dip.",
+        "Toddler tip: cut rolls into short pieces; serve the dip thinly."
+      ],
+      "es": [
+        "Remojar los fideos de arroz en agua caliente 5 min; escurrir.",
+        "Pasar una hoja de papel de arroz por agua tibia 10 segundos y extenderla.",
+        "Rellenar con fideos, pollo, verduras y menta; enrollar apretado como un burrito.",
+        "Batir la mantequilla de maní con la soja, la lima y 3 cdas de agua tibia para el dip.",
+        "Consejo para pequeños: cortar los rollitos en trozos cortos; dip bien liviano."
+      ]
+    },
+    "tip": {
+      "en": "A colourful hands-on lunch — let the kids roll their own.",
+      "es": "Un almuerzo colorido para hacer con las manos — que los chicos armen los suyos."
+    },
+    "prep": [
+      "cook-chicken"
+    ]
+  },
+  {
+    "id": "chickpea-tuna-salad-sandwiches",
+    "type": "lunch",
+    "protein": "plant",
+    "base": "bread",
+    "experimental": true,
+    "name": {
+      "en": "Chickpea \"Tuna\" Salad Sandwiches",
+      "es": "Sándwiches de \"Atún\" de Garbanzos"
+    },
+    "ing": {
+      "en": [
+        "2 cans (400g each) chickpeas, drained",
+        "3 tbsp mayonnaise",
+        "1 celery stalk, finely diced",
+        "1 tbsp Dijon mustard",
+        "Juice of 1 lemon",
+        "8 slices whole-grain bread",
+        "Lettuce leaves",
+        "2 tomatoes, sliced",
+        "Salt & pepper"
+      ],
+      "es": [
+        "2 latas (400 g c/u) garbanzos escurridos",
+        "3 cdas mayonesa",
+        "1 tallo de apio picado fino",
+        "1 cda mostaza Dijon",
+        "Jugo de 1 limón",
+        "8 rebanadas de pan integral",
+        "Hojas de lechuga",
+        "2 tomates en rodajas",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mash the chickpeas roughly with a fork.",
+        "Mix with mayonnaise, celery, mustard, lemon, salt, and pepper.",
+        "Fill the bread with the chickpea salad, lettuce, and tomato.",
+        "Toddler tip: mash the chickpeas finer and spread thinly."
+      ],
+      "es": [
+        "Pisar los garbanzos con un tenedor, sin hacerlos puré.",
+        "Mezclar con mayonesa, apio, mostaza, limón, sal y pimienta.",
+        "Rellenar el pan con la ensalada de garbanzos, lechuga y tomate.",
+        "Consejo para pequeños: pisar más los garbanzos y untar en capa fina."
+      ]
+    },
+    "tip": {
+      "en": "All the creaminess of tuna salad, none of the mercury.",
+      "es": "Toda la cremosidad de la ensalada de atún, sin nada de mercurio."
+    }
+  },
+  {
+    "id": "pizza-quesadillas",
+    "type": "lunch",
+    "protein": "plant",
+    "base": "bread",
+    "tags": [
+      "tortilla",
+      "pizza"
+    ],
+    "experimental": true,
+    "name": {
+      "en": "Pizza Quesadillas",
+      "es": "Quesadillas Pizza"
+    },
+    "ing": {
+      "en": [
+        "8 small flour tortillas",
+        "1 can (400g) crushed tomatoes",
+        "250g mozzarella, grated",
+        "150g mushrooms, sliced",
+        "1 red bell pepper, diced",
+        "1 tsp dried oregano",
+        "Mixed greens for salad"
+      ],
+      "es": [
+        "8 tortillas de harina pequeñas",
+        "1 lata (400 g) tomates triturados",
+        "250 g mozzarella rallada",
+        "150 g champiñones en láminas",
+        "1 morrón rojo picado",
+        "1 cdita orégano seco",
+        "Hojas verdes variadas para la ensalada"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Simmer the tomatoes with oregano 10 min until thick.",
+        "Spread sauce on 4 tortillas; add mozzarella, mushrooms, and pepper; cover with the others.",
+        "Toast 3 min per side in a dry pan until melted.",
+        "Cut into wedges; serve with salad.",
+        "Toddler tip: cut into thin strips once slightly cooled."
+      ],
+      "es": [
+        "Cocinar los tomates con orégano 10 min hasta que espesen.",
+        "Untar 4 tortillas con salsa; agregar mozzarella, champiñones y morrón; tapar con las otras.",
+        "Dorar 3 min por lado en sartén seca hasta que se derrita.",
+        "Cortar en triángulos; servir con ensalada.",
+        "Consejo para pequeños: cortar en tiras finas cuando se entibie."
+      ]
+    },
+    "tip": {
+      "en": "Pizza night meets taco night — ready in 15 minutes.",
+      "es": "La noche de pizza se cruza con la de tacos — lista en 15 minutos."
+    }
+  },
+  {
     "id": "apple-slices-with-peanut-butter-and-cheese",
     "type": "snack",
     "group": "fruit",
@@ -2532,6 +4804,9 @@ const recipes = [
     "id": "banana-oat-muffins",
     "type": "snack",
     "group": "grain",
+    "tags": [
+      "muffin"
+    ],
     "name": {
       "en": "Banana Oat Muffins",
       "es": "Muffins de Banana y Avena"
@@ -2634,6 +4909,9 @@ const recipes = [
     "id": "watermelon-and-strawberry-skewers",
     "type": "snack",
     "group": "fruit",
+    "tags": [
+      "skewers"
+    ],
     "name": {
       "en": "Watermelon & Strawberry Skewers",
       "es": "Brochetas de Sandía y Frutillas"
@@ -2849,6 +5127,950 @@ const recipes = [
     "prep": [
       "freeze-bananas"
     ]
+  },
+  {
+    "id": "frozen-yogurt-banana-pops",
+    "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "frozen"
+    ],
+    "name": {
+      "en": "Frozen Yogurt Banana Pops",
+      "es": "Paletas de Banana con Yogur"
+    },
+    "ing": {
+      "en": [
+        "3 bananas, halved",
+        "1 cup Greek yogurt",
+        "1 tbsp honey",
+        "2 tbsp granola, crushed",
+        "Wooden skewers"
+      ],
+      "es": [
+        "3 bananas cortadas a la mitad",
+        "1 taza yogur griego",
+        "1 cda miel",
+        "2 cdas granola triturada",
+        "Palitos de brochette de madera"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Push a skewer into each banana half.",
+        "Mix yogurt with honey; dip the bananas and roll in granola.",
+        "Freeze on a lined tray for at least 2 hours.",
+        "Toddler tip: skip the stick and serve thin frozen slices; no honey under 1."
+      ],
+      "es": [
+        "Clavar un palito en cada mitad de banana.",
+        "Mezclar el yogur con la miel; bañar las bananas y pasarlas por la granola.",
+        "Congelar sobre una bandeja forrada al menos 2 horas.",
+        "Consejo para pequeños: sin palito, servir rodajas finas congeladas; sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "A cold treat with potassium and calcium — no added sugar needed.",
+      "es": "Un postre frío con potasio y calcio — sin azúcar agregada."
+    },
+    "prep": [
+      "banana-pops"
+    ]
+  },
+  {
+    "id": "baked-apple-chips",
+    "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "apple"
+    ],
+    "name": {
+      "en": "Baked Cinnamon Apple Chips",
+      "es": "Chips de Manzana con Canela"
+    },
+    "ing": {
+      "en": [
+        "4 apples, very thinly sliced",
+        "1 tsp cinnamon"
+      ],
+      "es": [
+        "4 manzanas en láminas muy finas",
+        "1 cdita canela"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to 110°C / 225°F; line 2 trays.",
+        "Lay the apple slices flat and dust with cinnamon.",
+        "Bake 1½–2 hours, flipping once, until crisp.",
+        "Cool completely; store in an airtight jar.",
+        "Toddler tip: offer softer, less-baked slices — crisp chips can be hard to chew."
+      ],
+      "es": [
+        "Precalentar el horno a 110 °C; forrar 2 bandejas.",
+        "Acomodar las láminas de manzana y espolvorear con canela.",
+        "Hornear 1½–2 horas, dando vuelta una vez, hasta que estén crocantes.",
+        "Enfriar por completo; guardar en un frasco hermético.",
+        "Consejo para pequeños: ofrecer láminas menos horneadas — las muy crocantes cuestan masticar."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    },
+    "prep": [
+      "apple-chips"
+    ]
+  },
+  {
+    "id": "melon-and-grape-skewers",
+    "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "skewers"
+    ],
+    "name": {
+      "en": "Melon & Grape Skewers",
+      "es": "Brochetas de Melón y Uvas"
+    },
+    "ing": {
+      "en": [
+        "½ melon, cubed",
+        "2 cups grapes",
+        "Wooden skewers"
+      ],
+      "es": [
+        "½ melón en cubos",
+        "2 tazas uvas",
+        "Palitos de brochette de madera"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Thread melon cubes and grapes onto skewers.",
+        "Chill until snack time.",
+        "Toddler tip: serve off the stick with grapes quartered lengthwise."
+      ],
+      "es": [
+        "Ensartar los cubos de melón y las uvas en los palitos.",
+        "Enfriar hasta la merienda.",
+        "Consejo para pequeños: servir sin palito, con las uvas cortadas en cuartos a lo largo."
+      ]
+    },
+    "tip": {
+      "en": "Juicy and hydrating — handy on warm afternoons.",
+      "es": "Jugoso e hidratante — ideal para las tardes calurosas."
+    }
+  },
+  {
+    "id": "mango-lassi",
+    "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "smoothie"
+    ],
+    "name": {
+      "en": "Mango Lassi",
+      "es": "Lassi de Mango"
+    },
+    "ing": {
+      "en": [
+        "2 cups frozen mango",
+        "2 cups Greek yogurt",
+        "1 cup milk",
+        "1 tbsp honey",
+        "Pinch of cinnamon"
+      ],
+      "es": [
+        "2 tazas mango congelado",
+        "2 tazas yogur griego",
+        "1 taza leche",
+        "1 cda miel",
+        "Pizca de canela"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Blend everything until smooth and frothy.",
+        "Pour into glasses and dust with cinnamon.",
+        "Toddler tip: serve in a cup with a lid; no honey under 1."
+      ],
+      "es": [
+        "Licuar todo hasta que quede liso y espumoso.",
+        "Servir en vasos y espolvorear con canela.",
+        "Consejo para pequeños: servir en vaso con tapa; sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "Probiotic yogurt plus vitamin C from the mango.",
+      "es": "Yogur con probióticos más la vitamina C del mango."
+    }
+  },
+  {
+    "id": "peanut-butter-stuffed-dates",
+    "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "nut-butter"
+    ],
+    "name": {
+      "en": "Peanut Butter Stuffed Dates",
+      "es": "Dátiles Rellenos con Mantequilla de Maní"
+    },
+    "ing": {
+      "en": [
+        "12 dates, pitted",
+        "3 tbsp peanut butter",
+        "2 apples, sliced"
+      ],
+      "es": [
+        "12 dátiles sin carozo",
+        "3 cdas mantequilla de maní",
+        "2 manzanas en gajos"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Slit each date open and check the pit is out.",
+        "Fill with a little peanut butter.",
+        "Serve with apple slices.",
+        "Toddler tip: chop dates into small pieces — whole dates are a choking risk."
+      ],
+      "es": [
+        "Abrir cada dátil y verificar que no tenga carozo.",
+        "Rellenar con un poco de mantequilla de maní.",
+        "Servir con gajos de manzana.",
+        "Consejo para pequeños: picar los dátiles en trocitos — enteros son riesgo de atragantamiento."
+      ]
+    },
+    "tip": {
+      "en": "Dates give natural sweetness, fibre, and iron.",
+      "es": "Los dátiles aportan dulzor natural, fibra y hierro."
+    }
+  },
+  {
+    "id": "pineapple-and-orange-cups",
+    "type": "snack",
+    "group": "fruit",
+    "name": {
+      "en": "Pineapple & Orange Fruit Cups",
+      "es": "Vasitos de Ananá y Naranja"
+    },
+    "ing": {
+      "en": [
+        "2 cups pineapple chunks",
+        "3 oranges, segmented",
+        "1 cup strawberries, halved",
+        "Fresh mint leaves (optional)"
+      ],
+      "es": [
+        "2 tazas ananá en trozos",
+        "3 naranjas en gajos",
+        "1 taza frutillas en mitades",
+        "Hojas de menta fresca (opcional)"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mix the fruit in a bowl.",
+        "Spoon into small cups and top with torn mint.",
+        "Toddler tip: cut everything into small, soft pieces."
+      ],
+      "es": [
+        "Mezclar la fruta en un bol.",
+        "Servir en vasitos y decorar con menta.",
+        "Consejo para pequeños: cortar todo en trocitos chicos y blandos."
+      ]
+    },
+    "tip": {
+      "en": "A vitamin C boost that helps the body absorb iron from other meals.",
+      "es": "Un refuerzo de vitamina C que ayuda a absorber el hierro de otras comidas."
+    }
+  },
+  {
+    "id": "mini-cheese-quesadillas",
+    "type": "snack",
+    "group": "dairy",
+    "tags": [
+      "tortilla"
+    ],
+    "name": {
+      "en": "Mini Cheese Quesadillas",
+      "es": "Mini Quesadillas de Queso"
+    },
+    "ing": {
+      "en": [
+        "4 small flour tortillas",
+        "1 cup shredded cheese",
+        "1 cucumber, sliced"
+      ],
+      "es": [
+        "4 tortillas de harina pequeñas",
+        "1 taza queso rallado",
+        "1 pepino en rodajas"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sprinkle cheese over half of each tortilla and fold.",
+        "Toast in a dry pan 1–2 min per side until melted.",
+        "Cut into wedges; serve with cucumber.",
+        "Toddler tip: let cool a little and cut into strips."
+      ],
+      "es": [
+        "Espolvorear queso sobre media tortilla y doblar.",
+        "Dorar en sartén seca 1–2 min por lado hasta que se derrita.",
+        "Cortar en triángulos; servir con pepino.",
+        "Consejo para pequeños: dejar entibiar y cortar en tiras."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "ricotta-with-honey-and-berries",
+    "type": "snack",
+    "group": "dairy",
+    "name": {
+      "en": "Ricotta with Honey & Berries",
+      "es": "Ricota con Miel y Frutos Rojos"
+    },
+    "ing": {
+      "en": [
+        "250g ricotta",
+        "1 cup mixed berries (fresh or frozen)",
+        "1 tbsp honey",
+        "Handful of crackers"
+      ],
+      "es": [
+        "250 g ricota",
+        "1 taza frutas del bosque (frescas o congeladas)",
+        "1 cda miel",
+        "Un puñado de galletas"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Spoon ricotta into small bowls.",
+        "Top with berries and a drizzle of honey.",
+        "Serve with crackers for scooping.",
+        "Toddler tip: mash the berries in; no honey under 1."
+      ],
+      "es": [
+        "Servir la ricota en bols chicos.",
+        "Cubrir con frutas del bosque y un hilo de miel.",
+        "Acompañar con galletas para untar.",
+        "Consejo para pequeños: pisar las frutas; sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "berry-yogurt-bark",
+    "type": "snack",
+    "group": "dairy",
+    "tags": [
+      "yogurt",
+      "frozen"
+    ],
+    "name": {
+      "en": "Berry Yogurt Bark",
+      "es": "Barrita Helada de Yogur y Frutos Rojos"
+    },
+    "ing": {
+      "en": [
+        "2 cups Greek yogurt",
+        "2 tbsp honey",
+        "1 cup mixed berries (fresh or frozen)",
+        "2 tbsp granola"
+      ],
+      "es": [
+        "2 tazas yogur griego",
+        "2 cdas miel",
+        "1 taza frutas del bosque (frescas o congeladas)",
+        "2 cdas granola"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mix yogurt with honey and spread 1 cm thick on a lined tray.",
+        "Scatter berries and granola on top.",
+        "Freeze 3 hours, then break into pieces.",
+        "Toddler tip: let pieces soften for a minute; no honey under 1."
+      ],
+      "es": [
+        "Mezclar el yogur con la miel y extender en 1 cm sobre una bandeja forrada.",
+        "Esparcir las frutas y la granola por encima.",
+        "Congelar 3 horas y romper en trozos.",
+        "Consejo para pequeños: dejar que se ablanden un minuto; sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "Keeps in the freezer for a week — a cool, calcium-rich snack.",
+      "es": "Dura una semana en el freezer — una merienda fresca y rica en calcio."
+    },
+    "prep": [
+      "yogurt-bark"
+    ]
+  },
+  {
+    "id": "mozzarella-and-tomato-skewers",
+    "type": "snack",
+    "group": "dairy",
+    "tags": [
+      "skewers"
+    ],
+    "name": {
+      "en": "Mozzarella & Tomato Skewers",
+      "es": "Brochetas Caprese"
+    },
+    "ing": {
+      "en": [
+        "200g mozzarella balls",
+        "1 cup cherry tomatoes",
+        "Fresh basil leaves",
+        "1 tsp olive oil",
+        "Wooden skewers"
+      ],
+      "es": [
+        "200 g bocconcinos de mozzarella",
+        "1 taza tomates cherry",
+        "Hojas de albahaca fresca",
+        "1 cdita aceite de oliva",
+        "Palitos de brochette de madera"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Thread tomatoes, basil, and mozzarella onto skewers.",
+        "Drizzle with a little olive oil.",
+        "Toddler tip: off the stick, with tomatoes and mozzarella quartered."
+      ],
+      "es": [
+        "Ensartar tomates, albahaca y mozzarella en los palitos.",
+        "Rociar con un poco de aceite de oliva.",
+        "Consejo para pequeños: sin palito, con tomates y mozzarella en cuartos."
+      ]
+    },
+    "tip": {
+      "en": "Choose pasteurised mozzarella during pregnancy.",
+      "es": "Elegí mozzarella pasteurizada durante el embarazo."
+    }
+  },
+  {
+    "id": "veggie-sticks-with-yogurt-ranch",
+    "type": "snack",
+    "group": "veg",
+    "name": {
+      "en": "Veggie Sticks with Yogurt Ranch",
+      "es": "Bastones de Verdura con Dip de Yogur"
+    },
+    "ing": {
+      "en": [
+        "3 carrots, cut into sticks",
+        "1 cucumber, cut into sticks",
+        "1 red bell pepper, cut into strips",
+        "1 cup Greek yogurt",
+        "1 tsp garlic powder",
+        "Fresh dill",
+        "Salt"
+      ],
+      "es": [
+        "3 zanahorias en bastones",
+        "1 pepino en bastones",
+        "1 morrón rojo en tiras",
+        "1 taza yogur griego",
+        "1 cdita ajo en polvo",
+        "Eneldo fresco",
+        "Sal"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mix yogurt, garlic powder, chopped dill, and a pinch of salt.",
+        "Arrange the veggie sticks around the dip.",
+        "Toddler tip: steam the carrot sticks 3 min so they are soft enough."
+      ],
+      "es": [
+        "Mezclar el yogur con el ajo en polvo, el eneldo picado y una pizca de sal.",
+        "Acomodar los bastones de verdura alrededor del dip.",
+        "Consejo para pequeños: cocinar al vapor los bastones de zanahoria 3 min para que estén blandos."
+      ]
+    },
+    "tip": {
+      "en": "Crunchy, colourful, and a sneaky extra portion of vegetables.",
+      "es": "Crocante, colorido y una porción extra de verduras."
+    }
+  },
+  {
+    "id": "edamame-with-sea-salt",
+    "type": "snack",
+    "group": "veg",
+    "name": {
+      "en": "Edamame with Sea Salt",
+      "es": "Edamame con Sal"
+    },
+    "ing": {
+      "en": [
+        "400g frozen edamame in pods",
+        "Salt",
+        "Juice of 1 lime"
+      ],
+      "es": [
+        "400 g edamame congelado en vaina",
+        "Sal",
+        "Jugo de 1 lima"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Boil the edamame 4–5 min; drain.",
+        "Toss with salt and lime juice.",
+        "Pop the beans out of the pods to eat.",
+        "Toddler tip: pod the beans and lightly squash them."
+      ],
+      "es": [
+        "Hervir el edamame 4–5 min; escurrir.",
+        "Mezclar con sal y jugo de lima.",
+        "Sacar los porotos de la vaina para comerlos.",
+        "Consejo para pequeños: sacar los porotos de la vaina y aplastarlos un poco."
+      ]
+    },
+    "tip": {
+      "en": "Plant protein, folate, and fun to eat with your hands.",
+      "es": "Proteína vegetal, folato y divertido de comer con la mano."
+    }
+  },
+  {
+    "id": "guacamole-with-tortilla-chips",
+    "type": "snack",
+    "group": "veg",
+    "tags": [
+      "avocado-snack"
+    ],
+    "name": {
+      "en": "Guacamole with Baked Tortilla Chips",
+      "es": "Guacamole con Nachos Horneados"
+    },
+    "ing": {
+      "en": [
+        "3 ripe avocados",
+        "1 tomato, finely diced",
+        "Juice of 1 lime",
+        "Fresh cilantro, chopped",
+        "6 corn tortillas, cut into chips",
+        "1 tbsp olive oil",
+        "Salt"
+      ],
+      "es": [
+        "3 paltas maduras",
+        "1 tomate picado fino",
+        "Jugo de 1 lima",
+        "Cilantro fresco picado",
+        "6 tortillas de maíz cortadas en triángulos",
+        "1 cda aceite de oliva",
+        "Sal"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Brush tortilla triangles with olive oil and bake at 200°C / 400°F for 8–10 min until crisp.",
+        "Mash avocados with lime juice and salt; stir in tomato and cilantro.",
+        "Serve the guacamole with the warm chips.",
+        "Toddler tip: guacamole on soft tortilla strips instead of crisp chips."
+      ],
+      "es": [
+        "Pincelar los triángulos de tortilla con aceite y hornear a 200 °C 8–10 min hasta que estén crocantes.",
+        "Pisar las paltas con el jugo de lima y sal; agregar el tomate y el cilantro.",
+        "Servir el guacamole con los nachos tibios.",
+        "Consejo para pequeños: guacamole sobre tiras de tortilla blanda en lugar de nachos crocantes."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "cucumber-cream-cheese-bites",
+    "type": "snack",
+    "group": "veg",
+    "name": {
+      "en": "Cucumber & Cream Cheese Bites",
+      "es": "Bocaditos de Pepino y Queso Crema"
+    },
+    "ing": {
+      "en": [
+        "2 cucumbers, cut into thick rounds",
+        "150g cream cheese",
+        "Fresh dill",
+        "1 cup cherry tomatoes, halved"
+      ],
+      "es": [
+        "2 pepinos en rodajas gruesas",
+        "150 g queso crema",
+        "Eneldo fresco",
+        "1 taza tomates cherry en mitades"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Top each cucumber round with a little cream cheese.",
+        "Sprinkle with chopped dill and add half a cherry tomato.",
+        "Toddler tip: peel the cucumber and quarter the tomatoes."
+      ],
+      "es": [
+        "Cubrir cada rodaja de pepino con un poco de queso crema.",
+        "Espolvorear con eneldo picado y agregar medio tomate cherry.",
+        "Consejo para pequeños: pelar el pepino y cortar los tomates en cuartos."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "homemade-popcorn",
+    "type": "snack",
+    "group": "grain",
+    "name": {
+      "en": "Homemade Popcorn",
+      "es": "Pochoclos Caseros"
+    },
+    "ing": {
+      "en": [
+        "½ cup popcorn kernels",
+        "1 tbsp olive oil",
+        "1 tbsp butter, melted",
+        "Salt"
+      ],
+      "es": [
+        "½ taza maíz pisingallo",
+        "1 cda aceite de oliva",
+        "1 cda manteca derretida",
+        "Sal"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Heat oil in a large pot with a lid; add kernels and cover.",
+        "Shake the pot as it pops; take off the heat when popping slows.",
+        "Toss with melted butter and a pinch of salt.",
+        "Toddler tip: not for under-4s — popcorn is a choking hazard; offer rice cakes instead."
+      ],
+      "es": [
+        "Calentar el aceite en una olla grande con tapa; agregar el maíz y tapar.",
+        "Sacudir la olla mientras explota; retirar cuando baje el ritmo.",
+        "Mezclar con la manteca derretida y una pizca de sal.",
+        "Consejo para pequeños: no para menores de 4 años — los pochoclos son riesgo de atragantamiento; ofrecer galletas de arroz."
+      ]
+    },
+    "tip": {
+      "en": "A whole-grain snack with plenty of fibre.",
+      "es": "Un snack integral con mucha fibra."
+    }
+  },
+  {
+    "id": "oat-and-date-energy-balls",
+    "type": "snack",
+    "group": "grain",
+    "tags": [
+      "nut-butter"
+    ],
+    "name": {
+      "en": "Oat & Date Energy Balls",
+      "es": "Bolitas Energéticas de Avena y Dátiles"
+    },
+    "ing": {
+      "en": [
+        "1 cup dates, pitted",
+        "1 cup rolled oats",
+        "3 tbsp peanut butter",
+        "2 tbsp cocoa powder",
+        "1 tbsp chia seeds"
+      ],
+      "es": [
+        "1 taza dátiles sin carozo",
+        "1 taza avena arrollada",
+        "3 cdas mantequilla de maní",
+        "2 cdas cacao en polvo",
+        "1 cda semillas de chía"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Blitz dates in a food processor until sticky.",
+        "Add oats, peanut butter, cocoa, and chia; pulse to combine.",
+        "Roll into 16 balls and chill 30 min.",
+        "Toddler tip: flatten into small discs so they are easier to chew."
+      ],
+      "es": [
+        "Procesar los dátiles hasta que quede una pasta.",
+        "Agregar la avena, la mantequilla de maní, el cacao y la chía; procesar para unir.",
+        "Formar 16 bolitas y enfriar 30 min.",
+        "Consejo para pequeños: aplastarlas en discos chicos para que sea más fácil masticar."
+      ]
+    },
+    "tip": {
+      "en": "They keep a week in the fridge — a quick energy boost for mom.",
+      "es": "Duran una semana en la heladera — un golpe de energía rápido para mamá."
+    },
+    "prep": [
+      "energy-balls"
+    ]
+  },
+  {
+    "id": "oatmeal-raisin-cookies",
+    "type": "snack",
+    "group": "grain",
+    "tags": [
+      "cookies"
+    ],
+    "name": {
+      "en": "Soft Oatmeal Raisin Cookies",
+      "es": "Galletitas Blandas de Avena y Pasas"
+    },
+    "ing": {
+      "en": [
+        "1½ cups rolled oats",
+        "¾ cup flour",
+        "1 tsp baking powder",
+        "1 tsp cinnamon",
+        "2 ripe bananas, mashed",
+        "1 egg",
+        "3 tbsp butter, melted",
+        "⅓ cup raisins",
+        "2 cups milk, to drink"
+      ],
+      "es": [
+        "1½ tazas avena arrollada",
+        "¾ taza harina",
+        "1 cdita polvo para hornear",
+        "1 cdita canela",
+        "2 bananas maduras pisadas",
+        "1 huevo",
+        "3 cdas manteca derretida",
+        "⅓ taza pasas de uva",
+        "2 tazas leche, para tomar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to 180°C / 350°F; line a tray.",
+        "Mix banana, egg, and butter; stir in oats, flour, baking powder, cinnamon, and raisins.",
+        "Drop spoonfuls on the tray and flatten slightly.",
+        "Bake 12–14 min; cool, then serve with milk.",
+        "Toddler tip: make a few without raisins and break into pieces."
+      ],
+      "es": [
+        "Precalentar el horno a 180 °C; forrar una bandeja.",
+        "Mezclar la banana, el huevo y la manteca; incorporar la avena, la harina, el polvo para hornear, la canela y las pasas.",
+        "Poner cucharadas en la bandeja y aplastar un poco.",
+        "Hornear 12–14 min; enfriar y servir con leche.",
+        "Consejo para pequeños: hacer algunas sin pasas y romperlas en trocitos."
+      ]
+    },
+    "tip": {
+      "en": "Sweetened mostly with banana — far less sugar than store cookies.",
+      "es": "Endulzadas casi solo con banana — mucha menos azúcar que las compradas."
+    },
+    "prep": [
+      "oat-cookies"
+    ]
+  },
+  {
+    "id": "pita-chips-with-tzatziki",
+    "type": "snack",
+    "group": "grain",
+    "tags": [
+      "pita"
+    ],
+    "name": {
+      "en": "Baked Pita Chips with Tzatziki",
+      "es": "Chips de Pan Pita con Tzatziki"
+    },
+    "ing": {
+      "en": [
+        "4 pita breads, cut into triangles",
+        "1 tbsp olive oil",
+        "1 cup Greek yogurt",
+        "1 cucumber, grated",
+        "1 clove garlic, grated",
+        "Fresh dill",
+        "Salt"
+      ],
+      "es": [
+        "4 panes pita en triángulos",
+        "1 cda aceite de oliva",
+        "1 taza yogur griego",
+        "1 pepino rallado",
+        "1 diente de ajo rallado",
+        "Eneldo fresco",
+        "Sal"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Brush pita triangles with oil; bake at 200°C / 400°F for 8 min until crisp.",
+        "Squeeze the grated cucumber dry; mix with yogurt, garlic, dill, and salt.",
+        "Serve the chips with the tzatziki.",
+        "Toddler tip: soft warm pita strips instead of crisp chips."
+      ],
+      "es": [
+        "Pincelar los triángulos de pita con aceite; hornear a 200 °C 8 min hasta que estén crocantes.",
+        "Escurrir bien el pepino rallado; mezclar con el yogur, el ajo, el eneldo y sal.",
+        "Servir los chips con el tzatziki.",
+        "Consejo para pequeños: tiras de pita tibia y blanda en lugar de chips."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "apple-donuts",
+    "type": "snack",
+    "group": "fruit",
+    "tags": [
+      "apple",
+      "nut-butter"
+    ],
+    "experimental": true,
+    "name": {
+      "en": "Apple \"Donuts\"",
+      "es": "\"Donas\" de Manzana"
+    },
+    "ing": {
+      "en": [
+        "3 apples, cored and sliced into rings",
+        "½ cup Greek yogurt",
+        "2 tbsp peanut butter",
+        "2 tbsp granola",
+        "1 tbsp sunflower seeds"
+      ],
+      "es": [
+        "3 manzanas sin el centro, en aros",
+        "½ taza yogur griego",
+        "2 cdas mantequilla de maní",
+        "2 cdas granola",
+        "1 cda semillas de girasol"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Pat the apple rings dry.",
+        "Spread half with yogurt and half with peanut butter.",
+        "Sprinkle with granola and seeds like donut toppings.",
+        "Toddler tip: thin apple rings, yogurt topping, no seeds."
+      ],
+      "es": [
+        "Secar los aros de manzana.",
+        "Untar la mitad con yogur y la otra mitad con mantequilla de maní.",
+        "Espolvorear con granola y semillas como si fueran donas.",
+        "Consejo para pequeños: aros finos de manzana, con yogur y sin semillas."
+      ]
+    },
+    "tip": {
+      "en": "Fun to decorate — and it is just fruit underneath.",
+      "es": "Divertidas de decorar — y abajo es solo fruta."
+    }
+  },
+  {
+    "id": "crispy-roasted-chickpeas",
+    "type": "snack",
+    "group": "veg",
+    "experimental": true,
+    "name": {
+      "en": "Crispy Roasted Chickpeas",
+      "es": "Garbanzos Crocantes al Horno"
+    },
+    "ing": {
+      "en": [
+        "2 cans (400g each) chickpeas, drained",
+        "1 tbsp olive oil",
+        "1 tsp paprika",
+        "½ tsp garlic powder",
+        "Salt"
+      ],
+      "es": [
+        "2 latas (400 g c/u) garbanzos escurridos",
+        "1 cda aceite de oliva",
+        "1 cdita pimentón",
+        "½ cdita ajo en polvo",
+        "Sal"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Dry the chickpeas very well with a towel.",
+        "Toss with oil, paprika, garlic powder, and salt.",
+        "Roast at 200°C / 400°F for 30–35 min, shaking halfway, until crunchy.",
+        "Toddler tip: not for little ones (choking risk) — give them soft hummus instead."
+      ],
+      "es": [
+        "Secar muy bien los garbanzos con un repasador.",
+        "Mezclar con aceite, pimentón, ajo en polvo y sal.",
+        "Hornear a 200 °C 30–35 min, sacudiendo a mitad, hasta que estén crocantes.",
+        "Consejo para pequeños: no para los más chicos (riesgo de atragantamiento) — mejor hummus blando."
+      ]
+    },
+    "tip": {
+      "en": "Crunchy like chips, but full of plant protein and fibre.",
+      "es": "Crocantes como papas fritas, pero llenos de proteína vegetal y fibra."
+    }
+  },
+  {
+    "id": "avocado-chocolate-mousse",
+    "type": "snack",
+    "group": "fruit",
+    "experimental": true,
+    "name": {
+      "en": "Avocado Chocolate Mousse",
+      "es": "Mousse de Chocolate y Palta"
+    },
+    "ing": {
+      "en": [
+        "2 ripe avocados",
+        "2 ripe bananas",
+        "3 tbsp cocoa powder",
+        "2 tbsp honey",
+        "¼ cup milk",
+        "1 cup mixed berries (fresh or frozen)"
+      ],
+      "es": [
+        "2 paltas maduras",
+        "2 bananas maduras",
+        "3 cdas cacao en polvo",
+        "2 cdas miel",
+        "¼ taza leche",
+        "1 taza frutas del bosque (frescas o congeladas)"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Blend avocados, bananas, cocoa, honey, and milk until silky.",
+        "Spoon into small cups and chill 30 min.",
+        "Top with berries.",
+        "Toddler tip: no honey under 1 — the banana sweetens it."
+      ],
+      "es": [
+        "Licuar las paltas, las bananas, el cacao, la miel y la leche hasta que quede sedoso.",
+        "Servir en vasitos y enfriar 30 min.",
+        "Cubrir con frutas del bosque.",
+        "Consejo para pequeños: sin miel antes del año — la banana la endulza."
+      ]
+    },
+    "tip": {
+      "en": "Nobody guesses the avocado — healthy fats in a chocolate cup.",
+      "es": "Nadie adivina la palta — grasas saludables en un vasito de chocolate."
+    }
   },
   {
     "id": "beef-and-lentil-soup-with-bread",
@@ -3106,7 +6328,8 @@ const recipes = [
     "protein": "beef",
     "base": "pasta",
     "tags": [
-      "beef-broccoli"
+      "beef-broccoli",
+      "stir-fry-noodles"
     ],
     "name": {
       "en": "Beef & Broccoli Noodles",
@@ -3291,6 +6514,9 @@ const recipes = [
     "type": "dinner",
     "protein": "poultry",
     "base": "rice",
+    "tags": [
+      "curry"
+    ],
     "name": {
       "en": "Chicken Curry with Rice",
       "es": "Curry de Pollo con Arroz"
@@ -3674,6 +6900,9 @@ const recipes = [
     "type": "dinner",
     "protein": "poultry",
     "base": "rice",
+    "tags": [
+      "risotto"
+    ],
     "name": {
       "en": "Chicken & Mushroom Risotto",
       "es": "Risotto de Pollo y Champiñones"
@@ -3741,6 +6970,9 @@ const recipes = [
     "type": "dinner",
     "protein": "fish",
     "base": "potato",
+    "tags": [
+      "breaded-fish"
+    ],
     "name": {
       "en": "Baked Fish & Chips",
       "es": "Pescado Rebozado al Horno con Papas"
@@ -3801,6 +7033,9 @@ const recipes = [
     "type": "dinner",
     "protein": "poultry",
     "base": "bread",
+    "tags": [
+      "tortilla"
+    ],
     "name": {
       "en": "Chicken Enchiladas",
       "es": "Enchiladas de Pollo"
@@ -4115,6 +7350,1345 @@ const recipes = [
       "en": "Minimal effort, maximum flavour. The roasted garlic becomes sweet and spreadable!",
       "es": "Mínimo esfuerzo, máximo sabor. ¡El ajo asado se vuelve dulce y untable!"
     }
+  },
+  {
+    "id": "shepherds-pie",
+    "type": "dinner",
+    "protein": "beef",
+    "base": "potato",
+    "tags": [
+      "mince-pie"
+    ],
+    "name": {
+      "en": "Shepherd’s Pie (Pastel de Papas)",
+      "es": "Pastel de Papas"
+    },
+    "ing": {
+      "en": [
+        "700g ground beef",
+        "1 onion, diced",
+        "2 carrots, diced",
+        "1 cup frozen peas",
+        "2 tbsp tomato paste",
+        "1 cup beef broth",
+        "1 tsp paprika",
+        "1 kg potatoes, peeled & cubed",
+        "½ cup warm milk",
+        "2 tbsp butter",
+        "½ cup grated parmesan",
+        "1 tbsp olive oil"
+      ],
+      "es": [
+        "700 g carne picada",
+        "1 cebolla picada",
+        "2 zanahorias picadas",
+        "1 taza arvejas congeladas",
+        "2 cdas extracto de tomate",
+        "1 taza caldo de carne",
+        "1 cdita pimentón",
+        "1 kg papas peladas y en cubos",
+        "½ taza leche tibia",
+        "2 cdas manteca",
+        "½ taza parmesano rallado",
+        "1 cda aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Brown beef, onion, and carrot in olive oil 8 min.",
+        "Add tomato paste, paprika, broth, and peas; simmer 15 min until thick.",
+        "Boil potatoes and mash with milk and butter.",
+        "Spread the beef in a dish, cover with mash, and sprinkle parmesan.",
+        "Bake at 200°C / 400°F for 20 min until golden.",
+        "Toddler tip: soft and mashable — ideal as is."
+      ],
+      "es": [
+        "Dorar la carne, la cebolla y la zanahoria en aceite de oliva 8 min.",
+        "Agregar el extracto, el pimentón, el caldo y las arvejas; cocinar 15 min hasta que espese.",
+        "Hervir las papas y hacer puré con la leche y la manteca.",
+        "Poner la carne en una fuente, cubrir con el puré y espolvorear parmesano.",
+        "Hornear a 200 °C 20 min hasta dorar.",
+        "Consejo para pequeños: blando y fácil de pisar — ideal así."
+      ]
+    },
+    "tip": {
+      "en": "Iron from the beef, vitamin A from the carrots — classic family comfort.",
+      "es": "Hierro de la carne, vitamina A de la zanahoria — un clásico reconfortante."
+    }
+  },
+  {
+    "id": "lemon-herb-roast-chicken",
+    "type": "dinner",
+    "protein": "poultry",
+    "base": "potato",
+    "tags": [
+      "traybake"
+    ],
+    "name": {
+      "en": "Lemon & Herb Roast Chicken with Vegetables",
+      "es": "Pollo al Horno con Limón, Hierbas y Verduras"
+    },
+    "ing": {
+      "en": [
+        "8 chicken thighs",
+        "4 medium potatoes, chunked",
+        "3 carrots, chunked",
+        "1 red onion, wedged",
+        "1 lemon, halved",
+        "4 cloves garlic",
+        "2 sprigs fresh rosemary",
+        "3 tbsp olive oil",
+        "Salt & pepper"
+      ],
+      "es": [
+        "8 muslos de pollo",
+        "4 papas medianas en trozos",
+        "3 zanahorias en trozos",
+        "1 cebolla morada en gajos",
+        "1 limón cortado a la mitad",
+        "4 dientes de ajo",
+        "2 ramas de romero fresco",
+        "3 cdas aceite de oliva",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to 200°C / 400°F.",
+        "Toss potatoes, carrots, onion, and garlic with half the oil in a large tray.",
+        "Rub chicken with the rest of the oil, lemon juice, rosemary, salt, and pepper; nestle on top with the lemon halves.",
+        "Roast 45 min until the chicken reaches 74°C / 165°F inside.",
+        "Toddler tip: shred the meat off the bone; mash the soft vegetables."
+      ],
+      "es": [
+        "Precalentar el horno a 200 °C.",
+        "Mezclar las papas, las zanahorias, la cebolla y el ajo con la mitad del aceite en una asadera grande.",
+        "Frotar el pollo con el resto del aceite, jugo de limón, romero, sal y pimienta; acomodar encima con las mitades de limón.",
+        "Asar 45 min hasta que el pollo llegue a 74 °C por dentro.",
+        "Consejo para pequeños: desmenuzar la carne del hueso; pisar las verduras blandas."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "vegetable-lasagna",
+    "type": "dinner",
+    "protein": "plant",
+    "base": "pasta",
+    "tags": [
+      "lasagna"
+    ],
+    "name": {
+      "en": "Vegetable Lasagna",
+      "es": "Lasaña de Verduras"
+    },
+    "ing": {
+      "en": [
+        "12 lasagna sheets",
+        "2 zucchini, diced",
+        "1 red bell pepper, diced",
+        "2 cups fresh spinach",
+        "1 can (400g) crushed tomatoes",
+        "500g ricotta",
+        "250g mozzarella, grated",
+        "1 egg",
+        "1 onion, diced",
+        "2 cloves garlic, minced",
+        "1 tsp dried basil",
+        "2 tbsp olive oil"
+      ],
+      "es": [
+        "12 láminas de lasaña",
+        "2 zapallitos en cubos",
+        "1 morrón rojo picado",
+        "2 tazas espinaca fresca",
+        "1 lata (400 g) tomates triturados",
+        "500 g ricota",
+        "250 g mozzarella rallada",
+        "1 huevo",
+        "1 cebolla picada",
+        "2 dientes de ajo picados",
+        "1 cdita albahaca seca",
+        "2 cdas aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sauté onion, garlic, zucchini, and pepper 8 min; add tomatoes and basil, simmer 10 min.",
+        "Mix ricotta with egg and chopped spinach.",
+        "Layer sauce, sheets, ricotta, and mozzarella three times, ending with sauce and mozzarella.",
+        "Cover with foil and bake at 190°C / 375°F for 30 min; uncover for 15 min more.",
+        "Rest 10 min before cutting.",
+        "Toddler tip: cut a soft middle piece into small squares."
+      ],
+      "es": [
+        "Saltear la cebolla, el ajo, el zapallito y el morrón 8 min; agregar los tomates y la albahaca, cocinar 10 min.",
+        "Mezclar la ricota con el huevo y la espinaca picada.",
+        "Armar capas de salsa, láminas, ricota y mozzarella tres veces, terminando con salsa y mozzarella.",
+        "Tapar con papel aluminio y hornear a 190 °C 30 min; destapar y hornear 15 min más.",
+        "Dejar reposar 10 min antes de cortar.",
+        "Consejo para pequeños: cortar un trozo blando del centro en cuadraditos."
+      ]
+    },
+    "tip": {
+      "en": "Ricotta and mozzarella make it a calcium powerhouse — use pasteurised cheese.",
+      "es": "La ricota y la mozzarella la llenan de calcio — usá quesos pasteurizados."
+    }
+  },
+  {
+    "id": "turkey-chili-with-beans",
+    "type": "dinner",
+    "protein": "poultry",
+    "base": "rice",
+    "tags": [
+      "chili"
+    ],
+    "name": {
+      "en": "Turkey Chili with Beans",
+      "es": "Chili de Pavo con Porotos"
+    },
+    "ing": {
+      "en": [
+        "500g ground turkey",
+        "1 can kidney beans, drained",
+        "1 can (400g) diced tomatoes",
+        "1 onion, diced",
+        "1 red bell pepper, diced",
+        "2 cloves garlic, minced",
+        "1 tsp cumin",
+        "1 tsp chili powder",
+        "3 cups cooked rice",
+        "½ cup sour cream",
+        "1 tbsp olive oil"
+      ],
+      "es": [
+        "500 g carne picada de pavo",
+        "1 lata porotos kidney escurridos",
+        "1 lata (400 g) tomates picados",
+        "1 cebolla picada",
+        "1 morrón rojo picado",
+        "2 dientes de ajo picados",
+        "1 cdita comino",
+        "1 cdita ají molido",
+        "3 tazas arroz cocido",
+        "½ taza crema agria",
+        "1 cda aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Brown turkey with onion, pepper, and garlic in olive oil 8 min.",
+        "Add cumin, chili powder, tomatoes, and beans; simmer 20 min.",
+        "Serve over rice with a spoonful of sour cream.",
+        "Toddler tip: make it mild and mash the beans a little."
+      ],
+      "es": [
+        "Dorar el pavo con la cebolla, el morrón y el ajo en aceite de oliva 8 min.",
+        "Agregar el comino, el ají, los tomates y los porotos; cocinar 20 min.",
+        "Servir sobre arroz con una cucharada de crema agria.",
+        "Consejo para pequeños: hacerlo suave y pisar un poco los porotos."
+      ]
+    },
+    "tip": {
+      "en": "Lean turkey plus beans: protein and fibre in one pot.",
+      "es": "Pavo magro más porotos: proteína y fibra en una sola olla."
+    },
+    "prep": [
+      "rice"
+    ]
+  },
+  {
+    "id": "teriyaki-salmon-with-rice",
+    "type": "dinner",
+    "protein": "fish",
+    "base": "rice",
+    "tags": [
+      "salmon"
+    ],
+    "name": {
+      "en": "Teriyaki Salmon with Rice & Greens",
+      "es": "Salmón Teriyaki con Arroz y Verdes"
+    },
+    "ing": {
+      "en": [
+        "4 salmon fillets (180g each)",
+        "3 tbsp soy sauce",
+        "2 tbsp honey",
+        "1 tsp fresh ginger, grated",
+        "1 clove garlic, grated",
+        "3 cups cooked rice",
+        "2 cups broccoli florets",
+        "1 tsp sesame seeds"
+      ],
+      "es": [
+        "4 filetes de salmón (180 g c/u)",
+        "3 cdas salsa de soja",
+        "2 cdas miel",
+        "1 cdita jengibre fresco rallado",
+        "1 diente de ajo rallado",
+        "3 tazas arroz cocido",
+        "2 tazas floretes de brócoli",
+        "1 cdita semillas de sésamo"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mix soy sauce, honey, ginger, and garlic.",
+        "Brush over the salmon and bake at 200°C / 400°F for 12–15 min until it flakes.",
+        "Steam the broccoli 4 min.",
+        "Serve salmon over rice with broccoli; sprinkle sesame seeds.",
+        "Toddler tip: flake the salmon, checking for bones."
+      ],
+      "es": [
+        "Mezclar la salsa de soja, la miel, el jengibre y el ajo.",
+        "Pincelar el salmón y hornear a 200 °C 12–15 min hasta que se desmenuce.",
+        "Cocinar el brócoli al vapor 4 min.",
+        "Servir el salmón sobre el arroz con brócoli; espolvorear sésamo.",
+        "Consejo para pequeños: desmenuzar el salmón revisando las espinas."
+      ]
+    },
+    "tip": {
+      "en": "Omega-3 rich salmon twice a week is great for baby’s development.",
+      "es": "El salmón rico en omega-3 dos veces por semana es excelente para el desarrollo del bebé."
+    },
+    "prep": [
+      "rice"
+    ]
+  },
+  {
+    "id": "arroz-con-pollo",
+    "type": "dinner",
+    "protein": "poultry",
+    "base": "rice",
+    "name": {
+      "en": "Arroz con Pollo",
+      "es": "Arroz con Pollo"
+    },
+    "ing": {
+      "en": [
+        "700g chicken thighs, boneless, cubed",
+        "1½ cups long-grain rice",
+        "1 onion, diced",
+        "1 red bell pepper, diced",
+        "2 cloves garlic, minced",
+        "1 cup frozen peas",
+        "1 tsp turmeric",
+        "1 tsp paprika",
+        "3 cups chicken broth",
+        "2 tbsp olive oil"
+      ],
+      "es": [
+        "700 g muslos de pollo deshuesados en cubos",
+        "1½ tazas arroz largo fino",
+        "1 cebolla picada",
+        "1 morrón rojo picado",
+        "2 dientes de ajo picados",
+        "1 taza arvejas congeladas",
+        "1 cdita cúrcuma",
+        "1 cdita pimentón",
+        "3 tazas caldo de pollo",
+        "2 cdas aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Brown the chicken in olive oil 6 min; set aside.",
+        "Sauté onion, pepper, and garlic 5 min; stir in rice, turmeric, and paprika for 1 min.",
+        "Add broth and chicken; cover and simmer 18 min.",
+        "Stir in peas and cook 3 more min until the rice is tender.",
+        "Toddler tip: chop the chicken small; the rice is perfectly soft."
+      ],
+      "es": [
+        "Dorar el pollo en aceite de oliva 6 min; reservar.",
+        "Saltear la cebolla, el morrón y el ajo 5 min; agregar el arroz, la cúrcuma y el pimentón 1 min.",
+        "Agregar el caldo y el pollo; tapar y cocinar 18 min.",
+        "Incorporar las arvejas y cocinar 3 min más hasta que el arroz esté tierno.",
+        "Consejo para pequeños: picar el pollo chiquito; el arroz queda bien blando."
+      ]
+    },
+    "tip": {
+      "en": "One pot, everyone happy — a Latin American family classic.",
+      "es": "Una sola olla y todos contentos — un clásico familiar latinoamericano."
+    }
+  },
+  {
+    "id": "stuffed-zucchini",
+    "type": "dinner",
+    "protein": "beef",
+    "base": "none",
+    "name": {
+      "en": "Stuffed Zucchini (Zapallitos Rellenos)",
+      "es": "Zapallitos Rellenos"
+    },
+    "ing": {
+      "en": [
+        "6 round or regular zucchini",
+        "400g ground beef",
+        "1 onion, finely diced",
+        "1 egg",
+        "½ cup breadcrumbs",
+        "½ cup grated parmesan",
+        "1 can (400g) crushed tomatoes",
+        "1 tbsp olive oil",
+        "Crusty bread"
+      ],
+      "es": [
+        "6 zapallitos redondos o largos",
+        "400 g carne picada",
+        "1 cebolla picada fina",
+        "1 huevo",
+        "½ taza pan rallado",
+        "½ taza parmesano rallado",
+        "1 lata (400 g) tomates triturados",
+        "1 cda aceite de oliva",
+        "Pan de campo"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Halve the zucchini, scoop out the centres, and chop the scooped flesh.",
+        "Brown beef, onion, and chopped zucchini 8 min; cool slightly, then mix with egg and half the breadcrumbs.",
+        "Fill the zucchini shells; top with parmesan and the rest of the breadcrumbs.",
+        "Spread tomatoes in a dish, set the zucchini on top, and bake at 190°C / 375°F for 30 min.",
+        "Serve with crusty bread for the sauce.",
+        "Toddler tip: scoop out the soft filling and mash with sauce."
+      ],
+      "es": [
+        "Cortar los zapallitos a la mitad, ahuecarlos y picar la pulpa.",
+        "Dorar la carne, la cebolla y la pulpa 8 min; entibiar y mezclar con el huevo y la mitad del pan rallado.",
+        "Rellenar los zapallitos; cubrir con parmesano y el resto del pan rallado.",
+        "Poner los tomates en una fuente, acomodar los zapallitos encima y hornear a 190 °C 30 min.",
+        "Servir con pan de campo para la salsa.",
+        "Consejo para pequeños: sacar el relleno blando y pisarlo con la salsa."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "shrimp-veggie-noodle-stir-fry",
+    "type": "dinner",
+    "protein": "fish",
+    "base": "pasta",
+    "tags": [
+      "stir-fry-noodles"
+    ],
+    "name": {
+      "en": "Shrimp & Veggie Noodle Stir-Fry",
+      "es": "Salteado de Fideos con Langostinos y Verduras"
+    },
+    "ing": {
+      "en": [
+        "400g peeled shrimp",
+        "300g egg noodles",
+        "2 cups broccoli florets",
+        "1 red bell pepper, sliced",
+        "1 carrot, julienned",
+        "3 tbsp soy sauce",
+        "1 tbsp oyster sauce",
+        "1 tbsp fresh ginger, grated",
+        "2 cloves garlic, minced",
+        "2 tbsp cooking oil"
+      ],
+      "es": [
+        "400 g langostinos pelados",
+        "300 g fideos de huevo",
+        "2 tazas floretes de brócoli",
+        "1 morrón rojo en tiras",
+        "1 zanahoria en juliana",
+        "3 cdas salsa de soja",
+        "1 cda salsa de ostras",
+        "1 cda jengibre fresco rallado",
+        "2 dientes de ajo picados",
+        "2 cdas aceite para cocinar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Cook noodles; drain.",
+        "Stir-fry shrimp 2–3 min until pink and cooked through; remove.",
+        "Stir-fry broccoli, pepper, carrot, garlic, and ginger 4 min.",
+        "Add noodles, shrimp, soy, and oyster sauce; toss until glossy.",
+        "Toddler tip: cut noodles and shrimp small."
+      ],
+      "es": [
+        "Cocinar los fideos; escurrir.",
+        "Saltear los langostinos 2–3 min hasta que estén rosados y cocidos; retirar.",
+        "Saltear el brócoli, el morrón, la zanahoria, el ajo y el jengibre 4 min.",
+        "Agregar los fideos, los langostinos, la soja y la salsa de ostras; mezclar hasta que brille.",
+        "Consejo para pequeños: cortar los fideos y los langostinos chiquitos."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "black-bean-sweet-potato-chili",
+    "type": "dinner",
+    "protein": "plant",
+    "base": "potato",
+    "tags": [
+      "chili"
+    ],
+    "name": {
+      "en": "Black Bean & Sweet Potato Chili",
+      "es": "Chili de Porotos Negros y Batata"
+    },
+    "ing": {
+      "en": [
+        "2 large sweet potatoes, cubed",
+        "2 cans black beans, drained",
+        "1 can (400g) diced tomatoes",
+        "1 onion, diced",
+        "2 cloves garlic, minced",
+        "1 tsp cumin",
+        "1 tsp paprika",
+        "2 cups vegetable broth",
+        "1 avocado, sliced",
+        "½ cup shredded cheese",
+        "1 tbsp olive oil"
+      ],
+      "es": [
+        "2 batatas grandes en cubos",
+        "2 latas porotos negros escurridos",
+        "1 lata (400 g) tomates picados",
+        "1 cebolla picada",
+        "2 dientes de ajo picados",
+        "1 cdita comino",
+        "1 cdita pimentón",
+        "2 tazas caldo de verduras",
+        "1 palta en rodajas",
+        "½ taza queso rallado",
+        "1 cda aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sauté onion and garlic in olive oil 5 min; add spices.",
+        "Add sweet potatoes, beans, tomatoes, and broth; simmer 25 min until tender.",
+        "Serve topped with avocado and cheese.",
+        "Toddler tip: mash sweet potato and beans together."
+      ],
+      "es": [
+        "Saltear la cebolla y el ajo en aceite de oliva 5 min; agregar las especias.",
+        "Agregar las batatas, los porotos, los tomates y el caldo; cocinar 25 min hasta que estén tiernas.",
+        "Servir con palta y queso por encima.",
+        "Consejo para pequeños: pisar la batata con los porotos."
+      ]
+    },
+    "tip": {
+      "en": "Fibre, folate, and beta-carotene — a cosy meat-free night.",
+      "es": "Fibra, folato y betacaroteno — una noche sin carne bien reconfortante."
+    }
+  },
+  {
+    "id": "pork-and-pepper-stir-fry",
+    "type": "dinner",
+    "protein": "pork",
+    "base": "rice",
+    "name": {
+      "en": "Pork & Pepper Stir-Fry with Rice",
+      "es": "Salteado de Cerdo y Morrones con Arroz"
+    },
+    "ing": {
+      "en": [
+        "500g pork tenderloin, thin strips",
+        "2 bell peppers, sliced",
+        "1 onion, sliced",
+        "2 cups broccoli florets",
+        "3 tbsp soy sauce",
+        "1 tbsp honey",
+        "1 tsp cornstarch",
+        "3 cups cooked rice",
+        "2 tbsp cooking oil"
+      ],
+      "es": [
+        "500 g lomo de cerdo en tiras finas",
+        "2 morrones en tiras",
+        "1 cebolla en pluma",
+        "2 tazas floretes de brócoli",
+        "3 cdas salsa de soja",
+        "1 cda miel",
+        "1 cdita maicena",
+        "3 tazas arroz cocido",
+        "2 cdas aceite para cocinar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Toss pork with 1 tbsp soy sauce and the cornstarch.",
+        "Stir-fry pork in hot oil 4–5 min until cooked through; remove.",
+        "Stir-fry peppers, onion, and broccoli 4 min.",
+        "Return the pork with the rest of the soy and the honey; serve over rice.",
+        "Toddler tip: chop the pork into tiny pieces."
+      ],
+      "es": [
+        "Mezclar el cerdo con 1 cda de salsa de soja y la maicena.",
+        "Saltear el cerdo en aceite caliente 4–5 min hasta que esté bien cocido; retirar.",
+        "Saltear los morrones, la cebolla y el brócoli 4 min.",
+        "Volver a poner el cerdo con el resto de la soja y la miel; servir sobre arroz.",
+        "Consejo para pequeños: picar el cerdo en trocitos muy chicos."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    },
+    "prep": [
+      "rice"
+    ]
+  },
+  {
+    "id": "hake-provencal-with-potatoes",
+    "type": "dinner",
+    "protein": "fish",
+    "base": "potato",
+    "name": {
+      "en": "Hake Provençal with Roast Potatoes",
+      "es": "Merluza a la Provenzal con Papas al Horno"
+    },
+    "ing": {
+      "en": [
+        "4 hake fillets (150g each)",
+        "4 medium potatoes, cubed",
+        "3 cloves garlic, minced",
+        "Fresh parsley",
+        "3 tbsp olive oil",
+        "1 lemon, in wedges",
+        "Mixed greens for salad",
+        "Salt & pepper"
+      ],
+      "es": [
+        "4 filetes de merluza (150 g c/u)",
+        "4 papas medianas en cubos",
+        "3 dientes de ajo picados",
+        "Perejil fresco",
+        "3 cdas aceite de oliva",
+        "1 limón en gajos",
+        "Hojas verdes variadas para la ensalada",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Roast potatoes with 1 tbsp oil and salt at 220°C / 425°F for 30 min.",
+        "Mix garlic, chopped parsley, and the rest of the oil.",
+        "Spread over the hake and bake for the last 12 min until it flakes.",
+        "Serve with lemon wedges and salad.",
+        "Toddler tip: flake the fish and check for bones."
+      ],
+      "es": [
+        "Asar las papas con 1 cda de aceite y sal a 220 °C 30 min.",
+        "Mezclar el ajo, el perejil picado y el resto del aceite.",
+        "Untar la merluza y hornear los últimos 12 min hasta que se desmenuce.",
+        "Servir con gajos de limón y ensalada.",
+        "Consejo para pequeños: desmenuzar el pescado y revisar las espinas."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "chicken-fajitas",
+    "type": "dinner",
+    "protein": "poultry",
+    "base": "bread",
+    "tags": [
+      "tortilla"
+    ],
+    "name": {
+      "en": "Chicken Fajitas",
+      "es": "Fajitas de Pollo"
+    },
+    "ing": {
+      "en": [
+        "600g chicken breast, cut into strips",
+        "2 bell peppers, sliced",
+        "1 onion, sliced",
+        "1 tsp cumin",
+        "1 tsp paprika",
+        "Juice of 1 lime",
+        "8 small flour tortillas",
+        "1 avocado, sliced",
+        "½ cup sour cream",
+        "2 tbsp olive oil"
+      ],
+      "es": [
+        "600 g pechuga de pollo en tiras",
+        "2 morrones en tiras",
+        "1 cebolla en pluma",
+        "1 cdita comino",
+        "1 cdita pimentón",
+        "Jugo de 1 lima",
+        "8 tortillas de harina pequeñas",
+        "1 palta en rodajas",
+        "½ taza crema agria",
+        "2 cdas aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Toss chicken with cumin, paprika, lime juice, and 1 tbsp oil.",
+        "Cook in a hot pan 6–8 min until cooked through; remove.",
+        "Sauté peppers and onion 5 min.",
+        "Serve everything with warm tortillas, avocado, and sour cream.",
+        "Toddler tip: chicken strips, soft peppers, and avocado as finger food."
+      ],
+      "es": [
+        "Mezclar el pollo con el comino, el pimentón, el jugo de lima y 1 cda de aceite.",
+        "Cocinar en sartén bien caliente 6–8 min hasta que esté bien cocido; retirar.",
+        "Saltear los morrones y la cebolla 5 min.",
+        "Servir todo con tortillas tibias, palta y crema agria.",
+        "Consejo para pequeños: tiras de pollo, morrón blando y palta para comer con la mano."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "beef-kebabs-with-couscous",
+    "type": "dinner",
+    "protein": "beef",
+    "base": "grain",
+    "tags": [
+      "skewers"
+    ],
+    "name": {
+      "en": "Beef & Vegetable Kebabs with Couscous",
+      "es": "Brochetas de Carne y Verduras con Cuscús"
+    },
+    "ing": {
+      "en": [
+        "600g beef sirloin, cubed",
+        "1 red bell pepper, chunked",
+        "1 zucchini, chunked",
+        "1 red onion, wedged",
+        "2 tbsp olive oil",
+        "1 tsp paprika",
+        "1½ cups dry couscous",
+        "1 cup Greek yogurt",
+        "Fresh mint, chopped",
+        "Wooden skewers"
+      ],
+      "es": [
+        "600 g bife de lomo fino en cubos",
+        "1 morrón rojo en trozos",
+        "1 zapallito en trozos",
+        "1 cebolla morada en gajos",
+        "2 cdas aceite de oliva",
+        "1 cdita pimentón",
+        "1½ tazas cuscús seco",
+        "1 taza yogur griego",
+        "Menta fresca picada",
+        "Palitos de brochette de madera"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Toss beef and vegetables with oil, paprika, and salt; thread onto skewers.",
+        "Grill or bake at 220°C / 425°F for 12–15 min, turning, until the beef is cooked through.",
+        "Pour boiling water over the couscous, cover 5 min, and fluff.",
+        "Serve with mint yogurt.",
+        "Toddler tip: off the skewer, beef cut into tiny pieces."
+      ],
+      "es": [
+        "Mezclar la carne y las verduras con aceite, pimentón y sal; armar las brochetas.",
+        "Grillar u hornear a 220 °C 12–15 min, girando, hasta que la carne esté bien cocida.",
+        "Cubrir el cuscús con agua hirviendo, tapar 5 min y desgranar.",
+        "Servir con yogur con menta.",
+        "Consejo para pequeños: sin palito, con la carne en trocitos muy chicos."
+      ]
+    },
+    "tip": {
+      "en": "Cook beef well done during pregnancy.",
+      "es": "En el embarazo, cocinar la carne bien cocida."
+    }
+  },
+  {
+    "id": "eggplant-parmesan-with-pasta",
+    "type": "dinner",
+    "protein": "plant",
+    "base": "pasta",
+    "name": {
+      "en": "Eggplant Parmesan with Spaghetti",
+      "es": "Berenjenas a la Parmesana con Spaghetti"
+    },
+    "ing": {
+      "en": [
+        "2 eggplants, sliced",
+        "2 eggs, beaten",
+        "1 cup breadcrumbs",
+        "1 can (400g) crushed tomatoes",
+        "250g mozzarella, sliced",
+        "½ cup grated parmesan",
+        "300g spaghetti",
+        "Fresh basil leaves",
+        "2 tbsp olive oil"
+      ],
+      "es": [
+        "2 berenjenas en rodajas",
+        "2 huevos batidos",
+        "1 taza pan rallado",
+        "1 lata (400 g) tomates triturados",
+        "250 g mozzarella en rodajas",
+        "½ taza parmesano rallado",
+        "300 g spaghetti",
+        "Hojas de albahaca fresca",
+        "2 cdas aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Dip eggplant in egg and breadcrumbs; bake on an oiled tray at 200°C / 400°F for 20 min.",
+        "Layer eggplant, tomato, mozzarella, and parmesan in a dish.",
+        "Bake 20 min more until bubbling.",
+        "Serve with spaghetti tossed in a little sauce and basil.",
+        "Toddler tip: soft middle pieces, cut small."
+      ],
+      "es": [
+        "Pasar las berenjenas por huevo y pan rallado; hornear en bandeja aceitada a 200 °C 20 min.",
+        "Armar capas de berenjena, tomate, mozzarella y parmesano en una fuente.",
+        "Hornear 20 min más hasta que burbujee.",
+        "Servir con spaghetti con un poco de salsa y albahaca.",
+        "Consejo para pequeños: trozos blandos del centro, cortados chiquitos."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "mushroom-and-spinach-risotto",
+    "type": "dinner",
+    "protein": "plant",
+    "base": "rice",
+    "tags": [
+      "risotto"
+    ],
+    "name": {
+      "en": "Mushroom & Spinach Risotto",
+      "es": "Risotto de Hongos y Espinaca"
+    },
+    "ing": {
+      "en": [
+        "1½ cups arborio rice",
+        "300g mushrooms, sliced",
+        "2 cups fresh spinach",
+        "1 onion, finely diced",
+        "2 cloves garlic, minced",
+        "1.2L hot vegetable broth",
+        "½ cup grated parmesan",
+        "2 tbsp butter",
+        "1 tbsp olive oil"
+      ],
+      "es": [
+        "1½ tazas arroz arborio",
+        "300 g champiñones en láminas",
+        "2 tazas espinaca fresca",
+        "1 cebolla picada fina",
+        "2 dientes de ajo picados",
+        "1,2 L caldo de verduras caliente",
+        "½ taza parmesano rallado",
+        "2 cdas manteca",
+        "1 cda aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sauté onion, garlic, and mushrooms in olive oil 6 min.",
+        "Stir in rice for 1 min, then add broth a ladle at a time, stirring, for 18–20 min.",
+        "Stir in spinach, butter, and parmesan until creamy.",
+        "Rest 2 min and serve.",
+        "Toddler tip: naturally soft — chop the mushrooms small."
+      ],
+      "es": [
+        "Saltear la cebolla, el ajo y los champiñones en aceite de oliva 6 min.",
+        "Agregar el arroz 1 min y luego el caldo de a un cucharón, revolviendo, 18–20 min.",
+        "Incorporar la espinaca, la manteca y el parmesano hasta que quede cremoso.",
+        "Reposar 2 min y servir.",
+        "Consejo para pequeños: ya es blando — picar los champiñones chiquitos."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "pork-meatballs-with-mash",
+    "type": "dinner",
+    "protein": "pork",
+    "base": "potato",
+    "tags": [
+      "meatballs"
+    ],
+    "name": {
+      "en": "Pork Meatballs in Tomato Sauce with Mash",
+      "es": "Albóndigas de Cerdo en Salsa con Puré"
+    },
+    "ing": {
+      "en": [
+        "500g ground pork",
+        "1 egg",
+        "½ cup breadcrumbs",
+        "1 onion, finely diced",
+        "1 can (400g) crushed tomatoes",
+        "1 tsp dried oregano",
+        "1 kg potatoes, peeled & cubed",
+        "½ cup warm milk",
+        "2 tbsp butter",
+        "1 tbsp olive oil"
+      ],
+      "es": [
+        "500 g carne picada de cerdo",
+        "1 huevo",
+        "½ taza pan rallado",
+        "1 cebolla picada fina",
+        "1 lata (400 g) tomates triturados",
+        "1 cdita orégano seco",
+        "1 kg papas peladas y en cubos",
+        "½ taza leche tibia",
+        "2 cdas manteca",
+        "1 cda aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mix pork, egg, breadcrumbs, half the onion, salt, and pepper; roll into balls.",
+        "Brown in olive oil; add the rest of the onion, tomatoes, and oregano.",
+        "Cover and simmer 20 min until cooked through.",
+        "Boil potatoes; mash with milk and butter. Serve together.",
+        "Toddler tip: mash a meatball into the potato."
+      ],
+      "es": [
+        "Mezclar el cerdo, el huevo, el pan rallado, la mitad de la cebolla, sal y pimienta; formar bolitas.",
+        "Dorar en aceite de oliva; agregar el resto de la cebolla, los tomates y el orégano.",
+        "Tapar y cocinar 20 min hasta que estén bien cocidas.",
+        "Hervir las papas; hacer puré con leche y manteca. Servir juntos.",
+        "Consejo para pequeños: pisar una albóndiga con el puré."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "creamy-fish-pie",
+    "type": "dinner",
+    "protein": "fish",
+    "base": "potato",
+    "name": {
+      "en": "Creamy Fish Pie",
+      "es": "Pastel de Pescado Cremoso"
+    },
+    "ing": {
+      "en": [
+        "500g white fish fillets (cod or hake), cubed",
+        "200g peeled shrimp",
+        "1 cup frozen peas",
+        "2 cups milk",
+        "3 tbsp butter",
+        "3 tbsp flour",
+        "1 kg potatoes, peeled & cubed",
+        "Fresh parsley",
+        "½ cup shredded cheese"
+      ],
+      "es": [
+        "500 g filetes de pescado blanco (bacalao o merluza) en cubos",
+        "200 g langostinos pelados",
+        "1 taza arvejas congeladas",
+        "2 tazas leche",
+        "3 cdas manteca",
+        "3 cdas harina",
+        "1 kg papas peladas y en cubos",
+        "Perejil fresco",
+        "½ taza queso rallado"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Boil potatoes and mash with a little butter.",
+        "Melt the rest of the butter, stir in flour, then whisk in milk until thick.",
+        "Stir in fish, shrimp, peas, and parsley; pour into a dish.",
+        "Top with mash and cheese; bake at 200°C / 400°F for 30 min until the fish is cooked and the top golden.",
+        "Toddler tip: soft and creamy — check carefully for bones."
+      ],
+      "es": [
+        "Hervir las papas y hacer puré con un poco de manteca.",
+        "Derretir el resto de la manteca, agregar la harina y luego la leche, batiendo hasta espesar.",
+        "Incorporar el pescado, los langostinos, las arvejas y el perejil; volcar en una fuente.",
+        "Cubrir con el puré y el queso; hornear a 200 °C 30 min hasta que el pescado esté cocido y dorado.",
+        "Consejo para pequeños: blando y cremoso — revisar bien las espinas."
+      ]
+    },
+    "tip": {
+      "en": "Two low-mercury seafoods in one cosy dish.",
+      "es": "Dos pescados bajos en mercurio en un plato reconfortante."
+    }
+  },
+  {
+    "id": "chicken-noodle-stir-fry",
+    "type": "dinner",
+    "protein": "poultry",
+    "base": "pasta",
+    "tags": [
+      "stir-fry-noodles"
+    ],
+    "name": {
+      "en": "Chicken Noodle Stir-Fry",
+      "es": "Salteado de Fideos con Pollo"
+    },
+    "ing": {
+      "en": [
+        "600g chicken breast, cut into strips",
+        "300g egg noodles",
+        "2 cups shredded cabbage",
+        "2 carrots, julienned",
+        "1 cup green beans, cut",
+        "3 tbsp soy sauce",
+        "1 tbsp honey",
+        "1 tbsp sesame oil",
+        "2 tbsp cooking oil"
+      ],
+      "es": [
+        "600 g pechuga de pollo en tiras",
+        "300 g fideos de huevo",
+        "2 tazas repollo rallado",
+        "2 zanahorias en juliana",
+        "1 taza chauchas cortadas",
+        "3 cdas salsa de soja",
+        "1 cda miel",
+        "1 cda aceite de sésamo",
+        "2 cdas aceite para cocinar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Cook noodles; drain.",
+        "Stir-fry chicken in hot oil 6 min until cooked through.",
+        "Add cabbage, carrots, and green beans; stir-fry 4 min.",
+        "Add noodles, soy, honey, and sesame oil; toss well.",
+        "Toddler tip: cut noodles short and chicken small."
+      ],
+      "es": [
+        "Cocinar los fideos; escurrir.",
+        "Saltear el pollo en aceite caliente 6 min hasta que esté bien cocido.",
+        "Agregar el repollo, las zanahorias y las chauchas; saltear 4 min.",
+        "Agregar los fideos, la soja, la miel y el aceite de sésamo; mezclar bien.",
+        "Consejo para pequeños: cortar los fideos cortitos y el pollo chiquito."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "homemade-veggie-pizza",
+    "type": "dinner",
+    "protein": "plant",
+    "base": "bread",
+    "tags": [
+      "pizza"
+    ],
+    "name": {
+      "en": "Homemade Veggie Pizza Night",
+      "es": "Noche de Pizza Casera de Verduras"
+    },
+    "ing": {
+      "en": [
+        "2 pizza doughs (500g total)",
+        "1 can (400g) crushed tomatoes",
+        "300g mozzarella, grated",
+        "1 red bell pepper, sliced",
+        "150g mushrooms, sliced",
+        "10 black olives, sliced",
+        "1 tsp dried oregano",
+        "1 tbsp olive oil",
+        "Mixed greens for salad"
+      ],
+      "es": [
+        "2 masas de pizza (500 g en total)",
+        "1 lata (400 g) tomates triturados",
+        "300 g mozzarella rallada",
+        "1 morrón rojo en tiras",
+        "150 g champiñones en láminas",
+        "10 aceitunas negras en rodajas",
+        "1 cdita orégano seco",
+        "1 cda aceite de oliva",
+        "Hojas verdes variadas para la ensalada"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to its hottest setting with the trays inside.",
+        "Stretch the dough; spread with tomato and oregano.",
+        "Let everyone add mozzarella and toppings.",
+        "Bake 10–12 min until crisp and bubbling; drizzle with olive oil.",
+        "Serve with a green salad.",
+        "Toddler tip: cut into small squares; skip the olives."
+      ],
+      "es": [
+        "Precalentar el horno al máximo con las bandejas adentro.",
+        "Estirar la masa; untar con el tomate y el orégano.",
+        "Que cada uno agregue la mozzarella y los ingredientes.",
+        "Hornear 10–12 min hasta que esté crocante y burbujeante; rociar con aceite de oliva.",
+        "Servir con una ensalada verde.",
+        "Consejo para pequeños: cortar en cuadraditos; sin aceitunas."
+      ]
+    },
+    "tip": {
+      "en": "Kids love building their own — a fun Friday tradition.",
+      "es": "A los chicos les encanta armar la suya — una linda tradición de viernes."
+    }
+  },
+  {
+    "id": "beef-stroganoff-with-rice",
+    "type": "dinner",
+    "protein": "beef",
+    "base": "rice",
+    "name": {
+      "en": "Beef Stroganoff with Rice",
+      "es": "Strogonoff de Carne con Arroz"
+    },
+    "ing": {
+      "en": [
+        "500g beef sirloin, thin strips",
+        "250g mushrooms, sliced",
+        "1 onion, sliced",
+        "1 cup beef broth",
+        "1 cup sour cream",
+        "1 tsp paprika",
+        "1 tsp Dijon mustard",
+        "3 cups cooked rice",
+        "Fresh parsley",
+        "2 tbsp olive oil"
+      ],
+      "es": [
+        "500 g bife de lomo fino en tiras",
+        "250 g champiñones en láminas",
+        "1 cebolla en pluma",
+        "1 taza caldo de carne",
+        "1 taza crema agria",
+        "1 cdita pimentón",
+        "1 cdita mostaza Dijon",
+        "3 tazas arroz cocido",
+        "Perejil fresco",
+        "2 cdas aceite de oliva"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Sear beef in hot oil in batches until browned and cooked through; set aside.",
+        "Sauté onion and mushrooms 6 min.",
+        "Add broth, paprika, and mustard; simmer 5 min, then stir in sour cream and the beef.",
+        "Warm through without boiling; serve over rice with parsley.",
+        "Toddler tip: chop the beef very small and mix into the creamy rice."
+      ],
+      "es": [
+        "Sellar la carne en aceite caliente en tandas hasta dorar y cocinar bien; reservar.",
+        "Saltear la cebolla y los champiñones 6 min.",
+        "Agregar el caldo, el pimentón y la mostaza; cocinar 5 min y luego incorporar la crema agria y la carne.",
+        "Calentar sin que hierva; servir sobre arroz con perejil.",
+        "Consejo para pequeños: picar la carne bien chiquita y mezclar con el arroz cremoso."
+      ]
+    },
+    "tip": {
+      "en": "",
+      "es": ""
+    },
+    "prep": [
+      "rice"
+    ]
+  },
+  {
+    "id": "cauliflower-crust-pizza",
+    "type": "dinner",
+    "protein": "plant",
+    "base": "none",
+    "tags": [
+      "pizza"
+    ],
+    "experimental": true,
+    "name": {
+      "en": "Cauliflower Crust Pizza",
+      "es": "Pizza con Masa de Coliflor"
+    },
+    "ing": {
+      "en": [
+        "1 large cauliflower, grated",
+        "2 eggs",
+        "250g mozzarella, grated",
+        "½ cup grated parmesan",
+        "1 can (400g) crushed tomatoes",
+        "1 tsp dried oregano",
+        "1 cup cherry tomatoes, halved",
+        "Fresh basil leaves"
+      ],
+      "es": [
+        "1 coliflor grande rallada",
+        "2 huevos",
+        "250 g mozzarella rallada",
+        "½ taza parmesano rallado",
+        "1 lata (400 g) tomates triturados",
+        "1 cdita orégano seco",
+        "1 taza tomates cherry en mitades",
+        "Hojas de albahaca fresca"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Microwave the grated cauliflower 5 min; cool and squeeze out all the liquid in a towel.",
+        "Mix with eggs, half the mozzarella, and parmesan; press into a thin round on a lined tray.",
+        "Bake at 220°C / 425°F for 20 min until golden and firm.",
+        "Top with tomato, oregano, the rest of the mozzarella, and cherry tomatoes; bake 10 min more.",
+        "Finish with basil.",
+        "Toddler tip: cut into small soft squares."
+      ],
+      "es": [
+        "Cocinar la coliflor rallada 5 min en el microondas; enfriar y escurrir todo el líquido en un repasador.",
+        "Mezclar con los huevos, la mitad de la mozzarella y el parmesano; extender en un disco fino sobre una bandeja forrada.",
+        "Hornear a 220 °C 20 min hasta que esté dorada y firme.",
+        "Cubrir con tomate, orégano, el resto de la mozzarella y los cherry; hornear 10 min más.",
+        "Terminar con albahaca.",
+        "Consejo para pequeños: cortar en cuadraditos blandos."
+      ]
+    },
+    "tip": {
+      "en": "A vegetable disguised as pizza — worth the squeeze!",
+      "es": "Una verdura disfrazada de pizza — ¡vale la pena escurrirla bien!"
+    }
+  },
+  {
+    "id": "korean-beef-lettuce-wraps",
+    "type": "dinner",
+    "protein": "beef",
+    "base": "rice",
+    "experimental": true,
+    "name": {
+      "en": "Korean-Style Beef Lettuce Wraps",
+      "es": "Wraps de Lechuga con Carne al Estilo Coreano"
+    },
+    "ing": {
+      "en": [
+        "500g ground beef",
+        "3 tbsp soy sauce",
+        "1 tbsp honey",
+        "1 tbsp sesame oil",
+        "2 cloves garlic, minced",
+        "1 tbsp fresh ginger, grated",
+        "3 cups cooked rice",
+        "1 head butter lettuce, leaves separated",
+        "1 carrot, julienned",
+        "1 cucumber, cut into sticks",
+        "1 tsp sesame seeds"
+      ],
+      "es": [
+        "500 g carne picada",
+        "3 cdas salsa de soja",
+        "1 cda miel",
+        "1 cda aceite de sésamo",
+        "2 dientes de ajo picados",
+        "1 cda jengibre fresco rallado",
+        "3 tazas arroz cocido",
+        "1 planta de lechuga manteca, en hojas",
+        "1 zanahoria en juliana",
+        "1 pepino en bastones",
+        "1 cdita semillas de sésamo"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Brown the beef 8 min until fully cooked; drain.",
+        "Add garlic, ginger, soy sauce, honey, and sesame oil; cook 2 min.",
+        "Spoon rice and beef into lettuce cups; top with carrot, cucumber, and sesame seeds.",
+        "Wrap and eat with your hands.",
+        "Toddler tip: serve beef and rice in a bowl with soft cucumber pieces."
+      ],
+      "es": [
+        "Dorar la carne 8 min hasta que esté bien cocida; escurrir.",
+        "Agregar el ajo, el jengibre, la soja, la miel y el aceite de sésamo; cocinar 2 min.",
+        "Poner arroz y carne en las hojas de lechuga; cubrir con zanahoria, pepino y sésamo.",
+        "Envolver y comer con las manos.",
+        "Consejo para pequeños: servir la carne y el arroz en un bol con trocitos de pepino."
+      ]
+    },
+    "tip": {
+      "en": "Sweet-salty and crunchy — a new favourite in the making?",
+      "es": "Dulce, salado y crocante — ¿un nuevo favorito?"
+    },
+    "prep": [
+      "rice"
+    ]
+  },
+  {
+    "id": "butternut-squash-mac-and-cheese",
+    "type": "dinner",
+    "protein": "plant",
+    "base": "pasta",
+    "tags": [
+      "mac-cheese"
+    ],
+    "experimental": true,
+    "name": {
+      "en": "Butternut Squash Mac & Cheese",
+      "es": "Macarrones con Queso y Calabaza"
+    },
+    "ing": {
+      "en": [
+        "400g macaroni",
+        "500g butternut squash, peeled & cubed",
+        "1½ cups milk",
+        "1½ cups shredded cheese",
+        "2 tbsp butter",
+        "Pinch of nutmeg",
+        "½ cup breadcrumbs",
+        "2 cups broccoli florets"
+      ],
+      "es": [
+        "400 g macarrones",
+        "500 g calabaza pelada y en cubos",
+        "1½ tazas leche",
+        "1½ tazas queso rallado",
+        "2 cdas manteca",
+        "Pizca de nuez moscada",
+        "½ taza pan rallado",
+        "2 tazas floretes de brócoli"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Boil the squash 12 min until soft; blend with milk, butter, and nutmeg.",
+        "Cook macaroni, adding broccoli for the last 3 min; drain.",
+        "Stir the squash sauce and cheese into the pasta.",
+        "Top with breadcrumbs and grill 5 min until crisp.",
+        "Toddler tip: creamy and soft — perfect as is."
+      ],
+      "es": [
+        "Hervir la calabaza 12 min hasta que esté blanda; licuar con la leche, la manteca y la nuez moscada.",
+        "Cocinar los macarrones, agregando el brócoli los últimos 3 min; escurrir.",
+        "Mezclar la pasta con la salsa de calabaza y el queso.",
+        "Cubrir con pan rallado y gratinar 5 min hasta que esté crocante.",
+        "Consejo para pequeños: cremoso y blando — perfecto así."
+      ]
+    },
+    "tip": {
+      "en": "The orange sauce is half vegetable — kids never notice.",
+      "es": "La salsa naranja es mitad verdura — los chicos ni se dan cuenta."
+    }
   }
 ];
 
@@ -4183,5 +8757,37 @@ const prepTasks = {
   "chia-pudding": {
     "en": "Stir the chia pudding the evening before (it keeps 3 days)",
     "es": "Preparar el pudín de chía la noche anterior (dura 3 días)"
+  },
+  "blueberry-muffins": {
+    "en": "Bake the blueberry oat muffins (they keep 3 days)",
+    "es": "Hornear los muffins de avena y arándanos (duran 3 días)"
+  },
+  "banana-bread": {
+    "en": "Bake the banana bread — it keeps 4 days wrapped",
+    "es": "Hornear el budín de banana — dura 4 días envuelto"
+  },
+  "arroz-con-leche": {
+    "en": "Cook the arroz con leche and chill it",
+    "es": "Preparar el arroz con leche y enfriarlo"
+  },
+  "banana-pops": {
+    "en": "Dip and freeze the yogurt banana pops",
+    "es": "Bañar y congelar las paletas de banana"
+  },
+  "apple-chips": {
+    "en": "Bake the apple chips (low oven, about 2 hours)",
+    "es": "Hornear los chips de manzana (horno bajo, unas 2 horas)"
+  },
+  "yogurt-bark": {
+    "en": "Spread and freeze the yogurt bark",
+    "es": "Extender y congelar la barrita de yogur"
+  },
+  "energy-balls": {
+    "en": "Roll the oat & date energy balls (they keep a week)",
+    "es": "Armar las bolitas de avena y dátiles (duran una semana)"
+  },
+  "oat-cookies": {
+    "en": "Bake the oatmeal raisin cookies",
+    "es": "Hornear las galletitas de avena y pasas"
   }
 };

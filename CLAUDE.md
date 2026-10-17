@@ -19,6 +19,8 @@ above it. The README has the full table.
    - It is optional: the page must keep working without it.
    - It only listens to `plan:*` events and pointer hovers. Never call it from the UI.
    - All motion stays in `fx.css`, inside `prefers-reduced-motion: no-preference`.
+   - The pixel sprites are rows of characters in `fx.js` (see `INK` for the colours). Every row of
+     every frame must be the same length.
 
 ## Rules worth knowing
 
@@ -28,6 +30,8 @@ above it. The README has the full table.
   - Recipes must be self-contained, with no "leftovers" or "made on Sunday" ingredients, because
     any recipe can land on any day.
   - Make-ahead work goes in `prep`, as keys of `prepTasks`.
+  - `experimental: true` marks a new, not yet family-tested recipe. It shows a 🧪 flask, and
+    `RULES.experimental` caps how many land in a week.
 - `data/ingredients.js` is an ordered regex dictionary. The first match on an English ingredient
   line picks its shopping-list row, so specific entries go above general ones. After adding
   recipes, check that each new line matches the intended entry and not "Other".

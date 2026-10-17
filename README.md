@@ -9,7 +9,8 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
 ## Features
 
 - **A balanced random menu every week**: 5 breakfasts, 5 lunches, 5 snacks and 5 dinners picked
-  from 74 recipes.
+  from 160 recipes, including Argentine family classics such as milanesas, tarta de zapallitos,
+  ñoquis, pastel de papas and empanadas.
   - Each week aims for 1–2 egg breakfasts, 2–3 fish meals, at least one vegetarian meal, at most
     3 red-meat meals and 2–3 fruit snacks.
   - Lunch and dinner on the same day differ in protein and starch, and an egg breakfast never
@@ -18,6 +19,10 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     three soups, two pancake breakfasts…) are kept apart.
   - The draw is seeded by the week, so everyone who opens the page sees the same menu.
   - A ⚖️ balance bar under each week shows its mix of breakfasts, proteins and snacks.
+- **🧪 Experimental recipes**: 12 of the recipes are new ideas the family hasn't tried yet, like
+  cauliflower-crust pizza, rice-paper rolls and avocado chocolate mousse.
+  - When one comes up, its card shows a 🧪 flask and the tooltip says it is experimental.
+  - At most two land in a week.
 - **Real dates**: the page shows this week and the next three. On Saturday and Sunday it starts
   with the coming week. Today's card is highlighted and past days fade.
 - **🎲 Shuffle** a whole week or **🔄 swap** one meal; both keep the week balanced.
@@ -33,6 +38,8 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
   - Soft synthesized notes when the pointer moves over meals, tabs and buttons.
   - A dice roll when you shuffle, chimes for ticks, and a fanfare with confetti when a list is done.
   - Cards deal in after a shuffle.
+  - A pixel-art kitchen: a pan flipping pancakes and a bubbling soup pot in the header, plus a
+    toaster and a strolling chef above the footer. Hover them for their own sounds.
   - 🔊 in the header mutes the sounds.
   - Browsers start sound only after your first click or tap.
   - Motion is skipped for visitors who turn on "reduce motion".
@@ -57,7 +64,7 @@ The code is split into four layers. Each one only uses the layers listed above i
 | | `js/tooltip.js` | Tooltips for anything with a `data-tip` |
 | | `js/ui.js` | Draws the page, saves ticks and swaps, and handles every button |
 | | `css/ui.css` | Layout, colours and responsive rules. Edit the CSS variables at the top to retheme |
-| Flashy layer | `js/fx.js` | Sounds and animations, plus the 🔊 button |
+| Flashy layer | `js/fx.js` | Sounds, animations, the pixel kitchen and the 🔊 button |
 | | `css/fx.css` | Every animation, transition and hover lift |
 
 The flashy layer is optional. Without `js/fx.js` and `css/fx.css`, the page works the same, just

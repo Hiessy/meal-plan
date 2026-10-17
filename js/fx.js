@@ -8,6 +8,9 @@
      items, shuffling (a dice roll) and finishing a list.
    - Motion: cards deal in after a shuffle, rise in on a new
      week, pop after a swap; confetti when a list is all ticked.
+   - A pixel-art kitchen: a pan flipping pancakes and a soup pot
+     in the header, a toaster and a strolling chef above the footer.
+     Hover them (or experimental 🧪 meals) for their own sounds.
    - Adds a 🔊 / 🔇 button to the header; the choice is saved.
 
    It reacts to pointer hovers and to the plan:* events that
@@ -139,7 +142,19 @@
     down:   () => tone(659.25, { dur: 0.07, vol: 0.03, to: 523.25 }),
     copy:   () => { tone(987.77, { dur: 0.08, vol: 0.035 }); tone(1479.98, { at: 0.07, dur: 0.22, vol: 0.035 }); },
     ping:   () => { tone(1567.98, { dur: 0.5, vol: 0.035 }); tone(2349.32, { at: 0.05, dur: 0.4, vol: 0.012 }); },
-    hello:  () => { tone(659.25, { dur: 0.09, vol: 0.04 }); tone(987.77, { at: 0.08, dur: 0.22, vol: 0.04 }); }
+    hello:  () => { tone(659.25, { dur: 0.09, vol: 0.04 }); tone(987.77, { at: 0.08, dur: 0.22, vol: 0.04 }); },
+
+    // the pixel kitchen and experimental recipes
+    sizzle: () => { noise({ dur: 0.35, vol: 0.03, freq: 6000, q: 0.6 }); noise({ at: 0.12, dur: 0.25, vol: 0.02, freq: 4500, q: 0.6 }); },
+    bubble: () => [0, 0.09, 0.2].forEach(t0 => {
+      const f = 260 + Math.random() * 180;
+      tone(f, { at: t0, dur: 0.08, vol: 0.04, to: f * 2.2 });
+    }),
+    ding:   () => { tone(2093, { dur: 0.6, vol: 0.03 }); tone(2637.02, { at: 0.02, dur: 0.5, vol: 0.02 }); },
+    bloop:  () => {                       // a lab beaker going "blub-blub"
+      tone(330, { dur: 0.12, vol: 0.04, type: 'triangle', to: 880 });
+      tone(494, { at: 0.11, dur: 0.12, vol: 0.035, type: 'triangle', to: 1320 });
+    }
   };
 
   // After a click: the audio may still be waking up, the sound plays as soon as it can
@@ -152,7 +167,12 @@
 
   /* ── Hover sounds (mouse and pen; touch has no hover) ─────── */
   const HOVERS = [
+    ['.meal-slot[data-exp]', () => sounds.bloop()],
     ['.meal-slot', el => sounds.meal(+el.dataset.day || 0, +el.dataset.slot || 0)],
+    ['.px-pan', () => sounds.sizzle()],
+    ['.px-pot', () => sounds.bubble()],
+    ['.px-toaster', () => sounds.ding()],
+    ['.px-chef', () => sounds.hello()],
     ['.tab-btn',   () => sounds.tab()],
     ['.check',     () => sounds.row()],
     ['button',     () => sounds.button()]
@@ -215,6 +235,122 @@
     document.body.appendChild(burst);
     setTimeout(() => burst.remove(), 1400);
   }
+
+  /* ── Pixel kitchen: little animated sprites around the page ──
+     Each sprite is a few frames of pixel rows ('.' = empty), drawn
+     side by side into one SVG; css/fx.css steps through the frames. */
+  const INK = {
+    k: '#3b2a1f', m: '#4b5563', M: '#9ca3af', L: '#e5e7eb', H: '#a0673a',
+    p: '#f4c06a', P: '#c98a3c', r: '#d94b3d', R: '#9b2c22', o: '#f59e0b', O: '#fde68a',
+    s: 'rgba(255,255,255,.85)', f: '#f97316', F: '#fde047', w: '#ffffff', c: '#f2c9a0',
+    n: '#ef4444', t: '#e8b273', T: '#a8652b', g: '#e2e8f0', G: '#94a3b8'
+  };
+
+  // A frame from a list of rows, with some rows swapped and single pixels set
+  function frame(base, rows = {}, dots = []) {
+    const out = base.map((row, y) => rows[y] || row);
+    dots.forEach(([x, y, ch]) => { out[y] = out[y].slice(0, x) + ch + out[y].slice(x + 1); });
+    return out;
+  }
+  const blank = (w, h) => Array.from({ length: h }, () => '.'.repeat(w));
+
+  // Frying pan flipping a pancake over a flame
+  const panBase = frame(blank(18, 17), {
+    11: 'k............k....', 12: 'kmmmmmmmmmmmmkkHHH', 13: '.kMMMMMMMMMMk.....', 14: '..kkkkkkkkkk......'
+  });
+  const flameA = { 15: '...f..F..f..F.....', 16: '..fFf.fFf.fFf.....' };
+  const flameB = { 15: '....F..f..F..f....', 16: '...fFf.fFf.fFf....' };
+  const cakeIn = { 10: '.ppppppppppp......', 11: 'kPPPPPPPPPPPPk....' };
+  const at = (top, flipped) => ({ [top]: flipped ? '.PPPPPPPPPPP......' : '.ppppppppppp......',
+                                  [top + 1]: flipped ? '.ppppppppppp......' : '.PPPPPPPPPPP......' });
+  const PAN = [
+    frame(panBase, { ...cakeIn, ...flameA }, [[3, 9, 'O'], [9, 9, 'O']]),
+    frame(panBase, { ...cakeIn, ...flameB }, [[5, 9, 'O'], [11, 8, 'O']]),
+    frame(panBase, { ...cakeIn, ...flameA }, [[2, 8, 'O'], [8, 9, 'O']]),
+    frame(panBase, { ...at(6, false), ...flameB }),
+    frame(panBase, { ...at(2, true), ...flameA }),
+    frame(panBase, { ...at(6, true), ...flameB })
+  ];
+
+  // Soup pot bubbling, with steam rising
+  const potBase = frame(blank(16, 18), {
+    8: '..kkkkkkkkkkkk..', 10: 'kkrrrrrrrrrrrrkk', 11: '.krrrrrrrrrrrrk.', 12: '.krLrrrrrrrrrrk.',
+    13: '.krLrrrrrrrrrrk.', 14: '.kRrrrrrrrrrrRk.', 15: '..kRRRRRRRRRRk..', 16: '...kkkkkkkkkk...'
+  });
+  const soup = surface => '.k' + surface + 'k.';
+  const steam = pts => pts.map(([x, y]) => [x, y, 's']);
+  const POT = [
+    frame(potBase, { 9: soup('oOoooooOoooo'), 17: '..fFf.fFf.fFf...' },
+      steam([[6, 4], [5, 5], [6, 5], [10, 5], [6, 6], [9, 6], [10, 6], [10, 7]])),
+    frame(potBase, { 9: soup('oooOoooooOoo'), 17: '...fFf.fFf.fFf..' },
+      steam([[5, 2], [4, 3], [5, 3], [11, 3], [5, 4], [10, 4], [11, 4], [11, 5], [7, 6], [6, 7], [7, 7]])),
+    frame(potBase, { 9: soup('ooooOoOooooo'), 17: '..fFf.fFf.fFf...' },
+      steam([[4, 0], [3, 1], [4, 1], [11, 1], [4, 2], [10, 2], [11, 2], [10, 3], [6, 4], [5, 5], [6, 5], [12, 5], [6, 6], [11, 6], [12, 6]]))
+  ];
+
+  // Toaster that pops now and then
+  const toasterBase = frame(blank(16, 15), {
+    8: '..kkkkkkkkkkkk..', 9: '.kgGGGgggGGGggk.', 10: '.kggggggggggggk.', 11: '.kggggggggggggkk',
+    12: '.kggggggggggggk.', 13: '.kGGGGGGGGGGGGk.', 14: '..kk........kk..'
+  });
+  const toastUp = top => {
+    const rows = { [top]: '...TTT...TTT....' };
+    for (let y = top + 1; y <= 7; y++) rows[y] = '...TtT...TtT....';
+    return rows;
+  };
+  const down = frame(toasterBase, { 7: '...TTT...TTT....' });
+  const TOASTER = [down, down, down, down, down,
+    frame(toasterBase, toastUp(1), [[2, 0, 'O'], [13, 0, 'O']]),
+    frame(toasterBase, toastUp(3)),
+    down];
+
+  // A chef with a wooden spoon, two walking frames
+  const chefTop = [
+    '...wwwwww...', '..wwwwwwww..', '..wwwwwwww..', '...LLLLLL...', '...cccccc...', '...ckcckc.H.',
+    '...cccccc.H.', '....nnnn..H.', '..wwwwwwwwH.', '.cwwwwwwwwc.', '.cwwwkwwwwc.', '..wwwwwwww..', '..mmmmmmmm..'
+  ];
+  const CHEF = [
+    chefTop.concat(['..mm....mm..', '..mm....mm..', '.kkk....kkk.']),
+    chefTop.concat(['...mm..mm...', '...mm..mm...', '..kkk.kkk...'])
+  ];
+
+  // → <div class="px px-NAME"> holding every frame side by side
+  function sprite(name, frames, scale, seconds) {
+    const w = frames[0][0].length, h = frames[0].length;
+    let rects = '';
+    frames.forEach((rows, f) => rows.forEach((row, y) => {
+      for (let x = 0; x < row.length;) {          // one rect per run of the same colour
+        let end = x;
+        while (end < row.length && row[end] === row[x]) end++;
+        if (row[x] !== '.') rects += `<rect x="${f * w + x}" y="${y}" width="${end - x}" height="1" fill="${INK[row[x]]}"/>`;
+        x = end;
+      }
+    }));
+    const el = document.createElement('div');
+    el.className = 'px px-' + name;
+    el.setAttribute('aria-hidden', 'true');
+    el.style.cssText = `--frames:${frames.length};--px-time:${seconds}s;width:${w * scale}px;height:${h * scale}px`;
+    el.innerHTML = `<svg viewBox="0 0 ${w * frames.length} ${h}" width="${w * frames.length * scale}" height="${h * scale}"
+      shape-rendering="crispEdges">${rects}</svg>`;
+    return el;
+  }
+
+  function buildKitchen() {
+    const head = document.querySelector('header');
+    if (head) head.append(sprite('pot', POT, 3, 0.9), sprite('pan', PAN, 3, 1.5));
+
+    const footer = document.querySelector('.site-footer');
+    if (!footer) return;
+    const strip = document.createElement('div');
+    strip.className = 'px-kitchen';
+    strip.setAttribute('aria-hidden', 'true');
+    const walker = document.createElement('div');
+    walker.className = 'px-walker';
+    walker.append(sprite('chef', CHEF, 3, 0.5));
+    strip.append(sprite('toaster', TOASTER, 3, 2.4), walker);
+    footer.before(strip);
+  }
+  buildKitchen();
 
   /* ── Reacting to the planner ──────────────────────────────── */
   document.addEventListener('plan:action', e => {

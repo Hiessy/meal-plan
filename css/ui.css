@@ -306,6 +306,7 @@ main {
   font-weight: 700;
   color: var(--text-muted);
 }
+.chip.chip-exp { border-color: #c4b5fd; background: #f5f3ff; color: #6d28d9; }
 .chip {
   display: inline-flex;
   align-items: center;
@@ -526,6 +527,17 @@ main {
 .badge-snack  { background: var(--badge-snack-bg);  color: var(--badge-snack-txt); }
 .badge-dinner { background: var(--badge-dinner-bg); color: var(--badge-dinner-txt); }
 
+.flask { font-size: .9em; }
+.exp-chip {
+  padding: .1rem .55rem;
+  border: 1px dashed #a78bfa;
+  border-radius: var(--r-pill);
+  background: #f5f3ff;
+  color: #6d28d9;
+  font-size: .72rem;
+  font-weight: 700;
+  cursor: help;
+}
 .meal-name {
   grid-column: 1;
   font-size: .9rem;

@@ -37,9 +37,10 @@ const Planner = (() => {
       base:    { pasta: [0, 2], rice: [0, 3], bread: [0, 4], potato: [0, 3], grain: [0, 3] }
     },
     snacks: {
-      group: { fruit: [2, 3], dairy: [1, 2], veg: [0, 1], grain: [0, 2] }
+      group: { fruit: [2, 3], dairy: [1, 2], veg: [0, 2], grain: [0, 2] }
     },
-    tagCap: { soup: 2, toast: 2 },             // any other tag: at most once a week
+    tagCap: { soup: 2, toast: 2, tortilla: 2 }, // any other tag: at most once a week
+    experimental: [0, 2],                      // new, not yet family-tested recipes
     recentWeeks: 2                             // stay away from the last two weeks' recipes
   };
 
@@ -77,13 +78,14 @@ const Planner = (() => {
   const bump = (counts, key) => { if (key) counts[key] = (counts[key] || 0) + 1; };
   const outside = (n, [min, max]) => n < min ? min - n : n > max ? n - max : 0;
   const isRed = r => r.protein === 'beef' || r.protein === 'pork';
-  const newCounts = () => ({ breakfast: {}, protein: {}, base: {}, group: {}, tag: {}, red: 0 });
+  const newCounts = () => ({ breakfast: {}, protein: {}, base: {}, group: {}, tag: {}, red: 0, experimental: 0 });
 
   function add(r, s) {
     if (r.type === 'breakfast') bump(s.breakfast, r.group);
     else if (r.type === 'snack') bump(s.group, r.group);
     else { bump(s.protein, r.protein); bump(s.base, r.base); if (isRed(r)) s.red++; }
     (r.tags || []).forEach(tag => bump(s.tag, tag));
+    if (r.experimental) s.experimental++;
   }
 
   // How many of each breakfast group, protein, starch, snack group and tag a menu has
@@ -107,6 +109,7 @@ const Planner = (() => {
       if (isRed(r)) c += step(s.red, RULES.mains.redMeat);
     }
     (r.tags || []).forEach(tag => { if ((s.tag[tag] || 0) >= (RULES.tagCap[tag] || 1)) c += COST.rule; });
+    if (r.experimental) c += step(s.experimental, RULES.experimental);
     return c;
   }
 
@@ -126,6 +129,7 @@ const Planner = (() => {
     for (const b in mains.base) total += COST.rule * outside(s.base[b] || 0, mains.base[b]);
     for (const g in snacks.group) total += COST.rule * outside(s.group[g] || 0, snacks.group[g]);
     for (const tag in s.tag) total += COST.rule * Math.max(0, s.tag[tag] - (RULES.tagCap[tag] || 1));
+    total += COST.rule * outside(s.experimental, RULES.experimental);
     ids.forEach(id => { total += avoid.get(id) || 0; });
     for (let d = 0; d < DAYS; d++) {
       const day = i => byId[ids[d * SLOTS + i]];
