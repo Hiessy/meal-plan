@@ -27,9 +27,9 @@ above it. The README has the full table.
      pure function of `t` (ms into its loop), and `cue()` plays a sound once per loop. The scene
      follows the hovered element via `data-type` on meal slots and `data-cat` on shopping aisles,
      and on touch screens the element in the middle of the screen.
-   - The canvas is shown at whole multiples (2×, 3× on wide screens) so pixels stay square.
-     The TV can be dragged and resized, and resizing snaps to whole multiples. Its spot is saved
-     under `meal-plan-tv-box`.
+   - The TV set's size follows its canvas width: 144 px (1×) by default, top left. Dragging
+     and resizing snap to whole multiples so pixels stay square. Its spot is saved under
+     `meal-plan-tv-spot` and its power state under `meal-plan-tv-state`.
 
 ## Rules worth knowing
 

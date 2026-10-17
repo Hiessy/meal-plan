@@ -51,7 +51,7 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
   - Cards deal in after a shuffle.
   - A pixel-art pan flipping pancakes and a bubbling soup pot in the header. Hover them for their
     own sounds.
-  - **📺 Kitchen TV**: a little pixel screen in the corner whose scene follows what you look at.
+  - **📺 Kitchen TV**: an old wooden TV set, top left, whose pixel scene follows what you look at.
     - Shopping list: a shopper walks the market, chats, pays, takes the produce, skips a stall and
       buys again. The stalls sell whatever aisle you hover.
     - Sunday prep, or an open recipe: a cook chops, blends and fries.
@@ -59,9 +59,11 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     - Lunch: from the fridge to the oven to the table.
     - Snack: a kid grabs an apple and munches.
     - Dinner: the family eats together under the lamp.
-    - On phones it follows what is in the middle of the screen. The – button tucks it away.
-    - Drag its bar to move it and the corner grip to resize it; double-click the bar to put it
-      back. Where it sits is remembered on this device.
+    - On phones it follows what is in the middle of the screen.
+    - The knob changes channel, the red button turns it off (the picture shrinks to a dot) and
+      × tucks it away behind a 📺 button.
+    - Drag the set to move it and the corner grip to resize it; double-click it to put it back,
+      small and top left. Where it sits is remembered on this device.
     - Each scene plays its sounds the first time through: coins, chopping, the blender, sizzling.
   - 🔊 in the header mutes the sounds.
   - Browsers start sound only after your first click or tap.

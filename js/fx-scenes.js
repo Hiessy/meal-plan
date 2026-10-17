@@ -22,7 +22,6 @@
   const W = 144, H = 54, FLOOR = 50;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canHover = window.matchMedia('(hover: hover)').matches;
-  const PREF_KEY = 'meal-plan-tv';
   const FX = window.Fx || { play() {}, sprites: null, ink: {} };
 
   /* ── Drawing ──────────────────────────────────────────────── */
@@ -526,7 +525,7 @@
   function cue(id, at, sound) {
     if (scene.t < at || scene.fired.has(id)) return;
     scene.fired.add(id);
-    if (performance.now() < scene.loud && !stage.hidden && !reduceMotion) FX.play(sound);
+    if (performance.now() < scene.loud && isOn && !stage.hidden && !reduceMotion) FX.play(sound);
   }
 
   let idleTimer = null;
@@ -539,7 +538,7 @@
     }
     Object.assign(scene, { name, cat, start: performance.now(), fired: new Set(), loop: -1 });
     scene.loud = performance.now() + SCENES[name].len;
-    caption.textContent = SCENES[name].caption[document.documentElement.lang === 'es' ? 'es' : 'en'];
+    tune();
     stage.classList.remove('swap');
     void stage.offsetWidth;
     stage.classList.add('swap');
@@ -559,7 +558,7 @@
   let last = 0;
   function tick(now) {
     requestAnimationFrame(tick);
-    if (stage.hidden || document.hidden || now - last < 83) return;
+    if (stage.hidden || !isOn || document.hidden || now - last < 83) return;
     last = now;
     render(now);
   }
@@ -597,82 +596,137 @@
     const f = e.detail.on && e.detail.facet;
     if (f) setScene(f.startsWith('breakfast') ? 'breakfast' : f.startsWith('group') ? 'snack' : f === 'exp' ? 'cooking' : 'dinner');
   });
-  document.addEventListener('plan:lang', () => {
-    caption.textContent = SCENES[scene.name].caption[document.documentElement.lang === 'es' ? 'es' : 'en'];
-    label();
-  });
+  document.addEventListener('plan:lang', () => label());
 
-  /* ── The TV and its off switch ────────────────────────────── */
-  const stage = document.createElement('div');
-  stage.className = 'fx-stage';
-  const bar = document.createElement('div');
-  bar.className = 'fx-stage-bar';
-  const caption = document.createElement('span');
-  const hide = document.createElement('button');
-  hide.type = 'button';
-  hide.className = 'fx-stage-min';
-  hide.textContent = '–';
-  bar.append(caption, hide);
-  stage.append(canvas, bar);
-
-  const show = document.createElement('button');
-  show.type = 'button';
-  show.className = 'fx-stage-open';
+  /* ── The TV set ───────────────────────────────────────────── */
+  // An old wooden TV: the screen and its brass channel plate, and a
+  // side panel with a hide button, the channel knob, a speaker grille
+  // and the power button.
+  const el = (tag, cls, parent) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (tag === 'button') node.type = 'button';
+    if (parent) parent.append(node);
+    return node;
+  };
+  const stage = el('div', 'fx-stage');
+  stage.tabIndex = 0;
+  el('span', 'fx-antenna', stage).setAttribute('aria-hidden', 'true');
+  const tube = el('div', 'fx-tube', stage);
+  el('div', 'fx-screen', tube).append(canvas);
+  const plate = el('div', 'fx-plate', tube);
+  const chNum = el('b', '', plate);
+  const caption = el('span', '', plate);
+  const panel = el('div', 'fx-panel', stage);
+  const hide = el('button', 'fx-stage-min', panel);
+  hide.textContent = '×';
+  const knob = el('button', 'fx-knob', panel);
+  el('span', 'fx-grille', panel).setAttribute('aria-hidden', 'true');
+  const power = el('button', 'fx-power', panel);
+  const grip = el('button', 'fx-stage-grip', stage);
+  const show = el('button', 'fx-stage-open');
   show.textContent = '📺';
 
-  const grip = document.createElement('button');
-  grip.type = 'button';
-  grip.className = 'fx-stage-grip';
-  stage.append(grip);
-  bar.tabIndex = 0;
-
+  const lang = () => document.documentElement.lang === 'es' ? 'es' : 'en';
   const LABELS = {
     en: { hide: 'Hide the kitchen TV', show: 'Show the kitchen TV — pixel scenes that follow what you look at',
-          move: 'Drag to move the kitchen TV · double-click to put it back · arrow keys work too',
-          size: 'Drag to resize the kitchen TV · arrow keys work too' },
+          tv: 'Kitchen TV — drag it to move it, double-click to put it back, arrow keys move it too',
+          size: 'Drag to resize the kitchen TV · arrow keys work too',
+          knob: 'Change the channel', off: 'Turn the TV off', on: 'Turn the TV on', offText: 'OFF' },
     es: { hide: 'Ocultar la tele de la cocina', show: 'Mostrar la tele de la cocina — escenas pixeladas según lo que mirás',
-          move: 'Arrastrá para mover la tele · doble clic para devolverla a su lugar · también con las flechas',
-          size: 'Arrastrá para cambiar el tamaño de la tele · también con las flechas' }
+          tv: 'Tele de la cocina — arrastrala para moverla, doble clic para devolverla a su lugar, también con las flechas',
+          size: 'Arrastrá para cambiar el tamaño de la tele · también con las flechas',
+          knob: 'Cambiar de canal', off: 'Apagar la tele', on: 'Prender la tele', offText: 'APAGADA' }
   };
+  const tip = (node, text) => { node.dataset.tip = text; node.setAttribute('aria-label', text); };
   function label() {
-    const L = LABELS[document.documentElement.lang === 'es' ? 'es' : 'en'];
-    hide.dataset.tip = L.hide; hide.setAttribute('aria-label', L.hide);
-    show.dataset.tip = L.show; show.setAttribute('aria-label', L.show);
-    bar.dataset.tip = L.move; bar.setAttribute('aria-label', L.move);
-    grip.dataset.tip = L.size; grip.setAttribute('aria-label', L.size);
+    const L = LABELS[lang()];
+    tip(hide, L.hide); tip(show, L.show); tip(grip, L.size); tip(knob, L.knob);
+    tip(power, isOn ? L.off : L.on);
+    plate.dataset.tip = L.tv;
+    stage.setAttribute('aria-label', L.tv);
+    tune();
   }
 
+  // The plate shows the channel number and what is on
+  const CHANNELS = Object.keys(SCENES);
+  function tune() {
+    const ch = CHANNELS.indexOf(scene.name);
+    stage.style.setProperty('--ch', ch);
+    chNum.textContent = 'CH ' + (ch + 1);
+    caption.textContent = isOn ? SCENES[scene.name].caption[lang()] : LABELS[lang()].offText;
+  }
+  knob.addEventListener('click', () => {
+    setScene(CHANNELS[(CHANNELS.indexOf(scene.name) + 1) % CHANNELS.length]);
+    FX.play('tab');
+  });
+
+  /* ── Power and hiding ─────────────────────────────────────── */
+  // 'on' | 'off' (the set stays, the screen goes dark) | 'hidden' (tucked away behind 📺)
+  const PREF_KEY = 'meal-plan-tv-state';
+  let isOn = true;
+  const save = state => { try { localStorage.setItem(PREF_KEY, state); } catch (e) {} };
+
+  function setPower(on, quiet) {
+    if (on === isOn) return;
+    isOn = on;
+    clearTimeout(setPower.timer);
+    stage.classList.remove('powering-on', 'powering-off');
+    if (on) {
+      stage.classList.remove('off');
+      if (!quiet) { stage.classList.add('powering-on'); FX.play('open'); }
+      scene.loud = performance.now() + SCENES[scene.name].len;
+      render(performance.now());
+    } else if (quiet || reduceMotion) {
+      stage.classList.add('off');
+    } else {
+      stage.classList.add('powering-off');                  // the picture shrinks to a line, then a dot
+      FX.play('close');
+      setPower.timer = setTimeout(() => stage.classList.replace('powering-off', 'off'), 480);
+    }
+    label();
+    save(on ? 'on' : 'off');
+  }
+  power.addEventListener('click', () => setPower(!isOn));
+
+  function setShown(shown) {
+    stage.hidden = !shown;
+    show.hidden = shown;
+    save(shown ? (isOn ? 'on' : 'off') : 'hidden');
+    if (shown) { place(); render(performance.now()); }
+  }
+  hide.addEventListener('click', () => setShown(false));
+  show.addEventListener('click', () => setShown(true));
+
   /* ── Moving and resizing ──────────────────────────────────── */
-  // Drag the bar to move the TV and the corner grip to resize it. The
-  // spot is saved as a share of the free space on each axis, so it
-  // keeps its corner when the window changes size.
-  const BOX_KEY = 'meal-plan-tv-box';
-  const MIN_W = 200, GAP = 8;
+  // Drag the set to move it and the corner grip to resize it. The spot
+  // is saved as a share of the free space on each axis, so it keeps its
+  // corner when the window changes size. It starts small, top left.
+  const BOX_KEY = 'meal-plan-tv-spot';
+  const GAP = 8, START_TOP = 64;
   let box = null;                                     // { x, y: 0 (left/top) … 1, w: px }
   try { box = JSON.parse(localStorage.getItem(BOX_KEY)); } catch (e) {}
   if (!box || !(box.w > 0)) box = null;
 
   const view = () => ({ w: document.documentElement.clientWidth, h: window.innerHeight });
-  const frame = () => ({ w: stage.offsetWidth - canvas.clientWidth, h: stage.offsetHeight - canvas.clientHeight });
-  const heightFor = w => (w - frame().w) * H / W + frame().h;
   const within = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-
-  function maxWidth() {
-    const v = view(), f = frame();
-    return Math.max(MIN_W, Math.min(v.w - 2 * GAP, (v.h - 2 * GAP - f.h) * W / H + f.w));
+  // The set's size follows its screen: the canvas width in px, W at the smallest
+  const screenW = () => canvas.offsetWidth;
+  function maxScreen() {
+    const v = view(), r = stage.getBoundingClientRect();
+    const fw = r.width - screenW(), fh = r.height - canvas.offsetHeight;
+    return Math.max(W, Math.min(v.w - 2 * GAP - fw, (v.h - 2 * GAP - 10 - fh) * W / H));
   }
   // Close to a whole number of screen pixels per scene pixel? Snap to it, so the art stays crisp
-  function snap(w) {
-    const f = frame().w, k = Math.round((w - f) / W);
-    return k >= 1 && Math.abs(k * W + f - w) < 10 ? k * W + f : Math.round(w);
+  function snap(cw) {
+    const k = Math.round(cw / W);
+    return k >= 1 && Math.abs(k * W - cw) < 10 ? k * W : Math.round(cw);
   }
-  function put(left, top, width) {
-    const v = view();
-    stage.style.width = width + 'px';
-    const h = stage.offsetHeight;
-    stage.style.left = within(left, GAP, v.w - width - GAP) + 'px';
-    stage.style.top = within(top, GAP, v.h - h - GAP) + 'px';
-    stage.style.right = stage.style.bottom = 'auto';
+  function put(left, top, cw) {
+    canvas.style.width = cw + 'px';
+    const v = view(), r = stage.getBoundingClientRect();
+    stage.style.left = within(left, GAP, v.w - r.width - GAP) + 'px';
+    stage.style.top = within(top, GAP + 10, v.h - r.height - GAP) + 'px';   // room for the antenna
   }
   // The grip goes on the corner that faces the middle of the screen
   function corner() {
@@ -682,51 +736,54 @@
   function place() {
     if (stage.hidden) return;
     if (!box) {
-      stage.removeAttribute('style');
+      put(GAP, START_TOP, W);
     } else {
-      const v = view(), w = Math.min(box.w, maxWidth()), h = heightFor(w);
-      put(GAP + box.x * Math.max(0, v.w - w - 2 * GAP), GAP + box.y * Math.max(0, v.h - h - 2 * GAP), w);
+      canvas.style.width = within(box.w, W, maxScreen()) + 'px';
+      const v = view(), r = stage.getBoundingClientRect();
+      put(GAP + box.x * Math.max(0, v.w - r.width - 2 * GAP), GAP + box.y * Math.max(0, v.h - r.height - 2 * GAP), screenW());
     }
     corner();
   }
   function remember() {
     const v = view(), r = stage.getBoundingClientRect();
     const share = (pos, free) => free > 0 ? within((pos - GAP) / free, 0, 1) : 0;
-    box = { x: share(r.left, v.w - r.width - 2 * GAP), y: share(r.top, v.h - r.height - 2 * GAP), w: Math.round(r.width) };
+    box = { x: share(r.left, v.w - r.width - 2 * GAP), y: share(r.top, v.h - r.height - 2 * GAP), w: screenW() };
     try { localStorage.setItem(BOX_KEY, JSON.stringify(box)); } catch (e) {}
     corner();
   }
-  // New width with the corner opposite the grip held still
-  function resizeFrom(start, width) {
-    const g = stage.dataset.grip, w = snap(within(width, MIN_W, maxWidth())), h = heightFor(w);
-    put(g[1] === 'r' ? start.left : start.right - w, g[0] === 'b' ? start.top : start.bottom - h, w);
+  // New screen width with the corner opposite the grip held still
+  function resizeFrom(start, cw) {
+    const g = stage.dataset.grip;
+    canvas.style.width = snap(within(cw, W, maxScreen())) + 'px';
+    const r = stage.getBoundingClientRect();
+    put(g[1] === 'r' ? start.left : start.right - r.width, g[0] === 'b' ? start.top : start.bottom - r.height, screenW());
   }
 
   function drag(e, resizing) {
     if (e.button !== 0 || (!resizing && e.target.closest('button'))) return;
     e.preventDefault();
-    const el = e.currentTarget, start = stage.getBoundingClientRect(), x0 = e.clientX, y0 = e.clientY;
+    const target = e.currentTarget, start = stage.getBoundingClientRect(), cw0 = screenW(), x0 = e.clientX, y0 = e.clientY;
     const g = stage.dataset.grip, sx = g[1] === 'r' ? 1 : -1, sy = g[0] === 'b' ? 1 : -1;
-    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+    try { target.setPointerCapture(e.pointerId); } catch (err) {}
     stage.classList.add(resizing ? 'resizing' : 'dragging');
     const move = ev => {
       const dx = ev.clientX - x0, dy = ev.clientY - y0;
-      if (!resizing) return put(start.left + dx, start.top + dy, start.width);
+      if (!resizing) return put(start.left + dx, start.top + dy, cw0);
       const across = sx * dx, down = sy * dy * W / H;   // vertical drag counted in width
-      resizeFrom(start, start.width + (Math.abs(across) > Math.abs(down) ? across : down));
+      resizeFrom(start, cw0 + (Math.abs(across) > Math.abs(down) ? across : down));
     };
     const end = () => {
-      ['pointermove', 'pointerup', 'pointercancel'].forEach((type, i) => el.removeEventListener(type, i ? end : move));
+      ['pointermove', 'pointerup', 'pointercancel'].forEach((type, i) => target.removeEventListener(type, i ? end : move));
       stage.classList.remove('dragging', 'resizing');
       remember();
     };
-    el.addEventListener('pointermove', move);
-    el.addEventListener('pointerup', end);
-    el.addEventListener('pointercancel', end);
+    target.addEventListener('pointermove', move);
+    target.addEventListener('pointerup', end);
+    target.addEventListener('pointercancel', end);
   }
-  bar.addEventListener('pointerdown', e => drag(e, false));
+  stage.addEventListener('pointerdown', e => { if (!e.target.closest('.fx-stage-grip')) drag(e, false); });
   grip.addEventListener('pointerdown', e => drag(e, true));
-  bar.addEventListener('dblclick', e => {
+  stage.addEventListener('dblclick', e => {
     if (e.target.closest('button')) return;
     box = null;
     try { localStorage.removeItem(BOX_KEY); } catch (err) {}
@@ -734,12 +791,12 @@
   });
 
   const ARROWS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
-  bar.addEventListener('keydown', e => {
+  stage.addEventListener('keydown', e => {
     const a = ARROWS[e.key];
-    if (!a || e.target !== bar) return;
+    if (!a || e.target !== stage) return;
     e.preventDefault();
     const r = stage.getBoundingClientRect();
-    put(r.left + a[0] * 24, r.top + a[1] * 24, r.width);
+    put(r.left + a[0] * 24, r.top + a[1] * 24, screenW());
     remember();
   });
   grip.addEventListener('keydown', e => {
@@ -747,26 +804,18 @@
     if (!a) return;
     e.preventDefault();
     const r = stage.getBoundingClientRect();
-    resizeFrom(r, r.width + (a[0] || -a[1]) * 36);
+    resizeFrom(r, screenW() + (a[0] || -a[1]) * 36);
     remember();
   });
   window.addEventListener('resize', place);
-  function setOpen(open) {
-    stage.hidden = !open;
-    show.hidden = open;
-    document.body.classList.toggle('fx-stage-on', open);
-    try { localStorage.setItem(PREF_KEY, open ? 'on' : 'off'); } catch (e) {}
-    if (open) { place(); render(performance.now()); }
-  }
-  hide.addEventListener('click', () => setOpen(false));
-  show.addEventListener('click', () => setOpen(true));
 
-  label();
-  caption.textContent = SCENES.kitchen.caption[document.documentElement.lang === 'es' ? 'es' : 'en'];
+  /* ── Switching it on ──────────────────────────────────────── */
   document.body.append(stage, show);
   let saved = 'on';
   try { saved = localStorage.getItem(PREF_KEY) || 'on'; } catch (e) {}
-  setOpen(saved !== 'off');
+  if (saved === 'off') setPower(false, true);
+  label();
+  setShown(saved !== 'hidden');
   render(performance.now());
   if (!reduceMotion) requestAnimationFrame(tick);
 })();

@@ -41,48 +41,206 @@ header .px-pan { right: 7%; }
 }
 @media print { .px, .fx-stage, .fx-stage-open { display: none !important; } }
 
-/* ── Kitchen TV (built by js/fx-scenes.js) ─────────────────── */
+/* ── Kitchen TV (built by js/fx-scenes.js) ─────────────────────
+   An old wooden TV set: rabbit-ear antenna, curved screen with
+   scanlines, a brass channel plate, and a side panel with the
+   channel knob, speaker grille and power button. */
 .fx-stage {
   position: fixed;
-  right: max(16px, env(safe-area-inset-right));
-  bottom: max(16px, env(safe-area-inset-bottom));
+  left: 8px;
+  top: 64px;
   z-index: 150;
-  width: 304px;                 /* 288-px canvas = the 144-px scene at 2× */
-  padding: 6px 6px 0;
+  display: flex;
+  gap: 6px;
+  padding: 8px 7px 9px 8px;
   border: 2px solid #2b1d14;
-  border-radius: 12px;
-  background: #5a3e2b;
-  box-shadow: 0 10px 30px rgba(0,0,0,.3);
-}
-.fx-stage canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 6px;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-}
-.fx-stage-bar {
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.16), transparent 35%, rgba(0,0,0,.18)),
+    repeating-linear-gradient(92deg, #8a5530 0 5px, #7d4a29 5px 7px, #93603a 7px 13px, #7a4727 13px 15px);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.22), inset 0 -3px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.35);
   cursor: grab;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+}
+.fx-stage:focus-visible { outline: 3px solid var(--color-accent, #b7793f); outline-offset: 3px; }
+.fx-stage.dragging { cursor: grabbing; }
+.fx-stage.dragging, .fx-stage.resizing { transition: none !important; box-shadow: 0 18px 44px rgba(0,0,0,.45); }
+/* Little feet */
+.fx-stage::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -7px;
+  height: 6px;
+  border-left: 12px solid #2b1d14;
+  border-right: 12px solid #2b1d14;
+  border-radius: 0 0 4px 4px;
+  pointer-events: none;
+}
+/* Rabbit-ear antenna */
+.fx-antenna {
+  position: absolute;
+  left: 50%;
+  top: -9px;
+  width: 22px;
+  height: 9px;
+  margin-left: -13px;
+  border: 2px solid #2b1d14;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  background: #4a3020;
+  pointer-events: none;
+}
+.fx-antenna::before, .fx-antenna::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 9px;
+  width: 2px;
+  height: 30px;
+  background: linear-gradient(#cbd5e1, #64748b);
+  transform-origin: 50% 100%;
+  border-radius: 2px;
+}
+.fx-antenna::before { transform: rotate(-32deg); box-shadow: 0 -2px 0 2px #94a3b8; }
+.fx-antenna::after  { transform: rotate(28deg);  box-shadow: 0 -2px 0 2px #94a3b8; }
+.fx-tube {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+/* The curved glass: rounded corners, scanlines, vignette and glare */
+.fx-screen {
+  position: relative;
+  overflow: hidden;
+  border: 5px solid #1d1a17;
+  border-radius: 18px / 24px;
+  background: #0d1313;
+  box-shadow: 0 0 0 2px #c9a46a, 0 2px 0 3px rgba(0,0,0,.35);
+}
+.fx-screen canvas {
+  display: block;
+  width: 144px;                 /* set by js/fx-scenes.js */
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.fx-screen::before, .fx-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.fx-screen::before {
+  z-index: 1;
+  background:
+    repeating-linear-gradient(to bottom, rgba(0,0,0,.16) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,.5) 100%);
+}
+.fx-screen::after {
+  z-index: 2;
+  background: linear-gradient(135deg, rgba(255,255,255,.22) 0 12%, transparent 30%);
+}
+.fx-stage.off .fx-screen canvas { visibility: hidden; }
+.fx-stage.off .fx-screen { background: radial-gradient(ellipse at 38% 30%, #33403f, #0b1010 70%); }
+/* Brass plate with the channel and what is on */
+.fx-plate {
+  contain: inline-size;         /* fill the screen's width without widening the set */
   display: flex;
   align-items: center;
-  gap: .5rem;
-  padding: 4px 2px 5px 4px;
-  color: #fbe7cf;
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .3px;
+  gap: 5px;
+  min-width: 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: linear-gradient(#efd9a0, #b88f4c);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 0 rgba(0,0,0,.3);
+  color: #3b2a1f;
+  font: 700 .62rem/1.45 ui-monospace, Menlo, Consolas, monospace;
+  letter-spacing: .2px;
 }
-.fx-stage-bar span { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.fx-stage.dragging .fx-stage-bar { cursor: grabbing; }
-.fx-stage.dragging, .fx-stage.resizing { transition: none !important; box-shadow: 0 18px 44px rgba(0,0,0,.4); }
+.fx-plate b { flex-shrink: 0; }
+.fx-plate span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* Side panel: hide, channel knob, speaker grille, power */
+.fx-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 28px;
+  padding: 4px 0;
+  border-radius: 8px;
+  background: linear-gradient(#3a271a, #241810);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.6);
+}
+.fx-panel button {
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.fx-stage-min {
+  width: 14px;
+  height: 14px;
+  background: rgba(255,255,255,.12);
+  color: #fbe7cf;
+  font-size: .62rem;
+  line-height: 14px;
+}
+.fx-knob {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at 35% 30%, #f3dcb0, #b88a52 55%, #6b4426);
+  box-shadow: 0 1px 2px rgba(0,0,0,.6), inset 0 -1px 1px rgba(0,0,0,.3);
+}
+.fx-knob::after {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 2px;
+  width: 2px;
+  height: 7px;
+  border-radius: 1px;
+  background: #3b2a1f;
+  transform-origin: 1px 8px;
+  transform: rotate(calc(var(--ch, 0) * 51deg));
+}
+.fx-grille {
+  flex: 1;
+  width: 16px;
+  min-height: 0;
+  border-radius: 3px;
+  background: repeating-linear-gradient(to bottom, #120b07 0 2px, #4f3523 2px 4px);
+}
+.fx-power {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle at 35% 30%, #fca5a5, #b91c1c 60%, #7f1d1d);
+  box-shadow: 0 1px 2px rgba(0,0,0,.6);
+}
+.fx-power::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 5px #4ade80;
+}
+.fx-stage.off .fx-power::after { background: #3f1d1d; box-shadow: none; }
+@media (hover: hover) {
+  .fx-panel button:hover { filter: brightness(1.15); }
+}
 /* The resize grip sits on the corner that faces the middle of the screen */
 .fx-stage-grip {
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   width: 20px;
   height: 20px;
   padding: 0;
@@ -104,57 +262,21 @@ header .px-pan { right: 7%; }
 .fx-stage[data-grip="bl"] .fx-stage-grip { left: -4px; bottom: -4px; cursor: nesw-resize; transform: rotate(90deg); }
 .fx-stage-grip:hover, .fx-stage-grip:focus-visible, .fx-stage.resizing .fx-stage-grip { opacity: 1; }
 @media (hover: none) { .fx-stage-grip { opacity: .9; } }
-.fx-stage-bar span::before {
-  content: '';
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 6px;
-  border-radius: 50%;
-  background: #ef4444;
-  box-shadow: 0 0 6px #ef4444;
-  vertical-align: 1px;
-}
-.fx-stage-min, .fx-stage-open {
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  line-height: 1;
-}
-.fx-stage-min {
-  width: 22px;
-  height: 22px;
-  background: rgba(255,255,255,.14);
-  color: #fbe7cf;
-  font-size: .8rem;
-}
+/* Brings a hidden TV back */
 .fx-stage-open {
   position: fixed;
-  right: max(16px, env(safe-area-inset-right));
+  left: max(12px, env(safe-area-inset-left));
   bottom: max(16px, env(safe-area-inset-bottom));
   z-index: 150;
   width: 46px;
   height: 46px;
   border: 2px solid #2b1d14;
-  background: #5a3e2b;
+  border-radius: 50%;
+  background: #7d4a29;
   font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
-}
-body.fx-stage-on .site-footer { padding-bottom: calc(180px + env(safe-area-inset-bottom)); }
-body.fx-stage-on .toast { bottom: calc(176px + env(safe-area-inset-bottom)); }
-@media (min-width: 1200px) {
-  .fx-stage { width: 448px; }  /* 3× */
-  body.fx-stage-on .site-footer { padding-bottom: calc(236px + env(safe-area-inset-bottom)); }
-  body.fx-stage-on .toast { bottom: calc(232px + env(safe-area-inset-bottom)); }
-}
-@media (hover: hover) {
-  .fx-stage-min:hover { background: rgba(255,255,255,.28); }
-}
-@media (max-width: 600px) {
-  .fx-stage { width: 236px; right: 10px; bottom: 10px; padding: 4px 4px 0; }
-  .fx-stage-bar { font-size: .66rem; padding: 3px 1px 4px 3px; }
-  body.fx-stage-on .site-footer { padding-bottom: calc(130px + env(safe-area-inset-bottom)); }
-  body.fx-stage-on .toast { bottom: calc(126px + env(safe-area-inset-bottom)); }
 }
 
 /* ── Confetti when a list is fully ticked (js/fx.js) ──────── */
@@ -260,6 +382,8 @@ body.fx-stage-on .toast { bottom: calc(176px + env(safe-area-inset-bottom)); }
   .flask .fl-bub { animation: fl-bub 1.8s ease-in infinite; animation-delay: calc(var(--i) * -.36s); }
   .fx-stage { transition: opacity .25s var(--ease), transform .25s var(--ease); }
   .fx-stage.swap canvas { animation: fx-tv .3s steps(3); }
+  .fx-stage.powering-off canvas { animation: fx-crt-off .48s ease-in forwards; }
+  .fx-stage.powering-on canvas { animation: fx-crt-on .45s ease-out; }
 
   /* ── Moments — classes added by js/fx.js ────────────────── */
   .meal-slot.fx-deal { animation: fx-deal .45s cubic-bezier(.2,.8,.3,1.15) both; animation-delay: calc(var(--fx-i, 0) * 28ms); }
@@ -289,6 +413,18 @@ body.fx-stage-on .toast { bottom: calc(176px + env(safe-area-inset-bottom)); }
   60%  { fill: #8b5cf6; }
   85%  { opacity: .9; }
   100% { transform: translate(var(--dx), var(--dy)); opacity: 0; fill: #c4b5fd; }
+}
+
+/* Old-TV power: the picture collapses to a bright line, then a dot — and back */
+@keyframes fx-crt-off {
+  0%   { transform: none; filter: none; }
+  55%  { transform: scale(1, .03); filter: brightness(3); }
+  100% { transform: scale(0, .03); filter: brightness(5); }
+}
+@keyframes fx-crt-on {
+  0%   { transform: scale(0, .03); filter: brightness(5); }
+  45%  { transform: scale(1, .03); filter: brightness(3); }
+  100% { transform: none; filter: none; }
 }
 
 /* The kitchen TV flickers when the channel changes */
