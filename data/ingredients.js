@@ -36,6 +36,12 @@ const ingredients = [
   { key: 'split-peas',      cat: 'Pantry',          en: 'Split peas (dry)', es: 'Arvejas partidas (secas)', price: 1.5, match: /split peas/i },
   { key: 'cornmeal',        cat: 'Grains & Bread',  en: 'Cornmeal & corn flour', es: 'Harina de maíz', price: 1.5, match: /cornmeal|corn flour|cornflour|arepa flour|purple corn/i },
   { key: 'passata',         cat: 'Pantry',          en: 'Tomato sauce (passata)', es: 'Puré o salsa de tomate', price: 1.5, match: /tomato sauce|passata/i },
+  { key: 'chickpea-flour',  cat: 'Pantry',          en: 'Chickpea flour', es: 'Harina de garbanzo', price: 1.5, match: /chickpea flour|gram flour|besan/i },
+  { key: 'rice-flour',      cat: 'Pantry',          en: 'Rice flour', es: 'Harina de arroz', price: 1.5, match: /rice flour/i },
+  { key: 'pigeon-peas',     cat: 'Pantry',          en: 'Pigeon peas (gandules, can)', es: 'Gandules (lata)', price: 2, match: /pigeon peas|gandules/i },
+  { key: 'semolina',        cat: 'Grains & Bread',  en: 'Semolina', es: 'Sémola', price: 1.5, match: /semolina/i },
+  { key: 'okra',            cat: 'Vegetables',      en: 'Okra', es: 'Okra (quimbombó)', price: 2.5, match: /\bokra\b/i },
+  { key: 'pomegranate',     cat: 'Fruit',           en: 'Pomegranate juice', es: 'Jugo de granada', price: 3, match: /pomegranate/i },
   { key: 'filled-pasta',    cat: 'Grains & Bread',  en: 'Filled pasta (ravioli, sorrentinos…)', es: 'Pasta rellena (ravioles, sorrentinos…)', price: 5, match: /ravioli|sorrentinos|cappelletti|capeletis|tortellini/i },
   { key: 'dulce-de-leche',  cat: 'Dairy & Fridge',  en: 'Dulce de leche', es: 'Dulce de leche', price: 1.5, match: /dulce de leche/i },
   { key: 'jam',             cat: 'Pantry',          en: 'Jam', es: 'Mermelada', price: 1, match: /\bjam\b|marmalade/i },
@@ -48,7 +54,7 @@ const ingredients = [
   { key: 'spices-extra',    cat: 'Pantry',          en: 'Other spices (allspice, garam masala…)', es: 'Otras especias (pimienta de Jamaica, garam masala…)', price: 0, kind: 'spice', match: /lemongrass|anise|caraway|allspice|mustard seeds|sumac|garam masala|za'?atar|cardamom|guascas|marjoram|peppercorns/i },
   { key: 'fish-sauce',      cat: 'Pantry',          en: 'Fish sauce', es: 'Salsa de pescado', price: 0, kind: 'spice', match: /fish sauce/i },
   { key: 'lamb',            cat: 'Proteins & Fish', en: 'Lamb', es: 'Cordero', price: 10, match: /\blamb\b/i },
-  { key: 'beef-steak',      cat: 'Proteins & Fish', en: 'Beef cuts (steaks, cutlets, flank, shin)', es: 'Cortes vacunos (bifes, nalga, matambre, osobuco)', price: 9, match: /beef (cutlets|steaks?|flank|shin|short ribs)|thin beef|flank steak|matambre|osobuco|^[\d.,½¼¾\s]+(g|kg) beef,/i },
+  { key: 'beef-steak',      cat: 'Proteins & Fish', en: 'Beef cuts (steaks, cutlets, flank, shin)', es: 'Cortes vacunos (bifes, nalga, matambre, osobuco)', price: 9, match: /beef (cutlets|steaks?|flank|shin|short ribs)|thin beef|flank steak|matambre|osobuco|brisket|^[\d.,½¼¾\s]+(g|kg) beef,/i },
   { key: 'pork-shoulder',   cat: 'Proteins & Fish', en: 'Pork shoulder & cutlets', es: 'Bondiola y escalopes de cerdo', price: 7, match: /pork shoulder|pork cutlets|bondiola/i },
   { key: 'sausages',        cat: 'Proteins & Fish', en: 'Sausages (chorizo, frankfurters)', es: 'Chorizos y salchichas', price: 4, match: /sausages?|chorizos?|frankfurters?/i },
   { key: 'ham',             cat: 'Dairy & Fridge',  en: 'Ham & prosciutto', es: 'Jamón cocido y crudo', price: 3, match: /\bham\b|prosciutto/i },
@@ -92,6 +98,7 @@ const ingredients = [
   { key: 'coffee',          cat: 'Pantry',          en: 'Instant coffee', es: 'Café instantáneo', price: 0, kind: 'spice', match: /coffee/i },
   { key: 'yerba-mate',      cat: 'Pantry',          en: 'Yerba mate', es: 'Yerba mate (saquitos)', price: 0, kind: 'spice', match: /yerba|mate tea/i },
   { key: 'chimichurri',     cat: 'Pantry',          en: 'Chimichurri', es: 'Chimichurri', price: 1, match: /chimichurri/i },
+  { key: 'cookies',         cat: 'Grains & Bread',  en: 'Cookies', es: 'Galletitas dulces', price: 2, match: /\bcookies\b/i },
 
   /* ── Specific names that contain a more general one ───────── */
   { key: 'beef-broth',      cat: 'Pantry',          en: 'Beef broth',                   es: 'Caldo de carne',                  price: 3, match: /beef broth/i },
@@ -551,5 +558,12 @@ const substitutes = {
   'sparkling-water': ['cold water with a pinch of baking powder', 'agua fría con una pizca de polvo para hornear'],
   'split-peas':      ['red lentils or frozen peas', 'lentejas rojas o arvejas congeladas'],
   'cornmeal':        ['semolina or polenta', 'sémola o polenta'],
-  'passata':         ['crushed canned tomatoes, blended', 'tomate triturado de lata, licuado']
+  'passata':         ['crushed canned tomatoes, blended', 'tomate triturado de lata, licuado'],
+  'chickpea-flour':  ['flour (less nutty) or rice flour', 'harina común (menos sabrosa) o harina de arroz'],
+  'rice-flour':      ['cornstarch or plain flour', 'maicena o harina común'],
+  'pigeon-peas':     ['black-eyed beans, peas or kidney beans', 'porotos tape, arvejas o porotos colorados'],
+  'semolina':        ['fine polenta or plain flour', 'polenta fina o harina común'],
+  'okra':            ['green beans or zucchini (thicken with a little cornstarch)', 'chauchas o zapallitos (espesá con un poco de maicena)'],
+  'pomegranate':     ['cranberry juice, or grape juice with lemon', 'jugo de arándanos, o jugo de uva con limón'],
+  'cookies':         ['plain biscuits or vanilla wafers', 'vainillas o galletitas simples']
 };

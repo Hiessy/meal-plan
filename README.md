@@ -10,9 +10,10 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
 
 - **A balanced random menu every week**: 5 breakfasts, 5 lunches, 5 snacks and 5 dinners picked
   from the recipe list.
-  - 2,296 recipes. 452 are dishes from 52 countries: over a hundred Argentine ones (milanesas,
-    locro, humita, empanadas, chupín, pastafrola, mate cocido…) and dishes from all over Latin
-    America, Europe, Africa, the Middle East and Asia.
+  - 2,584 recipes. 740 are dishes from 99 countries: 145 Argentine ones (milanesas, locro,
+    humita, empanadas tucumanas, chupín, pastafrola, fainá, chocotorta, mate cocido…) and dishes
+    from all over Latin America and the Caribbean, Europe, Africa, the Middle East, Asia and
+    Oceania.
   - **✨ 1,844 AI-created recipes**: original dishes invented by Claude, such as chimichurri
     salmon with crispy potatoes, yerba mate-crusted chicken or dulce de leche BBQ halloumi wraps.
     They count as experimental, so at most two land in a week; the **AI-created recipes** filter

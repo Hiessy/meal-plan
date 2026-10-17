@@ -44,17 +44,17 @@ const bloodTypes = (() => {
         'sour-cream', 'shredded-cheese', 'cheese', 'cream', 'ice-cream', 'condensed-milk', 'dulce-de-leche',
         'mayonnaise', 'ketchup', 'vinegar', 'potatoes', 'sweet-potatoes', ...TOMATO, 'bell-peppers', 'eggplant',
         'cabbage', 'coleslaw-mix', 'mushrooms', 'olives', 'oranges', 'bananas', 'mango', 'melon', 'coconut-milk',
-        'coconut', 'kidney-beans', 'chickpeas', 'hummus', 'white-beans']
+        'coconut', 'kidney-beans', 'chickpeas', 'chickpea-flour', 'hummus', 'white-beans']
     },
     B: {
       name: { en: 'B', es: 'B' },
-      avoid: [...CHICKEN, ...SHELLFISH, ...PORK, ...CORN, ...WHEAT, 'lentils', 'chickpeas', 'hummus', 'black-beans',
+      avoid: [...CHICKEN, ...SHELLFISH, ...PORK, ...CORN, ...WHEAT, 'lentils', 'chickpeas', 'chickpea-flour', 'hummus', 'black-beans',
         'peanut-butter', 'peanuts', 'sesame-oil', 'seeds', 'tahini', 'pine-nuts', 'mixed-nuts', ...TOMATO,
         'avocados', 'olives', 'pumpkin', 'coconut-milk', 'coconut', 'buckwheat']
     },
     AB: {
       name: { en: 'AB', es: 'AB' },
-      avoid: [...BEEF, ...PORK, ...CHICKEN, ...SHELLFISH, ...CORN, 'kidney-beans', 'black-beans', 'chickpeas',
+      avoid: [...BEEF, ...PORK, ...CHICKEN, ...SHELLFISH, ...CORN, 'kidney-beans', 'black-beans', 'chickpeas', 'chickpea-flour',
         'hummus', 'sesame-oil', 'seeds', 'tahini', 'avocados', 'bananas', 'oranges', 'mango', 'coconut-milk',
         'coconut', 'bell-peppers', 'olives', 'butter', 'parmesan', 'vinegar', 'buckwheat']
     }
