@@ -1163,6 +1163,7 @@ button.chip { font: inherit; cursor: pointer; }
 .pick-head h3 { flex: 1; margin: 0; }
 .pick-head h3::after { display: none; }
 .pick-head small.low { color: #b91c1c; }
+.more-btn { display: block; margin: .5rem auto .25rem; }
 .mini-btn {
   padding: .15rem .65rem;
   border: 1.5px solid var(--color-primary-light);

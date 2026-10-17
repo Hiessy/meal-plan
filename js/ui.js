@@ -917,7 +917,6 @@ function setFilter(kind, value) {
   if (kind === 'clear') draftFilters = FILTERS();
   renderFilters();
   filterPanel();
-  updatePanelCounts();
 }
 
 function renderPanel() {
@@ -926,25 +925,41 @@ function renderPanel() {
     `<button type="button" class="tool-btn" data-action="f-clear"><span class="ico">✕</span> ${t('clearFilters')}</button>`;
   byId('p-search').placeholder = t('searchRecipes');
   renderFilters();
+  renderList();
+}
+
+// The recipes that match the filters and the search, by meal type. Thousands
+// of recipes: each type shows PAGE rows at first and more on demand.
+const PAGE = 40;
+let pageShown = {};
+const searchKey = new Map();
+const nameKey = r => searchKey.get(r.id) || (searchKey.set(r.id, plain(r.name.en + ' ' + r.name.es)), searchKey.get(r.id));
+const matching = type => {
+  const q = plain(byId('p-search').value.trim());
+  return recipes.filter(r => r.type === type && passes(r, draftFilters) && (!q || nameKey(r).includes(q)));
+};
+function renderList() {
   byId('p-list').innerHTML = Planner.TYPES.map(type => {
-    const items = recipes.filter(r => r.type === type).map(r => {
+    const list = matching(type), limit = pageShown[type] || PAGE;
+    const items = list.slice(0, limit).map(r => {
       const off = r.experimental && !store.useExperimental;
-      return `<li data-id="${r.id}" data-name="${esc(plain(r.name.en + ' ' + r.name.es))}">
-        <label class="check pick${off ? ' off' : ''}">
+      return `<li><label class="check pick${off ? ' off' : ''}">
           <input type="checkbox" data-pick="${r.id}"${draft.has(r.id) ? '' : ' checked'}${off ? ' disabled' : ''}>
           <span>${iconOf(r)} ${r.name[lang]} ${originHtml(r)}${r.experimental ? ' ' + FLASK : ''}</span>
         </label></li>`;
     }).join('');
-    return `<section class="pick-group" data-type="${type}">
+    const more = list.length > limit
+      ? `<button type="button" class="mini-btn more-btn" data-action="p-more" data-type="${type}">${t('showMore')(Math.min(PAGE, list.length - limit), list.length - limit)}</button>`
+      : '';
+    return `<section class="pick-group" data-type="${type}"${list.length ? '' : ' hidden'}>
       <div class="pick-head">
         <h3>${t('typeTitles')[type]} <small id="p-n-${type}"></small></h3>
         <button type="button" class="mini-btn" data-action="pick-all" data-type="${type}">${t('pickAll')}</button>
         <button type="button" class="mini-btn" data-action="pick-none" data-type="${type}">${t('pickNone')}</button>
       </div>
-      <ul>${items}</ul>
+      <ul>${items}</ul>${more}
     </section>`;
   }).join('');
-  filterPanel();
   updatePanelCounts();
 }
 
@@ -958,17 +973,10 @@ function updatePanelCounts() {
   byId('p-count').textContent = t('inUse')(usableCount(draft, null, draftFilters), recipes.length);
 }
 
+// Filters or search changed: start each type from its first page again
 function filterPanel() {
-  const q = plain(byId('p-search').value.trim());
-  panelEl.querySelectorAll('.pick-group').forEach(group => {
-    let shown = 0;
-    group.querySelectorAll('li').forEach(li => {
-      const hit = (!q || li.dataset.name.includes(q)) && passes(Planner.recipe(li.dataset.id), draftFilters);
-      li.hidden = !hit;
-      if (hit) shown++;
-    });
-    group.hidden = !shown;
-  });
+  pageShown = {};
+  renderList();
 }
 
 function openPanel() {
@@ -1012,17 +1020,16 @@ function closePanel() {
   emit('panel', { open: false });
 }
 
-// All / None for the recipes of a type that the filters and search show
+// All / None for every recipe of a type that the filters and search show
 function pickType(type, on) {
-  panelEl.querySelectorAll(`.pick-group[data-type="${type}"] li:not([hidden]) input[data-pick]`).forEach(cb => {
-    cb.checked = on;
-    if (on) draft.delete(cb.dataset.pick); else draft.add(cb.dataset.pick);
-  });
+  matching(type).forEach(r => { if (on) draft.delete(r.id); else draft.add(r.id); });
+  panelEl.querySelectorAll(`.pick-group[data-type="${type}"] input[data-pick]`).forEach(cb => { cb.checked = on; });
   updatePanelCounts();
 }
 
 panelEl.addEventListener('click', e => { if (e.target === panelEl) closePanel(); });
-byId('p-search').addEventListener('input', filterPanel);
+let searchTimer = null;
+byId('p-search').addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(filterPanel, 150); });
 
 /* ============================================================
    Week Renderer
@@ -1145,7 +1152,8 @@ const actions = {
   'pick-all':    el => pickType(el.dataset.type, true),
   'pick-none':   el => pickType(el.dataset.type, false),
   facet:         el => toggleFacet(+el.dataset.n, el.dataset.facet),
-  'use-all':     () => { draft.clear(); renderPanel(); },
+  'use-all':     () => { draft.clear(); renderList(); },
+  'p-more':      el => { pageShown[el.dataset.type] = (pageShown[el.dataset.type] || PAGE) + PAGE; renderList(); },
   'f-country':   el => setFilter('country', el.dataset.code),
   'f-blood':     el => setFilter('blood', el.dataset.blood),
   'f-age':       el => setFilter('age', el.dataset.age),

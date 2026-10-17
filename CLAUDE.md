@@ -11,7 +11,12 @@ above it. The README has the full table.
 1. **Meals & recipes** — `data/recipes.js`, `data/recipes-world.js`, `data/ingredients.js`,
    `data/countries.js` and `data/diets.js`. These are data only.
    - `recipes-world.js` pushes onto `recipes`, one recipe per line. Every recipe has a `country`
-     (an ISO code in `countries.js`).
+     (an ISO code in `countries.js`), except the AI-created ones.
+   - `recipes-ai.js` is generated: run `node tools/gen-ai-recipes.js` after changing
+     `tools/ai-components.js` or the templates. Its recipes have `ai: true` and
+     `experimental: true` and no country. Check new lines with the dictionary afterwards.
+   - The recipe panel shows 40 rows per meal type and loads more on demand; keep it that way,
+     since there are thousands of recipes.
 2. **Menu logic** — `js/planner.js` (balanced draw), `js/lists.js` (shopping and prep lists) and
    `js/diets.js` (blood-type and age fit).
    No DOM access and no storage.
