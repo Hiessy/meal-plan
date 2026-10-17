@@ -9,8 +9,10 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
 ## Features
 
 - **A balanced random menu every week**: 5 breakfasts, 5 lunches, 5 snacks and 5 dinners picked
-  from 160 recipes, including Argentine family classics such as milanesas, tarta de zapallitos,
-  ñoquis, pastel de papas and empanadas.
+  from the recipe list.
+  - 452 recipes from 52 countries: over a hundred Argentine ones (milanesas, locro, humita,
+    empanadas, chupín, pastafrola, mate cocido…) and dishes from all over Latin America, Europe,
+    Africa, the Middle East and Asia.
   - Each week aims for 1–2 egg breakfasts, 2–3 fish meals, at least one vegetarian meal, at most
     3 red-meat meals and 2–3 fruit snacks.
   - Lunch and dinner on the same day differ in protein and starch, and an egg breakfast never
@@ -27,10 +29,22 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     tooltip says it is experimental. The flask bubbles, and its liquid cycles through red, blue,
     green, purple and orange.
   - At most two land in a week. Untick **Use experimental recipes** to leave them out.
-- **📖 Choose the recipes**: the Recipes button lists all 160, grouped by meal type, with a search
-  box and All/None per group. Untick any you don't want and the menus are drawn again from the
-  rest. Each type keeps at least 5. The choice is saved in the browser, so other devices keep the
-  shared menu.
+- **📖 Choose the recipes**: the Recipes button lists every recipe, grouped by meal type, with a
+  search box and All/None per group. Untick any you don't want and the menus are drawn again from
+  the rest. The choice is saved in the browser, so other devices keep the shared menu.
+  - **🌍 Countries**: pick as many as you like. With none picked, menus use your home country:
+    the one this device's time zone points to, if it has enough recipes, or else Argentina. The
+    plan bar shows the active filters.
+  - **🩸 Blood type** (O, A, B, AB; pick several for a family): leaves out recipes with foods that
+    *Eat Right 4 Your Type* (Dr. Peter J. D'Adamo with Catherine Whitney) lists to avoid, in a
+    simplified form. Studies have not found health benefits from eating for your blood type.
+  - **👶 Ages from 6 months**: leaves out recipes not advised for the youngest age picked, after
+    WHO guidance on feeding infants and young children. That means no honey before 1 year, no
+    added sugar or very salty sauces before 2, no whole nuts or popcorn before 5, and no raw fish
+    or alcohol for young children. The recipe sheet then says how to serve the meal at that age.
+  - A meal type needs at least one recipe left; with fewer than five, the menus repeat them.
+- Each meal card shows where the dish comes from (a flag, or the country code where the system
+  has no flag emoji).
 - **Real dates**: the page shows this week and the next three. On Saturday and Sunday it starts
   with the coming week. Today's card is highlighted and past days fade.
 - **🎲 Shuffle** a whole week or **🔄 swap** one meal; both keep the week balanced.
@@ -81,10 +95,14 @@ The code is split into four layers. Each one only uses the layers listed above i
 
 | Layer | Files | What it holds |
 |-------|-------|---------------|
-| Meals & recipes | `data/recipes.js` | The recipes (EN/ES) with their balance facts, plus the Sunday prep tasks |
-| | `data/ingredients.js` | Ingredient dictionary: shopping-list rows, aisles and price estimates |
+| Meals & recipes | `data/recipes.js` | The family recipes (EN/ES) with their balance facts, plus the Sunday prep tasks |
+| | `data/recipes-world.js` | Traditional dishes from many countries, one recipe per line |
+| | `data/ingredients.js` | Ingredient dictionary: shopping-list rows, aisles, prices and substitutes |
+| | `data/countries.js` | Country names, and which country each time zone belongs to |
+| | `data/diets.js` | Blood-type avoid lists and age groups with the youngest age each ingredient suits |
 | Menu logic | `js/planner.js` | Balanced random weekly menus: the rules, the draw, shuffle and swap (no page code) |
 | | `js/lists.js` | Builds the shopping list and the prep list from a week's meals (no page code) |
+| | `js/diets.js` | Which recipes suit the picked blood types and ages (no page code) |
 | UI | `js/i18n.js` | All interface text in English and Spanish |
 | | `js/tooltip.js` | Tooltips for anything with a `data-tip` |
 | | `js/ui.js` | Draws the page, saves ticks and swaps, and handles every button |

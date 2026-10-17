@@ -1061,6 +1061,66 @@ button.chip { font: inherit; cursor: pointer; }
 }
 
 .panel { max-width: 720px; }
+/* Filters at the top of the recipe panel */
+.filters {
+  display: grid;
+  gap: .75rem;
+  padding-bottom: .9rem;
+  margin-bottom: .4rem;
+  border-bottom: 1px solid var(--border);
+}
+.filter-row h3 {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin: 0 0 .35rem;
+  font-size: .9rem;
+}
+.filter-row h3::after { display: none; }
+.filter-row h3 small { font-weight: 500; color: var(--text-muted); font-size: .75rem; }
+.filter-row .chips { display: flex; flex-wrap: wrap; gap: .3rem; font-size: .78rem; }
+.filter-tools { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .35rem; font-size: .78rem; }
+.country-chips { max-height: 7.5rem; overflow-y: auto; padding: 2px; }
+.chip small { font-weight: 500; opacity: .7; }
+.chip.is-home { border-style: dashed; border-color: var(--color-accent); }
+.info-dot {
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: .7rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+}
+/* Where a recipe comes from */
+.flag { font-size: 1.05em; line-height: 1; }
+.flag-code {
+  display: inline-block;
+  padding: 0 .3em;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  vertical-align: .12em;
+}
+.meal-name .origin, .meal-name .ai-mark { margin-left: .2rem; white-space: nowrap; }
+.origin-chip { font-size: .75rem; color: var(--text-muted); }
+.filter-sum { margin-left: .35rem; font-size: .78em; font-weight: 600; color: var(--text-muted); }
+.diet-box {
+  margin-top: .75rem;
+  padding: .7rem .9rem;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--r-md, 10px);
+  background: #eff6ff;
+  font-size: .85rem;
+}
+.diet-box p + p { margin-top: .35rem; }
 .panel h2 { margin-bottom: .2rem; }
 .panel-intro { font-size: .8rem; color: var(--text-muted); }
 .panel-tools {

@@ -7,8 +7,9 @@
    type    : 'breakfast' | 'lunch' | 'snack' | 'dinner'
 
    Balance facts — js/planner.js uses these to keep each week varied:
-   protein : lunches & dinners — 'fish' | 'poultry' | 'beef' | 'pork'
-             | 'plant' (vegetarian) | 'egg'
+   protein : lunches & dinners — 'fish' (and seafood) | 'poultry' |
+             'beef' (and lamb: red meat) | 'pork' | 'plant' (vegetarian)
+             | 'egg'
    base    : lunches & dinners — main starch: 'rice' | 'pasta' |
              'bread' (incl. tortillas, wraps, buns) | 'potato' |
              'grain' (quinoa, couscous) | 'none'
@@ -25,8 +26,15 @@
    tip     : optional nutrition note ("" for none)
    prep    : optional make-ahead tasks for the Sunday prep card, as keys
              of prepTasks at the bottom of this file
+   country : where the dish comes from, an ISO code of data/countries.js.
+             Everyday dishes common in Argentine homes count as 'AR'.
    experimental : true for a new, not yet family-tested recipe — shown
-             with a 🧪 flask; at most two land in a week
+             with an Erlenmeyer flask; at most two land in a week
+   ai      : true for an original recipe invented by AI (in
+             data/recipes-ai.js; they are experimental too)
+
+   More recipes: data/recipes-world.js (traditional dishes from many
+   countries) and data/recipes-ai.js (AI-created) add to this list.
 
    To add a recipe, copy one of the same type and change it. Keep it
    self-contained: any recipe can land on any day.
@@ -35,6 +43,7 @@ const recipes = [
   {
     "id": "scrambled-eggs-on-whole-grain-toast",
     "type": "breakfast",
+    "country": "AR",
     "group": "egg",
     "name": {
       "en": "Scrambled Eggs on Whole-Grain Toast",
@@ -82,6 +91,7 @@ const recipes = [
   {
     "id": "spinach-and-pepper-omelette",
     "type": "breakfast",
+    "country": "AR",
     "group": "egg",
     "name": {
       "en": "Spinach & Pepper Omelette",
@@ -133,6 +143,7 @@ const recipes = [
   {
     "id": "breakfast-burritos",
     "type": "breakfast",
+    "country": "MX",
     "group": "egg",
     "tags": [
       "tortilla"
@@ -189,6 +200,7 @@ const recipes = [
   {
     "id": "baked-egg-and-veggie-muffins",
     "type": "breakfast",
+    "country": "US",
     "group": "egg",
     "name": {
       "en": "Baked Egg & Veggie Muffins",
@@ -243,6 +255,7 @@ const recipes = [
   {
     "id": "avocado-toast-with-fried-eggs",
     "type": "breakfast",
+    "country": "US",
     "group": "egg",
     "tags": [
       "toast"
@@ -295,6 +308,7 @@ const recipes = [
   {
     "id": "overnight-oats-with-berries",
     "type": "breakfast",
+    "country": "US",
     "group": "grain",
     "tags": [
       "oats"
@@ -346,6 +360,7 @@ const recipes = [
   {
     "id": "apple-and-cinnamon-porridge",
     "type": "breakfast",
+    "country": "GB",
     "group": "grain",
     "tags": [
       "oats"
@@ -394,6 +409,7 @@ const recipes = [
   {
     "id": "banana-oat-pancakes",
     "type": "breakfast",
+    "country": "US",
     "group": "grain",
     "tags": [
       "pancakes"
@@ -450,6 +466,7 @@ const recipes = [
   {
     "id": "french-toast-with-berries",
     "type": "breakfast",
+    "country": "FR",
     "group": "grain",
     "tags": [
       "pancakes"
@@ -504,6 +521,7 @@ const recipes = [
   {
     "id": "peanut-butter-and-banana-toast",
     "type": "breakfast",
+    "country": "US",
     "group": "grain",
     "tags": [
       "toast",
@@ -551,6 +569,7 @@ const recipes = [
   {
     "id": "cream-cheese-and-strawberry-toast",
     "type": "breakfast",
+    "country": "AR",
     "group": "grain",
     "tags": [
       "toast"
@@ -599,6 +618,7 @@ const recipes = [
   {
     "id": "greek-yogurt-bowl-with-granola-and-fruit",
     "type": "breakfast",
+    "country": "GR",
     "group": "dairy",
     "tags": [
       "yogurt"
@@ -647,6 +667,7 @@ const recipes = [
   {
     "id": "vanilla-chia-pudding-with-mango",
     "type": "breakfast",
+    "country": "US",
     "group": "dairy",
     "name": {
       "en": "Vanilla Chia Pudding with Mango",
@@ -695,6 +716,7 @@ const recipes = [
   {
     "id": "cheese-and-tomato-toasties",
     "type": "breakfast",
+    "country": "GB",
     "group": "dairy",
     "tags": [
       "toast"
@@ -743,6 +765,7 @@ const recipes = [
   {
     "id": "berry-smoothie-bowl",
     "type": "breakfast",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "smoothie"
@@ -796,6 +819,7 @@ const recipes = [
   {
     "id": "banana-licuado-with-toast",
     "type": "breakfast",
+    "country": "AR",
     "group": "fruit",
     "tags": [
       "smoothie"
@@ -842,6 +866,7 @@ const recipes = [
   {
     "id": "egg-in-a-hole-toast",
     "type": "breakfast",
+    "country": "US",
     "group": "egg",
     "name": {
       "en": "Egg-in-a-Hole Toast",
@@ -887,6 +912,7 @@ const recipes = [
   {
     "id": "breakfast-shakshuka",
     "type": "breakfast",
+    "country": "TN",
     "group": "egg",
     "name": {
       "en": "Breakfast Shakshuka",
@@ -940,6 +966,7 @@ const recipes = [
   {
     "id": "egg-and-cheese-quesadillas",
     "type": "breakfast",
+    "country": "MX",
     "group": "egg",
     "tags": [
       "tortilla"
@@ -990,6 +1017,7 @@ const recipes = [
   {
     "id": "boiled-eggs-with-toast-soldiers",
     "type": "breakfast",
+    "country": "GB",
     "group": "egg",
     "name": {
       "en": "Boiled Eggs with Toast Soldiers",
@@ -1035,6 +1063,7 @@ const recipes = [
   {
     "id": "blueberry-oat-muffins",
     "type": "breakfast",
+    "country": "US",
     "group": "grain",
     "tags": [
       "muffin"
@@ -1092,6 +1121,7 @@ const recipes = [
   {
     "id": "granola-bowls-with-milk-and-fruit",
     "type": "breakfast",
+    "country": "US",
     "group": "grain",
     "name": {
       "en": "Granola Bowls with Milk & Fruit",
@@ -1135,6 +1165,7 @@ const recipes = [
   {
     "id": "peanut-butter-banana-oatmeal",
     "type": "breakfast",
+    "country": "US",
     "group": "grain",
     "tags": [
       "oats",
@@ -1182,6 +1213,7 @@ const recipes = [
   {
     "id": "ricotta-and-pear-toast",
     "type": "breakfast",
+    "country": "IT",
     "group": "grain",
     "tags": [
       "toast"
@@ -1228,6 +1260,7 @@ const recipes = [
   {
     "id": "banana-bread-slices",
     "type": "breakfast",
+    "country": "US",
     "group": "grain",
     "name": {
       "en": "Banana Bread Slices",
@@ -1282,6 +1315,7 @@ const recipes = [
   {
     "id": "apple-cinnamon-pancakes",
     "type": "breakfast",
+    "country": "US",
     "group": "grain",
     "tags": [
       "pancakes"
@@ -1336,6 +1370,7 @@ const recipes = [
   {
     "id": "arroz-con-leche",
     "type": "breakfast",
+    "country": "AR",
     "group": "dairy",
     "name": {
       "en": "Arroz con Leche (Creamy Rice Pudding)",
@@ -1384,6 +1419,7 @@ const recipes = [
   {
     "id": "ricotta-bowls-with-peaches",
     "type": "breakfast",
+    "country": "IT",
     "group": "dairy",
     "name": {
       "en": "Ricotta Bowls with Peaches & Granola",
@@ -1427,6 +1463,7 @@ const recipes = [
   {
     "id": "caprese-toast",
     "type": "breakfast",
+    "country": "IT",
     "group": "dairy",
     "tags": [
       "toast"
@@ -1477,6 +1514,7 @@ const recipes = [
   {
     "id": "tropical-smoothie-bowl",
     "type": "breakfast",
+    "country": "BR",
     "group": "fruit",
     "tags": [
       "smoothie"
@@ -1528,6 +1566,7 @@ const recipes = [
   {
     "id": "fruit-salad-with-yogurt",
     "type": "breakfast",
+    "country": "AR",
     "group": "fruit",
     "tags": [
       "yogurt"
@@ -1576,6 +1615,7 @@ const recipes = [
   {
     "id": "baked-apples-with-oats",
     "type": "breakfast",
+    "country": "GB",
     "group": "fruit",
     "name": {
       "en": "Baked Apples with Oat Crumble",
@@ -1625,6 +1665,7 @@ const recipes = [
   {
     "id": "savory-oatmeal-with-egg",
     "type": "breakfast",
+    "country": "US",
     "group": "egg",
     "tags": [
       "oats"
@@ -1676,6 +1717,7 @@ const recipes = [
   {
     "id": "sweet-potato-toast",
     "type": "breakfast",
+    "country": "US",
     "group": "grain",
     "tags": [
       "toast",
@@ -1724,6 +1766,7 @@ const recipes = [
   {
     "id": "chocolate-banana-chia-pudding",
     "type": "breakfast",
+    "country": "US",
     "group": "dairy",
     "experimental": true,
     "name": {
@@ -1773,6 +1816,7 @@ const recipes = [
   {
     "id": "chicken-stir-fry-rice-bowl",
     "type": "lunch",
+    "country": "CN",
     "protein": "poultry",
     "base": "rice",
     "name": {
@@ -1833,6 +1877,7 @@ const recipes = [
   {
     "id": "pasta-bolognese",
     "type": "lunch",
+    "country": "IT",
     "protein": "beef",
     "base": "pasta",
     "tags": [
@@ -1895,6 +1940,7 @@ const recipes = [
   {
     "id": "chicken-rice-bowl-with-avocado",
     "type": "lunch",
+    "country": "US",
     "protein": "poultry",
     "base": "rice",
     "name": {
@@ -1951,6 +1997,7 @@ const recipes = [
   {
     "id": "red-lentil-and-spinach-soup",
     "type": "lunch",
+    "country": "TR",
     "protein": "plant",
     "base": "bread",
     "tags": [
@@ -2019,6 +2066,7 @@ const recipes = [
   {
     "id": "fish-tacos-with-slaw",
     "type": "lunch",
+    "country": "MX",
     "protein": "fish",
     "base": "bread",
     "tags": [
@@ -2078,6 +2126,7 @@ const recipes = [
   {
     "id": "chicken-vegetable-soup",
     "type": "lunch",
+    "country": "AR",
     "protein": "poultry",
     "base": "none",
     "tags": [
@@ -2144,6 +2193,7 @@ const recipes = [
   {
     "id": "quinoa-bowl-with-roasted-veggies-and-chickpeas",
     "type": "lunch",
+    "country": "US",
     "protein": "plant",
     "base": "grain",
     "name": {
@@ -2204,6 +2254,7 @@ const recipes = [
   {
     "id": "tuna-pasta-salad",
     "type": "lunch",
+    "country": "AR",
     "protein": "fish",
     "base": "pasta",
     "tags": [
@@ -2259,6 +2310,7 @@ const recipes = [
   {
     "id": "white-bean-and-vegetable-stew",
     "type": "lunch",
+    "country": "ES",
     "protein": "plant",
     "base": "bread",
     "tags": [
@@ -2322,6 +2374,7 @@ const recipes = [
   {
     "id": "pork-fried-rice",
     "type": "lunch",
+    "country": "CN",
     "protein": "pork",
     "base": "rice",
     "tags": [
@@ -2386,6 +2439,7 @@ const recipes = [
   {
     "id": "caesar-chicken-wraps",
     "type": "lunch",
+    "country": "US",
     "protein": "poultry",
     "base": "bread",
     "name": {
@@ -2439,6 +2493,7 @@ const recipes = [
   {
     "id": "red-lentil-soup",
     "type": "lunch",
+    "country": "TR",
     "protein": "plant",
     "base": "bread",
     "tags": [
@@ -2503,6 +2558,7 @@ const recipes = [
   {
     "id": "chicken-pasta-with-pesto",
     "type": "lunch",
+    "country": "IT",
     "protein": "poultry",
     "base": "pasta",
     "name": {
@@ -2560,6 +2616,7 @@ const recipes = [
   {
     "id": "tuna-salad-sandwiches",
     "type": "lunch",
+    "country": "US",
     "protein": "fish",
     "base": "bread",
     "tags": [
@@ -2617,6 +2674,7 @@ const recipes = [
   {
     "id": "minestrone-soup-with-bread",
     "type": "lunch",
+    "country": "IT",
     "protein": "plant",
     "base": "bread",
     "tags": [
@@ -2688,6 +2746,7 @@ const recipes = [
   {
     "id": "beef-and-vegetable-stew-with-rice",
     "type": "lunch",
+    "country": "AR",
     "protein": "beef",
     "base": "rice",
     "tags": [
@@ -2757,6 +2816,7 @@ const recipes = [
   {
     "id": "spinach-and-egg-frittata-with-green-salad",
     "type": "lunch",
+    "country": "IT",
     "protein": "egg",
     "base": "none",
     "name": {
@@ -2813,6 +2873,7 @@ const recipes = [
   {
     "id": "chicken-noodle-soup",
     "type": "lunch",
+    "country": "US",
     "protein": "poultry",
     "base": "pasta",
     "tags": [
@@ -2879,6 +2940,7 @@ const recipes = [
   {
     "id": "bean-burrito-bowls",
     "type": "lunch",
+    "country": "MX",
     "protein": "plant",
     "base": "rice",
     "name": {
@@ -2944,6 +3006,7 @@ const recipes = [
   {
     "id": "tuna-and-pasta-bake",
     "type": "lunch",
+    "country": "GB",
     "protein": "fish",
     "base": "pasta",
     "tags": [
@@ -3001,6 +3064,7 @@ const recipes = [
   {
     "id": "baked-chicken-milanesa-with-mash",
     "type": "lunch",
+    "country": "AR",
     "protein": "poultry",
     "base": "potato",
     "tags": [
@@ -3062,6 +3126,7 @@ const recipes = [
   {
     "id": "zucchini-tart",
     "type": "lunch",
+    "country": "AR",
     "protein": "egg",
     "base": "bread",
     "tags": [
@@ -3121,6 +3186,7 @@ const recipes = [
   {
     "id": "lentil-stew-guiso",
     "type": "lunch",
+    "country": "AR",
     "protein": "plant",
     "base": "bread",
     "tags": [
@@ -3185,6 +3251,7 @@ const recipes = [
   {
     "id": "turkey-meatballs-with-rice",
     "type": "lunch",
+    "country": "US",
     "protein": "poultry",
     "base": "rice",
     "tags": [
@@ -3247,6 +3314,7 @@ const recipes = [
   {
     "id": "salmon-fishcakes-with-salad",
     "type": "lunch",
+    "country": "GB",
     "protein": "fish",
     "base": "potato",
     "tags": [
@@ -3306,6 +3374,7 @@ const recipes = [
   {
     "id": "shrimp-fried-rice",
     "type": "lunch",
+    "country": "CN",
     "protein": "fish",
     "base": "rice",
     "tags": [
@@ -3366,6 +3435,7 @@ const recipes = [
   {
     "id": "black-bean-quesadillas",
     "type": "lunch",
+    "country": "MX",
     "protein": "plant",
     "base": "bread",
     "tags": [
@@ -3421,6 +3491,7 @@ const recipes = [
   {
     "id": "pasta-primavera",
     "type": "lunch",
+    "country": "IT",
     "protein": "plant",
     "base": "pasta",
     "name": {
@@ -3475,6 +3546,7 @@ const recipes = [
   {
     "id": "greek-chicken-pita-pockets",
     "type": "lunch",
+    "country": "GR",
     "protein": "poultry",
     "base": "bread",
     "name": {
@@ -3531,6 +3603,7 @@ const recipes = [
   {
     "id": "pumpkin-soup-with-toast",
     "type": "lunch",
+    "country": "AR",
     "protein": "plant",
     "base": "bread",
     "tags": [
@@ -3588,6 +3661,7 @@ const recipes = [
   {
     "id": "beef-tacos",
     "type": "lunch",
+    "country": "MX",
     "protein": "beef",
     "base": "bread",
     "tags": [
@@ -3647,6 +3721,7 @@ const recipes = [
   {
     "id": "hake-with-potato-salad",
     "type": "lunch",
+    "country": "AR",
     "protein": "fish",
     "base": "potato",
     "name": {
@@ -3701,6 +3776,7 @@ const recipes = [
   {
     "id": "chicken-and-corn-empanadas",
     "type": "lunch",
+    "country": "AR",
     "protein": "poultry",
     "base": "bread",
     "tags": [
@@ -3762,6 +3838,7 @@ const recipes = [
   {
     "id": "gnocchi-with-tomato-sauce",
     "type": "lunch",
+    "country": "AR",
     "protein": "plant",
     "base": "pasta",
     "tags": [
@@ -3817,6 +3894,7 @@ const recipes = [
   {
     "id": "tuna-and-white-bean-salad",
     "type": "lunch",
+    "country": "IT",
     "protein": "fish",
     "base": "bread",
     "tags": [
@@ -3874,6 +3952,7 @@ const recipes = [
   {
     "id": "pork-and-pineapple-rice-bowls",
     "type": "lunch",
+    "country": "US",
     "protein": "pork",
     "base": "rice",
     "name": {
@@ -3931,6 +4010,7 @@ const recipes = [
   {
     "id": "egg-fried-noodles-with-veggies",
     "type": "lunch",
+    "country": "CN",
     "protein": "egg",
     "base": "pasta",
     "name": {
@@ -3985,6 +4065,7 @@ const recipes = [
   {
     "id": "chickpea-and-spinach-curry",
     "type": "lunch",
+    "country": "IN",
     "protein": "plant",
     "base": "rice",
     "tags": [
@@ -4047,6 +4128,7 @@ const recipes = [
   {
     "id": "homemade-fish-fingers-with-peas",
     "type": "lunch",
+    "country": "GB",
     "protein": "fish",
     "base": "potato",
     "tags": [
@@ -4102,6 +4184,7 @@ const recipes = [
   {
     "id": "polenta-with-beef-ragu",
     "type": "lunch",
+    "country": "AR",
     "protein": "beef",
     "base": "grain",
     "tags": [
@@ -4163,6 +4246,7 @@ const recipes = [
   {
     "id": "rainbow-rice-paper-rolls",
     "type": "lunch",
+    "country": "VN",
     "protein": "poultry",
     "base": "rice",
     "experimental": true,
@@ -4223,6 +4307,7 @@ const recipes = [
   {
     "id": "chickpea-tuna-salad-sandwiches",
     "type": "lunch",
+    "country": "US",
     "protein": "plant",
     "base": "bread",
     "experimental": true,
@@ -4276,6 +4361,7 @@ const recipes = [
   {
     "id": "pizza-quesadillas",
     "type": "lunch",
+    "country": "US",
     "protein": "plant",
     "base": "bread",
     "tags": [
@@ -4331,6 +4417,7 @@ const recipes = [
   {
     "id": "apple-slices-with-peanut-butter-and-cheese",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "apple"
@@ -4373,6 +4460,7 @@ const recipes = [
   {
     "id": "yogurt-parfait-with-berries",
     "type": "snack",
+    "country": "US",
     "group": "dairy",
     "tags": [
       "yogurt"
@@ -4415,6 +4503,7 @@ const recipes = [
   {
     "id": "hummus-and-veggie-sticks",
     "type": "snack",
+    "country": "LB",
     "group": "veg",
     "tags": [
       "hummus"
@@ -4459,6 +4548,7 @@ const recipes = [
   {
     "id": "banana-with-almond-butter",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "nut-butter"
@@ -4497,6 +4587,7 @@ const recipes = [
   {
     "id": "fresh-fruit-salad",
     "type": "snack",
+    "country": "AR",
     "group": "fruit",
     "name": {
       "en": "Fresh Fruit Salad",
@@ -4540,6 +4631,7 @@ const recipes = [
   {
     "id": "cheese-crackers-and-grapes",
     "type": "snack",
+    "country": "AR",
     "group": "dairy",
     "tags": [
       "cheese-plate"
@@ -4582,6 +4674,7 @@ const recipes = [
   {
     "id": "green-power-smoothie",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "smoothie"
@@ -4631,6 +4724,7 @@ const recipes = [
   {
     "id": "rice-cakes-with-cream-cheese-and-cucumber",
     "type": "snack",
+    "country": "AR",
     "group": "grain",
     "tags": [
       "rice-cakes"
@@ -4675,6 +4769,7 @@ const recipes = [
   {
     "id": "orange-slices-and-cheese",
     "type": "snack",
+    "country": "AR",
     "group": "fruit",
     "tags": [
       "cheese-plate"
@@ -4715,6 +4810,7 @@ const recipes = [
   {
     "id": "yogurt-with-honey-and-nuts",
     "type": "snack",
+    "country": "GR",
     "group": "dairy",
     "tags": [
       "yogurt"
@@ -4763,6 +4859,7 @@ const recipes = [
   {
     "id": "apple-slices-and-cheddar",
     "type": "snack",
+    "country": "GB",
     "group": "fruit",
     "tags": [
       "apple"
@@ -4803,6 +4900,7 @@ const recipes = [
   {
     "id": "banana-oat-muffins",
     "type": "snack",
+    "country": "US",
     "group": "grain",
     "tags": [
       "muffin"
@@ -4864,6 +4962,7 @@ const recipes = [
   {
     "id": "hummus-and-warm-pita-with-cucumber",
     "type": "snack",
+    "country": "LB",
     "group": "veg",
     "tags": [
       "hummus"
@@ -4908,6 +5007,7 @@ const recipes = [
   {
     "id": "watermelon-and-strawberry-skewers",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "skewers"
@@ -4952,6 +5052,7 @@ const recipes = [
   {
     "id": "cheese-and-fruit-plate",
     "type": "snack",
+    "country": "FR",
     "group": "dairy",
     "tags": [
       "cheese-plate"
@@ -4996,6 +5097,7 @@ const recipes = [
   {
     "id": "pear-with-almond-butter",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "nut-butter"
@@ -5034,6 +5136,7 @@ const recipes = [
   {
     "id": "rice-cakes-with-avocado-smash",
     "type": "snack",
+    "country": "AR",
     "group": "grain",
     "tags": [
       "rice-cakes"
@@ -5082,6 +5185,7 @@ const recipes = [
   {
     "id": "berry-banana-smoothie",
     "type": "snack",
+    "country": "AR",
     "group": "fruit",
     "tags": [
       "smoothie"
@@ -5131,6 +5235,7 @@ const recipes = [
   {
     "id": "frozen-yogurt-banana-pops",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "frozen"
@@ -5180,6 +5285,7 @@ const recipes = [
   {
     "id": "baked-apple-chips",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "apple"
@@ -5225,6 +5331,7 @@ const recipes = [
   {
     "id": "melon-and-grape-skewers",
     "type": "snack",
+    "country": "ES",
     "group": "fruit",
     "tags": [
       "skewers"
@@ -5265,6 +5372,7 @@ const recipes = [
   {
     "id": "mango-lassi",
     "type": "snack",
+    "country": "IN",
     "group": "fruit",
     "tags": [
       "smoothie"
@@ -5309,6 +5417,7 @@ const recipes = [
   {
     "id": "peanut-butter-stuffed-dates",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "nut-butter"
@@ -5351,6 +5460,7 @@ const recipes = [
   {
     "id": "pineapple-and-orange-cups",
     "type": "snack",
+    "country": "AR",
     "group": "fruit",
     "name": {
       "en": "Pineapple & Orange Fruit Cups",
@@ -5390,6 +5500,7 @@ const recipes = [
   {
     "id": "mini-cheese-quesadillas",
     "type": "snack",
+    "country": "MX",
     "group": "dairy",
     "tags": [
       "tortilla"
@@ -5432,6 +5543,7 @@ const recipes = [
   {
     "id": "ricotta-with-honey-and-berries",
     "type": "snack",
+    "country": "IT",
     "group": "dairy",
     "name": {
       "en": "Ricotta with Honey & Berries",
@@ -5473,6 +5585,7 @@ const recipes = [
   {
     "id": "berry-yogurt-bark",
     "type": "snack",
+    "country": "US",
     "group": "dairy",
     "tags": [
       "yogurt",
@@ -5521,6 +5634,7 @@ const recipes = [
   {
     "id": "mozzarella-and-tomato-skewers",
     "type": "snack",
+    "country": "IT",
     "group": "dairy",
     "tags": [
       "skewers"
@@ -5565,6 +5679,7 @@ const recipes = [
   {
     "id": "veggie-sticks-with-yogurt-ranch",
     "type": "snack",
+    "country": "US",
     "group": "veg",
     "name": {
       "en": "Veggie Sticks with Yogurt Ranch",
@@ -5610,6 +5725,7 @@ const recipes = [
   {
     "id": "edamame-with-sea-salt",
     "type": "snack",
+    "country": "JP",
     "group": "veg",
     "name": {
       "en": "Edamame with Sea Salt",
@@ -5649,6 +5765,7 @@ const recipes = [
   {
     "id": "guacamole-with-tortilla-chips",
     "type": "snack",
+    "country": "MX",
     "group": "veg",
     "tags": [
       "avocado-snack"
@@ -5699,6 +5816,7 @@ const recipes = [
   {
     "id": "cucumber-cream-cheese-bites",
     "type": "snack",
+    "country": "US",
     "group": "veg",
     "name": {
       "en": "Cucumber & Cream Cheese Bites",
@@ -5738,6 +5856,7 @@ const recipes = [
   {
     "id": "homemade-popcorn",
     "type": "snack",
+    "country": "US",
     "group": "grain",
     "name": {
       "en": "Homemade Popcorn",
@@ -5779,6 +5898,7 @@ const recipes = [
   {
     "id": "oat-and-date-energy-balls",
     "type": "snack",
+    "country": "US",
     "group": "grain",
     "tags": [
       "nut-butter"
@@ -5828,6 +5948,7 @@ const recipes = [
   {
     "id": "oatmeal-raisin-cookies",
     "type": "snack",
+    "country": "US",
     "group": "grain",
     "tags": [
       "cookies"
@@ -5887,6 +6008,7 @@ const recipes = [
   {
     "id": "pita-chips-with-tzatziki",
     "type": "snack",
+    "country": "GR",
     "group": "grain",
     "tags": [
       "pita"
@@ -5937,6 +6059,7 @@ const recipes = [
   {
     "id": "apple-donuts",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "tags": [
       "apple",
@@ -5985,6 +6108,7 @@ const recipes = [
   {
     "id": "crispy-roasted-chickpeas",
     "type": "snack",
+    "country": "US",
     "group": "veg",
     "experimental": true,
     "name": {
@@ -6029,6 +6153,7 @@ const recipes = [
   {
     "id": "avocado-chocolate-mousse",
     "type": "snack",
+    "country": "US",
     "group": "fruit",
     "experimental": true,
     "name": {
@@ -6075,6 +6200,7 @@ const recipes = [
   {
     "id": "beef-and-lentil-soup-with-bread",
     "type": "dinner",
+    "country": "AR",
     "protein": "beef",
     "base": "bread",
     "tags": [
@@ -6144,6 +6270,7 @@ const recipes = [
   {
     "id": "baked-salmon-sweet-potato-and-broccoli",
     "type": "dinner",
+    "country": "US",
     "protein": "fish",
     "base": "potato",
     "tags": [
@@ -6203,6 +6330,7 @@ const recipes = [
   {
     "id": "pork-tenderloin-mashed-potatoes-and-green-beans",
     "type": "dinner",
+    "country": "AR",
     "protein": "pork",
     "base": "potato",
     "tags": [
@@ -6266,6 +6394,7 @@ const recipes = [
   {
     "id": "paprika-chicken-thighs-and-roasted-veggies",
     "type": "dinner",
+    "country": "ES",
     "protein": "poultry",
     "base": "potato",
     "tags": [
@@ -6325,6 +6454,7 @@ const recipes = [
   {
     "id": "beef-and-broccoli-noodles",
     "type": "dinner",
+    "country": "CN",
     "protein": "beef",
     "base": "pasta",
     "tags": [
@@ -6385,6 +6515,7 @@ const recipes = [
   {
     "id": "pork-chops-with-apple-sauce-and-roasted-potatoes",
     "type": "dinner",
+    "country": "GB",
     "protein": "pork",
     "base": "potato",
     "name": {
@@ -6442,6 +6573,7 @@ const recipes = [
   {
     "id": "hearty-beef-stew-with-bread",
     "type": "dinner",
+    "country": "AR",
     "protein": "beef",
     "base": "bread",
     "tags": [
@@ -6512,6 +6644,7 @@ const recipes = [
   {
     "id": "chicken-curry-with-rice",
     "type": "dinner",
+    "country": "IN",
     "protein": "poultry",
     "base": "rice",
     "tags": [
@@ -6582,6 +6715,7 @@ const recipes = [
   {
     "id": "baked-cod-with-quinoa-and-asparagus",
     "type": "dinner",
+    "country": "US",
     "protein": "fish",
     "base": "grain",
     "name": {
@@ -6639,6 +6773,7 @@ const recipes = [
   {
     "id": "beef-burgers-and-sweet-potato-fries",
     "type": "dinner",
+    "country": "US",
     "protein": "beef",
     "base": "bread",
     "name": {
@@ -6703,6 +6838,7 @@ const recipes = [
   {
     "id": "salmon-with-couscous-and-roasted-vegetables",
     "type": "dinner",
+    "country": "MA",
     "protein": "fish",
     "base": "grain",
     "tags": [
@@ -6766,6 +6902,7 @@ const recipes = [
   {
     "id": "pork-ribs-with-coleslaw-and-corn",
     "type": "dinner",
+    "country": "US",
     "protein": "pork",
     "base": "none",
     "name": {
@@ -6827,6 +6964,7 @@ const recipes = [
   {
     "id": "beef-bolognese-with-spaghetti",
     "type": "dinner",
+    "country": "IT",
     "protein": "beef",
     "base": "pasta",
     "tags": [
@@ -6898,6 +7036,7 @@ const recipes = [
   {
     "id": "chicken-and-mushroom-risotto",
     "type": "dinner",
+    "country": "IT",
     "protein": "poultry",
     "base": "rice",
     "tags": [
@@ -6968,6 +7107,7 @@ const recipes = [
   {
     "id": "baked-fish-and-chips",
     "type": "dinner",
+    "country": "GB",
     "protein": "fish",
     "base": "potato",
     "tags": [
@@ -7031,6 +7171,7 @@ const recipes = [
   {
     "id": "chicken-enchiladas",
     "type": "dinner",
+    "country": "MX",
     "protein": "poultry",
     "base": "bread",
     "tags": [
@@ -7099,6 +7240,7 @@ const recipes = [
   {
     "id": "pork-tenderloin-with-roasted-root-vegetables",
     "type": "dinner",
+    "country": "GB",
     "protein": "pork",
     "base": "potato",
     "tags": [
@@ -7165,6 +7307,7 @@ const recipes = [
   {
     "id": "baked-salmon-quinoa-and-asparagus",
     "type": "dinner",
+    "country": "US",
     "protein": "fish",
     "base": "grain",
     "tags": [
@@ -7227,6 +7370,7 @@ const recipes = [
   {
     "id": "beef-and-broccoli-stir-fry-with-rice",
     "type": "dinner",
+    "country": "CN",
     "protein": "beef",
     "base": "rice",
     "tags": [
@@ -7293,6 +7437,7 @@ const recipes = [
   {
     "id": "chicken-and-potato-traybake",
     "type": "dinner",
+    "country": "AR",
     "protein": "poultry",
     "base": "potato",
     "tags": [
@@ -7354,6 +7499,7 @@ const recipes = [
   {
     "id": "shepherds-pie",
     "type": "dinner",
+    "country": "GB",
     "protein": "beef",
     "base": "potato",
     "tags": [
@@ -7419,6 +7565,7 @@ const recipes = [
   {
     "id": "lemon-herb-roast-chicken",
     "type": "dinner",
+    "country": "FR",
     "protein": "poultry",
     "base": "potato",
     "tags": [
@@ -7476,6 +7623,7 @@ const recipes = [
   {
     "id": "vegetable-lasagna",
     "type": "dinner",
+    "country": "IT",
     "protein": "plant",
     "base": "pasta",
     "tags": [
@@ -7541,6 +7689,7 @@ const recipes = [
   {
     "id": "turkey-chili-with-beans",
     "type": "dinner",
+    "country": "US",
     "protein": "poultry",
     "base": "rice",
     "tags": [
@@ -7603,6 +7752,7 @@ const recipes = [
   {
     "id": "teriyaki-salmon-with-rice",
     "type": "dinner",
+    "country": "JP",
     "protein": "fish",
     "base": "rice",
     "tags": [
@@ -7661,6 +7811,7 @@ const recipes = [
   {
     "id": "arroz-con-pollo",
     "type": "dinner",
+    "country": "AR",
     "protein": "poultry",
     "base": "rice",
     "name": {
@@ -7717,6 +7868,7 @@ const recipes = [
   {
     "id": "stuffed-zucchini",
     "type": "dinner",
+    "country": "AR",
     "protein": "beef",
     "base": "none",
     "name": {
@@ -7773,6 +7925,7 @@ const recipes = [
   {
     "id": "shrimp-veggie-noodle-stir-fry",
     "type": "dinner",
+    "country": "CN",
     "protein": "fish",
     "base": "pasta",
     "tags": [
@@ -7832,6 +7985,7 @@ const recipes = [
   {
     "id": "black-bean-sweet-potato-chili",
     "type": "dinner",
+    "country": "US",
     "protein": "plant",
     "base": "potato",
     "tags": [
@@ -7891,6 +8045,7 @@ const recipes = [
   {
     "id": "pork-and-pepper-stir-fry",
     "type": "dinner",
+    "country": "CN",
     "protein": "pork",
     "base": "rice",
     "name": {
@@ -7948,6 +8103,7 @@ const recipes = [
   {
     "id": "hake-provencal-with-potatoes",
     "type": "dinner",
+    "country": "AR",
     "protein": "fish",
     "base": "potato",
     "name": {
@@ -8000,6 +8156,7 @@ const recipes = [
   {
     "id": "chicken-fajitas",
     "type": "dinner",
+    "country": "MX",
     "protein": "poultry",
     "base": "bread",
     "tags": [
@@ -8059,6 +8216,7 @@ const recipes = [
   {
     "id": "beef-kebabs-with-couscous",
     "type": "dinner",
+    "country": "TR",
     "protein": "beef",
     "base": "grain",
     "tags": [
@@ -8118,6 +8276,7 @@ const recipes = [
   {
     "id": "eggplant-parmesan-with-pasta",
     "type": "dinner",
+    "country": "IT",
     "protein": "plant",
     "base": "pasta",
     "name": {
@@ -8172,6 +8331,7 @@ const recipes = [
   {
     "id": "mushroom-and-spinach-risotto",
     "type": "dinner",
+    "country": "IT",
     "protein": "plant",
     "base": "rice",
     "tags": [
@@ -8229,6 +8389,7 @@ const recipes = [
   {
     "id": "pork-meatballs-with-mash",
     "type": "dinner",
+    "country": "AR",
     "protein": "pork",
     "base": "potato",
     "tags": [
@@ -8288,6 +8449,7 @@ const recipes = [
   {
     "id": "creamy-fish-pie",
     "type": "dinner",
+    "country": "GB",
     "protein": "fish",
     "base": "potato",
     "name": {
@@ -8342,6 +8504,7 @@ const recipes = [
   {
     "id": "chicken-noodle-stir-fry",
     "type": "dinner",
+    "country": "CN",
     "protein": "poultry",
     "base": "pasta",
     "tags": [
@@ -8399,6 +8562,7 @@ const recipes = [
   {
     "id": "homemade-veggie-pizza",
     "type": "dinner",
+    "country": "AR",
     "protein": "plant",
     "base": "bread",
     "tags": [
@@ -8458,6 +8622,7 @@ const recipes = [
   {
     "id": "beef-stroganoff-with-rice",
     "type": "dinner",
+    "country": "RU",
     "protein": "beef",
     "base": "rice",
     "name": {
@@ -8517,6 +8682,7 @@ const recipes = [
   {
     "id": "cauliflower-crust-pizza",
     "type": "dinner",
+    "country": "US",
     "protein": "plant",
     "base": "none",
     "tags": [
@@ -8575,6 +8741,7 @@ const recipes = [
   {
     "id": "korean-beef-lettuce-wraps",
     "type": "dinner",
+    "country": "KR",
     "protein": "beef",
     "base": "rice",
     "experimental": true,
@@ -8637,6 +8804,7 @@ const recipes = [
   {
     "id": "butternut-squash-mac-and-cheese",
     "type": "dinner",
+    "country": "US",
     "protein": "plant",
     "base": "pasta",
     "tags": [

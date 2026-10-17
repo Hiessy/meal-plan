@@ -1,7 +1,7 @@
 /* ============================================================
    UI — draws the planner and handles everything the user does.
-   Needs data/recipes.js, data/ingredients.js, js/planner.js,
-   js/lists.js, js/i18n.js and js/tooltip.js loaded first.
+   Needs the data/ files, js/planner.js, js/lists.js, js/diets.js,
+   js/i18n.js and js/tooltip.js loaded first.
 
    Buttons carry data-action="…"; one click handler runs them.
    Other layers can follow along through events on document:
@@ -296,7 +296,8 @@ function renderModal() {
   byId('m-meta').innerHTML =
     `<span class="meal-badge badge-${d.type}${d.experimental ? ' badge-exp' : ''}">${d.experimental ? FLASK : mt.icon} ${mt.label}</span>` +
     `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>` +
-    (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">${FLASK} ${t('experimental')}</span>` : '');
+    (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">${FLASK} ${t('experimental')}</span>` : '') +
+    `<span class="origin-chip">${originHtml(d, true)}</span>`;
 
   const swapBtn = byId('m-swap');
   swapBtn.innerHTML = `<span class="ico">🔄</span> ${t('swap')}`;
@@ -317,6 +318,14 @@ function renderModal() {
   const tipEl = byId('m-tip');
   tipEl.textContent = tip ? '💚 ' + tip : '';
   tipEl.hidden = !tip;
+
+  // For the picked ages: how to serve it; for the picked blood types: that it fits
+  const { ages, blood } = store.filters;
+  const notes = ageGroups.filter(g => ages.includes(g.id)).map(g => `👶 <strong>${t('ageFor')(g.name[lang])}</strong> ${g.how[lang]}`);
+  if (blood.length) notes.push(`🩸 ${t('suitsBlood')(blood.map(b => bloodTypes[b].name[lang]).join(', '))}`);
+  const dietEl = byId('m-diet');
+  dietEl.innerHTML = notes.map(n => `<p>${n}</p>`).join('');
+  dietEl.hidden = !notes.length;
 
   [['m-prev', -1], ['m-next', 1]].forEach(([id, delta]) => {
     const btn = byId(id);
@@ -380,6 +389,7 @@ document.addEventListener('change', e => {
   const input = e.target;
   if (!input.dataset) return;
   if (input.dataset.pref === 'experimental') return setExperimental(input.checked);
+  if (input.dataset.filter === 'ai' && draftFilters) return setFilter('ai', input.checked);
   if (input.dataset.pick && draft) {
     if (input.checked) draft.delete(input.dataset.pick); else draft.add(input.dataset.pick);
     return updatePanelCounts();
@@ -710,13 +720,88 @@ const recipeIds = new Set(recipes.map(r => r.id));
 store.excluded = (Array.isArray(store.excluded) ? store.excluded : []).filter(id => recipeIds.has(id));
 if (typeof store.useExperimental !== 'boolean') store.useExperimental = true;
 
-const configurePlanner = () => Planner.configure({ exclude: store.excluded, experimental: store.useExperimental });
+// Filters: countries ([] = home, ['*'] = all), AI-created recipes on or off,
+// blood types and ages (data/diets.js) the recipes must all suit
+const FILTERS = () => ({ countries: [], ai: true, blood: [], ages: [] });
+const cleanFilters = f => {
+  const d = FILTERS(), list = (v, ok) => Array.isArray(v) ? v.filter(ok) : [];
+  return {
+    countries: list(f && f.countries, c => c === '*' || countries[c]),
+    ai: f && typeof f.ai === 'boolean' ? f.ai : d.ai,
+    blood: list(f && f.blood, b => bloodTypes[b]),
+    ages: list(f && f.ages, id => ageGroups.some(g => g.id === id))
+  };
+};
+store.filters = cleanFilters(store.filters);
+
+// Home: the country this device's time zone (or language) points to, if it
+// has enough recipes to fill a week; Argentina otherwise. ?home=XX tries another.
+const home = (() => {
+  let code = null;
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    const hit = Object.keys(timeZoneCountry).filter(k => tz.startsWith(k)).sort((a, b) => b.length - a.length)[0];
+    if (hit) code = timeZoneCountry[hit];
+  } catch (e) {}
+  if (!code) {
+    const m = /-([A-Za-z]{2})\b/.exec(navigator.language || '');
+    if (m && countries[m[1].toUpperCase()]) code = m[1].toUpperCase();
+  }
+  const asked = (new URLSearchParams(location.search).get('home') || '').toUpperCase();
+  if (countries[asked]) code = asked;
+  const enough = c => Planner.TYPES.every(type => recipes.filter(r => r.country === c && r.type === type).length >= 8);
+  return { code: code && enough(code) ? code : 'AR', detected: code };
+})();
+
+function passes(r, f) {
+  if (r.ai) { if (!f.ai) return false; }
+  else if (!f.countries.includes('*') && !(f.countries.length ? f.countries : [home.code]).includes(r.country)) return false;
+  return Diets.fits(r, f);
+}
+
+const configurePlanner = () => Planner.configure({
+  exclude: store.excluded, experimental: store.useExperimental, allow: r => passes(r, store.filters)
+});
 configurePlanner();
 
-const usable = (r, excluded) => !excluded.has(r.id) && (store.useExperimental || !r.experimental);
-const usableCount = (excluded, type) =>
-  recipes.filter(r => (!type || r.type === type) && usable(r, excluded)).length;
+const usable = (r, excluded, f = store.filters) => !excluded.has(r.id) && (store.useExperimental || !r.experimental) && passes(r, f);
+const usableCount = (excluded, type, f = store.filters) =>
+  recipes.filter(r => (!type || r.type === type) && usable(r, excluded, f)).length;
 const MIN_PER_TYPE = 5;
+
+// Flag emoji where the system draws them (not on Windows); the country code otherwise
+const flagsDrawn = (() => {
+  try {
+    const c = document.createElement('canvas');
+    c.width = c.height = 20;
+    const x = c.getContext('2d');
+    x.font = '16px sans-serif';
+    x.fillText('\u{1F1E6}\u{1F1F7}', 0, 16);
+    const d = x.getImageData(0, 0, 20, 20).data;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 3] && Math.abs(d[i] - d[i + 2]) > 40) return true;
+  } catch (e) {}
+  return false;
+})();
+const flagOf = code => flagsDrawn
+  ? `<span class="flag" aria-hidden="true">${String.fromCodePoint(...[...code].map(ch => 0x1F1A5 + ch.charCodeAt(0)))}</span>`
+  : `<span class="flag-code" aria-hidden="true">${code}</span>`;
+const countryName = code => countries[code] ? countries[code][lang] : code;
+const originText = r => r.ai ? '✨ ' + t('aiBadge') : t('origin')(countryName(r.country));
+const originHtml = (r, named) => r.ai
+  ? `<span class="ai-mark" title="${esc(t('aiBadge'))}">✨${named ? ' ' + t('aiBadge') : ''}</span>`
+  : `<span class="origin" title="${esc(countryName(r.country))}">${flagOf(r.country)}${named ? ' ' + countryName(r.country) : ''}</span>`;
+
+// "🇦🇷 · ✨ · 🩸 O, A · 👶 12–23 m" for the plan bar
+function filterSummary(f) {
+  const parts = [];
+  if (f.countries.includes('*')) parts.push('🌍');
+  else (f.countries.length ? f.countries : [home.code]).slice(0, 3).forEach(c => parts.push(flagOf(c)));
+  if (f.countries.length > 3 && !f.countries.includes('*')) parts.push('+' + (f.countries.length - 3));
+  if (f.ai && recipes.some(r => r.ai)) parts.push('✨');
+  if (f.blood.length) parts.push('🩸 ' + f.blood.map(b => bloodTypes[b].name[lang]).join(', '));
+  if (f.ages.length) parts.push('👶 ' + ageGroups.find(g => f.ages.includes(g.id)).name[lang]);
+  return parts.join(' · ');
+}
 
 // Pixel-art Erlenmeyer flask: the mark of an experimental recipe. css/fx.css
 // cycles the liquid through red, blue, green, purple and orange and floats the
@@ -745,7 +830,8 @@ const expToggle = () => `<label class="check toggle" data-tip="${esc(t('tipUseEx
 function buildPlanBar() {
   byId('plan-bar').innerHTML = expToggle() +
     `<button type="button" class="tool-btn" data-action="open-panel" data-tip="${esc(t('tipRecipesBtn'))}">
-      <span class="ico">📖</span> ${t('recipesBtn')(usableCount(new Set(store.excluded)), recipes.length)}</button>`;
+      <span class="ico">📖</span> ${t('recipesBtn')(usableCount(new Set(store.excluded)), recipes.length)}
+      <span class="filter-sum">${filterSummary(store.filters)}</span></button>`;
 }
 
 function applyConfig() {
@@ -753,7 +839,7 @@ function applyConfig() {
   buildPlanBar();
   [1,2,3,4].forEach(buildWeek);
   if (modalAt) renderModal();
-  emit('config', { excluded: store.excluded.length, experimental: store.useExperimental });
+  emit('config', { excluded: store.excluded.length, experimental: store.useExperimental, filters: store.filters });
 }
 
 function setExperimental(on) {
@@ -767,23 +853,86 @@ function setExperimental(on) {
 /* ── The panel with every recipe ── */
 const panelEl = byId('panel');
 let draft = null;          // recipe ids left out, while the panel is open
+let draftFilters = null;   // the filters, while the panel is open
 let panelFocus = null;
 
 const iconOf = r => r.type === 'breakfast' ? BREAKFAST_ICONS[r.group]
   : r.type === 'snack' ? GROUP_ICONS[r.group] : PROTEIN_ICONS[r.protein];
 const plain = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
+// Country chips (most recipes first), AI, blood types and ages
+const countryCounts = (() => {
+  const n = {};
+  recipes.forEach(r => { if (!r.ai) n[r.country] = (n[r.country] || 0) + 1; });
+  return Object.keys(n).sort((a, b) => n[b] - n[a] || countryName(a).localeCompare(countryName(b))).map(c => [c, n[c]]);
+})();
+
+function renderFilters() {
+  const f = draftFilters;
+  const homeNote = home.detected && home.detected !== home.code
+    ? t('homeFallback')(countryName(home.detected), countryName(home.code))
+    : t('homeNote')(countryName(home.code), home.detected === home.code);
+  const chip = (action, attr, value, label, pressed, tip, cls = '') =>
+    `<button type="button" class="chip${cls}" data-action="${action}" ${attr}="${value}" aria-pressed="${pressed}"
+      data-tip="${esc(tip)}">${label}</button>`;
+  const all = f.countries.includes('*');
+  byId('p-filters').innerHTML = `
+    <div class="filter-row">
+      <h3>🌍 ${t('countriesTitle')} <small>${all ? t('allCountries') : f.countries.length ? '' : homeNote}</small></h3>
+      <div class="filter-tools">
+        ${chip('f-country', 'data-code', '', '🏠 ' + t('homeOnly'), !f.countries.length, homeNote)}
+        ${chip('f-country', 'data-code', '*', '🌍 ' + t('allCountries'), all, t('allCountries'))}
+      </div>
+      <div class="chips country-chips">${countryCounts.map(([c, n]) =>
+        chip('f-country', 'data-code', c, `${flagOf(c)} ${countryName(c)} <small>${n}</small>`,
+          all || f.countries.includes(c), t('tipCountry')(countryName(c), n),
+          !f.countries.length && c === home.code ? ' is-home' : '')).join('')}</div>
+    </div>
+    ${recipes.some(r => r.ai) ? `<div class="filter-row">
+      <label class="check toggle" data-tip="${esc(t('tipAi'))}">
+        <input type="checkbox" data-filter="ai"${f.ai ? ' checked' : ''}><span>✨ ${t('aiRecipes')}</span>
+      </label>
+    </div>` : ''}
+    <div class="filter-row">
+      <h3>🩸 ${t('bloodTitle')} <button type="button" class="info-dot" data-tip="${esc(t('tipBlood'))}" aria-label="${esc(t('tipBlood'))}">?</button></h3>
+      <div class="chips">${Object.keys(bloodTypes).map(b =>
+        chip('f-blood', 'data-blood', b, bloodTypes[b].name[lang], f.blood.includes(b), t('tipBlood'))).join('')}</div>
+    </div>
+    <div class="filter-row">
+      <h3>👶 ${t('agesTitle')} <button type="button" class="info-dot" data-tip="${esc(t('tipAges'))}" aria-label="${esc(t('tipAges'))}">?</button></h3>
+      <div class="chips">${ageGroups.map(g =>
+        chip('f-age', 'data-age', g.id, g.name[lang], f.ages.includes(g.id), g.how[lang])).join('')}</div>
+    </div>`;
+}
+
+function setFilter(kind, value) {
+  const f = draftFilters, toggle = (list, v) => list.includes(v) ? list.filter(x => x !== v) : [...list, v];
+  if (kind === 'country') {
+    if (value === '' || value === '*') f.countries = value ? ['*'] : [];
+    else f.countries = toggle(f.countries.filter(c => c !== '*'), value);
+  }
+  if (kind === 'blood') f.blood = toggle(f.blood, value);
+  if (kind === 'age') f.ages = toggle(f.ages, value);
+  if (kind === 'ai') f.ai = value;
+  if (kind === 'clear') draftFilters = FILTERS();
+  renderFilters();
+  filterPanel();
+  updatePanelCounts();
+}
+
 function renderPanel() {
   byId('p-row').innerHTML = expToggle() +
-    `<button type="button" class="tool-btn" data-action="use-all"><span class="ico">↺</span> ${t('useAll')}</button>`;
+    `<button type="button" class="tool-btn" data-action="use-all"><span class="ico">↺</span> ${t('useAll')}</button>` +
+    `<button type="button" class="tool-btn" data-action="f-clear"><span class="ico">✕</span> ${t('clearFilters')}</button>`;
   byId('p-search').placeholder = t('searchRecipes');
+  renderFilters();
   byId('p-list').innerHTML = Planner.TYPES.map(type => {
     const items = recipes.filter(r => r.type === type).map(r => {
       const off = r.experimental && !store.useExperimental;
-      return `<li data-name="${esc(plain(r.name.en + ' ' + r.name.es))}">
+      return `<li data-id="${r.id}" data-name="${esc(plain(r.name.en + ' ' + r.name.es))}">
         <label class="check pick${off ? ' off' : ''}">
           <input type="checkbox" data-pick="${r.id}"${draft.has(r.id) ? '' : ' checked'}${off ? ' disabled' : ''}>
-          <span>${iconOf(r)} ${r.name[lang]}${r.experimental ? ' ' + FLASK : ''}</span>
+          <span>${iconOf(r)} ${r.name[lang]} ${originHtml(r)}${r.experimental ? ' ' + FLASK : ''}</span>
         </label></li>`;
     }).join('');
     return `<section class="pick-group" data-type="${type}">
@@ -801,12 +950,12 @@ function renderPanel() {
 
 function updatePanelCounts() {
   Planner.TYPES.forEach(type => {
-    const n = usableCount(draft, type), all = recipes.filter(r => r.type === type).length;
+    const n = usableCount(draft, type, draftFilters), all = recipes.filter(r => r.type === type).length;
     const el = byId('p-n-' + type);
     el.textContent = `${n}/${all}`;
     el.classList.toggle('low', n < MIN_PER_TYPE);
   });
-  byId('p-count').textContent = t('inUse')(usableCount(draft), recipes.length);
+  byId('p-count').textContent = t('inUse')(usableCount(draft, null, draftFilters), recipes.length);
 }
 
 function filterPanel() {
@@ -814,7 +963,7 @@ function filterPanel() {
   panelEl.querySelectorAll('.pick-group').forEach(group => {
     let shown = 0;
     group.querySelectorAll('li').forEach(li => {
-      const hit = !q || li.dataset.name.includes(q);
+      const hit = (!q || li.dataset.name.includes(q)) && passes(Planner.recipe(li.dataset.id), draftFilters);
       li.hidden = !hit;
       if (hit) shown++;
     });
@@ -824,6 +973,7 @@ function filterPanel() {
 
 function openPanel() {
   draft = new Set(store.excluded);
+  draftFilters = cleanFilters(store.filters);
   byId('p-search').value = '';
   renderPanel();
   panelFocus = document.activeElement;
@@ -834,32 +984,40 @@ function openPanel() {
   emit('panel', { open: true });
 }
 
-// Saves the choices; refuses while a meal type has fewer than five recipes
+// Saves the choices; refuses while a meal type has no recipe left, and
+// warns when one has fewer than five (they will repeat)
 function closePanel() {
   if (!draft) return;
-  const short = Planner.TYPES.find(type => usableCount(draft, type) < MIN_PER_TYPE);
-  if (short) {
-    showToast(t('needFive')(t('typeTitles')[short].toLowerCase(), MIN_PER_TYPE));
-    panelEl.querySelector(`.pick-group[data-type="${short}"]`).scrollIntoView({ block: 'start' });
+  const count = type => usableCount(draft, type, draftFilters);
+  const empty = Planner.TYPES.find(type => !count(type));
+  if (empty) {
+    showToast(t('noneMatch')(t('typeTitles')[empty].toLowerCase()));
     return;
   }
-  const changed = draft.size !== store.excluded.length || store.excluded.some(id => !draft.has(id));
+  const few = Planner.TYPES.find(type => count(type) < MIN_PER_TYPE);
+  const changed = draft.size !== store.excluded.length || store.excluded.some(id => !draft.has(id)) ||
+    JSON.stringify(draftFilters) !== JSON.stringify(store.filters);
   panelEl.classList.remove('open');
   if (!modalAt) document.body.classList.remove('modal-open');
   if (changed) {
     store.excluded = [...draft];
+    store.filters = draftFilters;
     saveStore();
     applyConfig();
-    showToast(t('toastPlanUpdated'));
+    showToast(few ? t('fewMatch')(t('typeTitles')[few].toLowerCase(), count(few)) : t('toastPlanUpdated'));
   }
   draft = null;
+  draftFilters = null;
   if (panelFocus && panelFocus.isConnected) panelFocus.focus({ preventScroll: true });
   emit('panel', { open: false });
 }
 
+// All / None for the recipes of a type that the filters and search show
 function pickType(type, on) {
-  recipes.filter(r => r.type === type).forEach(r => { if (on) draft.delete(r.id); else draft.add(r.id); });
-  panelEl.querySelectorAll(`.pick-group[data-type="${type}"] input[data-pick]`).forEach(cb => { cb.checked = on; });
+  panelEl.querySelectorAll(`.pick-group[data-type="${type}"] li:not([hidden]) input[data-pick]`).forEach(cb => {
+    cb.checked = on;
+    if (on) draft.delete(cb.dataset.pick); else draft.add(cb.dataset.pick);
+  });
   updatePanelCounts();
 }
 
@@ -895,6 +1053,7 @@ function buildWeek(n) {
       const slot = k % Planner.SLOTS;
       const mt = mealTypes[recipe.type];
       const tip = [
+        originText(recipe),
         recipe.experimental && t('tipExperimental'),
         t('tipMeal')(recipe.ing[lang].length, recipe.steps[lang].length),
         recipe.tip && recipe.tip[lang] && '💚 ' + recipe.tip[lang],
@@ -903,7 +1062,7 @@ function buildWeek(n) {
       return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}"
         data-day="${di}" data-slot="${slot}" data-type="${recipe.type}" data-facets="${facetsOf(recipe)}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
         <span class="meal-badge badge-${recipe.type}${recipe.experimental ? ' badge-exp' : ''}">${recipe.experimental ? FLASK : mt.icon} ${mt.label}</span>
-        <span class="meal-name">${recipe.name[lang]}</span>
+        <span class="meal-name">${recipe.name[lang]} ${originHtml(recipe)}</span>
         <span class="chev" aria-hidden="true">›</span>
       </button>`;
     }).join('');
@@ -986,7 +1145,11 @@ const actions = {
   'pick-all':    el => pickType(el.dataset.type, true),
   'pick-none':   el => pickType(el.dataset.type, false),
   facet:         el => toggleFacet(+el.dataset.n, el.dataset.facet),
-  'use-all':     () => { draft.clear(); renderPanel(); }
+  'use-all':     () => { draft.clear(); renderPanel(); },
+  'f-country':   el => setFilter('country', el.dataset.code),
+  'f-blood':     el => setFilter('blood', el.dataset.blood),
+  'f-age':       el => setFilter('age', el.dataset.age),
+  'f-clear':     () => setFilter('clear')
 };
 
 function run(name, el) {

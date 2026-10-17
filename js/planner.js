@@ -52,14 +52,15 @@ const Planner = (() => {
   const byId = Object.fromEntries(recipes.map(r => [r.id, r]));
   let pools = {};                              // the recipes each slot may draw from
 
-  // Which recipes the draw may use: leave out `exclude` (ids) and, if
-  // experimental is false, every experimental recipe. A type that would
-  // be left empty keeps its whole list.
-  function configure({ exclude = [], experimental = true } = {}) {
+  // Which recipes the draw may use: leave out `exclude` (ids), every
+  // experimental recipe if experimental is false, and any recipe that
+  // allow(recipe) turns down. A type that would be left empty keeps its
+  // whole list.
+  function configure({ exclude = [], experimental = true, allow = () => true } = {}) {
     const skip = new Set(exclude);
     pools = Object.fromEntries(TYPES.map(type => {
       const all = recipes.filter(r => r.type === type);
-      const allowed = all.filter(r => !skip.has(r.id) && (experimental || !r.experimental));
+      const allowed = all.filter(r => !skip.has(r.id) && (experimental || !r.experimental) && allow(r));
       return [type, allowed.length ? allowed : all];
     }));
     baseMenus.length = 0;                      // every menu is drawn again

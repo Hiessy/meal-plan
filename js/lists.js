@@ -21,6 +21,7 @@ const Lists = (() => {
     const rows = new Map();
     meals.forEach(meal => meal.recipe.ing.en.forEach((en, i) => {
       const entry = ingredientFor(en);
+      if (entry && entry.kind === 'none') return;          // water, ice: never bought
       const key = entry ? entry.key : 'other-' + en.toLowerCase();
       if (!rows.has(key)) rows.set(key, { key, entry, cat: entry ? entry.cat : 'Other', lines: [] });
       rows.get(key).lines.push({ en, es: meal.recipe.ing.es[i] || en, meal });
@@ -131,5 +132,5 @@ const Lists = (() => {
     return tasks;
   }
 
-  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, substitute };
+  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, substitute, entryFor: ingredientFor };
 })();

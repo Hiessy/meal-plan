@@ -8,8 +8,12 @@ https://hiessy.github.io/meal-plan/, so pushing to `master` deploys it.
 Scripts are plain classic scripts loaded in order by `index.html`. Each layer only uses the layers
 above it. The README has the full table.
 
-1. **Meals & recipes** — `data/recipes.js` and `data/ingredients.js`. These are data only.
-2. **Menu logic** — `js/planner.js` (balanced draw) and `js/lists.js` (shopping and prep lists).
+1. **Meals & recipes** — `data/recipes.js`, `data/recipes-world.js`, `data/ingredients.js`,
+   `data/countries.js` and `data/diets.js`. These are data only.
+   - `recipes-world.js` pushes onto `recipes`, one recipe per line. Every recipe has a `country`
+     (an ISO code in `countries.js`).
+2. **Menu logic** — `js/planner.js` (balanced draw), `js/lists.js` (shopping and prep lists) and
+   `js/diets.js` (blood-type and age fit).
    No DOM access and no storage.
 3. **UI** — `js/i18n.js`, `js/tooltip.js`, `js/ui.js` and `css/ui.css`.
    - `ui.js` is an IIFE and exposes no globals.
@@ -42,12 +46,18 @@ above it. The README has the full table.
   - `experimental: true` marks a new, not yet family-tested recipe. Its meal-type badge shows
     `FLASK` from `ui.js`, a pixel Erlenmeyer flask; `fx.css` cycles its colour and floats its
     bubbles. `RULES.experimental` caps how many land in a week.
-- `Planner.configure({ exclude, experimental })` narrows the pools the draw uses. The UI calls
-  it with the visitor's saved choices from the recipe panel and the Use-experimental checkbox,
-  so those choices change that device's menus. The panel keeps at least 5 recipes per type.
+- `Planner.configure({ exclude, experimental, allow })` narrows the pools the draw uses. The UI
+  calls it with the visitor's saved choices from the recipe panel (left-out recipes, countries,
+  AI-created, blood types, ages) and the Use-experimental checkbox, so those choices change that
+  device's menus. The panel refuses a meal type with no recipe left; fewer than 5 repeat.
+- With no country picked, the UI uses the home country: from `timeZoneCountry` (then the language
+  region), if it has at least 8 recipes of each type, else 'AR'. Add `?home=JP` to try another.
 - `data/ingredients.js` is an ordered regex dictionary. The first match on an English ingredient
   line picks its shopping-list row, so specific entries go above general ones. After adding
   recipes, check that each new line matches the intended entry and not "Other".
+  - `kind: 'none'` keeps a row off the list (water, ice).
+  - A new entry may also belong in `data/diets.js`: in a blood type's avoid list, or in `minAge`
+    when young children should not have it.
   - `substitutes` at the end of that file maps entry keys to `[English, Spanish]` alternatives,
     shown on hover via `Lists.substitute()`. Give every new entry one.
 - Balance chips are `data-action="facet"` toggles such as `protein:fish`. Meal slots carry
