@@ -19,10 +19,13 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     three soups, two pancake breakfasts…) are kept apart.
   - The draw is seeded by the week, so everyone who opens the page sees the same menu.
   - A ⚖️ balance bar under each week shows its mix of breakfasts, proteins and snacks.
+  - Click a chip in it, such as 🐟 fish or 🍳 egg breakfasts, to highlight those meals while the
+    rest fade. Pick several at once; **✕ Show all** clears them.
 - **Experimental recipes**: 12 of the recipes are new ideas the family hasn't tried yet, like
   cauliflower-crust pizza, rice-paper rolls and avocado chocolate mousse.
-  - When one comes up, its meal-type badge turns purple with a pixel beaker, and the tooltip says
-    it is experimental.
+  - When one comes up, its meal-type badge turns purple with a pixel Erlenmeyer flask, and the
+    tooltip says it is experimental. The flask bubbles, and its liquid cycles through red, blue,
+    green, purple and orange.
   - At most two land in a week. Untick **Use experimental recipes** to leave them out.
 - **📖 Choose the recipes**: the Recipes button lists all 160, grouped by meal type, with a search
   box and All/None per group. Untick any you don't want and the menus are drawn again from the
@@ -33,6 +36,9 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
 - **🎲 Shuffle** a whole week or **🔄 swap** one meal; both keep the week balanced.
   **↺ Original menu** undoes it.
 - **Recipe sheet** with ingredients, steps and toddler tips, plus previous/next through the week.
+- **⇄ Substitutes**: hover an ingredient in a recipe or in the shopping list (press and hold on a
+  phone) to see what to use instead. For example tuna → trout or salmon, spinach → Swiss chard
+  (acelga), milk → oat, almond or soy milk.
 - **Sunday prep**: the make-ahead tasks of that week's recipes, each with the meals it is for.
 - **Shopping list built from the week's meals**:
   - one row per ingredient, with the amounts added up
@@ -54,6 +60,8 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     - Snack: a kid grabs an apple and munches.
     - Dinner: the family eats together under the lamp.
     - On phones it follows what is in the middle of the screen. The – button tucks it away.
+    - Drag its bar to move it and the corner grip to resize it; double-click the bar to put it
+      back. Where it sits is remembered on this device.
     - Each scene plays its sounds the first time through: coins, chopping, the blender, sizzling.
   - 🔊 in the header mutes the sounds.
   - Browsers start sound only after your first click or tap.
@@ -104,6 +112,9 @@ to `[3, 4]` for more fish, or `egg: [1, 2]` under `breakfasts` for more egg brea
 **Shopping list**: each English ingredient line is matched against `data/ingredients.js` from top
 to bottom. The first match decides which row it joins. Lines that match nothing are listed under
 "Other" exactly as written.
+
+**Substitutes**: `substitutes` at the end of `data/ingredients.js` holds what to use instead of
+each ingredient, in English and Spanish, keyed like the dictionary entries.
 
 **Prices**: `price` in `data/ingredients.js` is a rough USD estimate per recipe that uses the
 ingredient. The +/− control in the shopping list scales all prices at once.

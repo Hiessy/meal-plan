@@ -28,6 +28,8 @@ above it. The README has the full table.
      follows the hovered element via `data-type` on meal slots and `data-cat` on shopping aisles,
      and on touch screens the element in the middle of the screen.
    - The canvas is shown at whole multiples (2×, 3× on wide screens) so pixels stay square.
+     The TV can be dragged and resized, and resizing snaps to whole multiples. Its spot is saved
+     under `meal-plan-tv-box`.
 
 ## Rules worth knowing
 
@@ -37,14 +39,19 @@ above it. The README has the full table.
   - Recipes must be self-contained, with no "leftovers" or "made on Sunday" ingredients, because
     any recipe can land on any day.
   - Make-ahead work goes in `prep`, as keys of `prepTasks`.
-  - `experimental: true` marks a new, not yet family-tested recipe. Its meal-type badge shows a
-    pixel beaker, and `RULES.experimental` caps how many land in a week.
+  - `experimental: true` marks a new, not yet family-tested recipe. Its meal-type badge shows
+    `FLASK` from `ui.js`, a pixel Erlenmeyer flask; `fx.css` cycles its colour and floats its
+    bubbles. `RULES.experimental` caps how many land in a week.
 - `Planner.configure({ exclude, experimental })` narrows the pools the draw uses. The UI calls
   it with the visitor's saved choices from the recipe panel and the Use-experimental checkbox,
   so those choices change that device's menus. The panel keeps at least 5 recipes per type.
 - `data/ingredients.js` is an ordered regex dictionary. The first match on an English ingredient
   line picks its shopping-list row, so specific entries go above general ones. After adding
   recipes, check that each new line matches the intended entry and not "Other".
+  - `substitutes` at the end of that file maps entry keys to `[English, Spanish]` alternatives,
+    shown on hover via `Lists.substitute()`. Give every new entry one.
+- Balance chips are `data-action="facet"` toggles such as `protein:fish`. Meal slots carry
+  `data-facets`, and picking a chip highlights the matching slots and sends `plan:focus`.
 - A menu is 20 recipe ids, day by day in `Planner.TYPES` order (breakfast, lunch, snack, dinner);
   slot k is day `Math.floor(k / Planner.SLOTS)`.
 - In `js/planner.js`, menus are seeded by week number counted from `EPOCH` (2026-10-05). Each week

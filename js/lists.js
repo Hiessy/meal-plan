@@ -29,6 +29,14 @@ const Lists = (() => {
   }
 
   const name       = (row, lang) => row.entry ? row.entry[lang] : row.lines[0][lang];
+
+  // What to use instead (data/ingredients.js `substitutes`), for a
+  // shopping row or an English recipe line — or null
+  function substitute(rowOrLine, lang) {
+    const entry = typeof rowOrLine === 'string' ? ingredientFor(rowOrLine) : rowOrLine.entry;
+    const alt = entry && substitutes[entry.key];
+    return alt ? alt[lang === 'es' ? 1 : 0] : null;
+  }
   const isOptional = (row, lang) => row.lines.every(l => /optional|opcional/i.test(l[lang]));
   const kind       = row => row.entry && row.entry.kind;
 
@@ -123,5 +131,5 @@ const Lists = (() => {
     return tasks;
   }
 
-  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep };
+  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, substitute };
 })();

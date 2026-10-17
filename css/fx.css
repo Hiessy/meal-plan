@@ -63,6 +63,10 @@ header .px-pan { right: 7%; }
   image-rendering: crisp-edges;
 }
 .fx-stage-bar {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   display: flex;
   align-items: center;
   gap: .5rem;
@@ -73,6 +77,33 @@ header .px-pan { right: 7%; }
   letter-spacing: .3px;
 }
 .fx-stage-bar span { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fx-stage.dragging .fx-stage-bar { cursor: grabbing; }
+.fx-stage.dragging, .fx-stage.resizing { transition: none !important; box-shadow: 0 18px 44px rgba(0,0,0,.4); }
+/* The resize grip sits on the corner that faces the middle of the screen */
+.fx-stage-grip {
+  position: absolute;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  touch-action: none;
+  opacity: .6;
+}
+.fx-stage-grip::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: linear-gradient(135deg, transparent 0 46%, #fbe7cf 46% 56%, transparent 56% 68%, #fbe7cf 68% 78%, transparent 78%);
+}
+.fx-stage[data-grip="br"] .fx-stage-grip { right: -4px; bottom: -4px; cursor: nwse-resize; }
+.fx-stage[data-grip="tl"] .fx-stage-grip { left: -4px; top: -4px; cursor: nwse-resize; transform: rotate(180deg); }
+.fx-stage[data-grip="tr"] .fx-stage-grip { right: -4px; top: -4px; cursor: nesw-resize; transform: rotate(-90deg); }
+.fx-stage[data-grip="bl"] .fx-stage-grip { left: -4px; bottom: -4px; cursor: nesw-resize; transform: rotate(90deg); }
+.fx-stage-grip:hover, .fx-stage-grip:focus-visible, .fx-stage.resizing .fx-stage-grip { opacity: 1; }
+@media (hover: none) { .fx-stage-grip { opacity: .9; } }
 .fx-stage-bar span::before {
   content: '';
   display: inline-block;
@@ -166,7 +197,7 @@ body.fx-stage-on .toast { bottom: calc(176px + env(safe-area-inset-bottom)); }
     transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease),
                 box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
   }
-  .meal-slot { transition: background var(--dur) var(--ease); }
+  .meal-slot { transition: background var(--dur) var(--ease), opacity .3s var(--ease), box-shadow .3s var(--ease); }
   .chev, .arrow { transition: transform var(--dur) var(--ease); }
   .check input { transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
   .progress-pill { transition: background var(--dur) var(--ease), color var(--dur) var(--ease); }
@@ -223,7 +254,10 @@ body.fx-stage-on .toast { bottom: calc(176px + env(safe-area-inset-bottom)); }
   @media (hover: hover) {
     header .px:hover { translate: 0 -3px; transition: translate .15s; }
   }
-  .meal-slot:hover .badge-exp .beaker { animation: fx-flask .9s ease-in-out infinite; }
+  .meal-slot:hover .badge-exp .flask { animation: fx-flask .9s ease-in-out infinite; }
+  /* The experimental flask: the liquid changes colour and bubbles float out of the neck */
+  .flask .fl-liquid { animation: fl-colors 7.5s linear infinite; }
+  .flask .fl-bub { animation: fl-bub 1.8s ease-in infinite; animation-delay: calc(var(--i) * -.36s); }
   .fx-stage { transition: opacity .25s var(--ease), transform .25s var(--ease); }
   .fx-stage.swap canvas { animation: fx-tv .3s steps(3); }
 
@@ -238,6 +272,25 @@ body.fx-stage-on .toast { bottom: calc(176px + env(safe-area-inset-bottom)); }
 @keyframes px-play {
   to { transform: translateX(-100%); }
 }
+/* Red → blue → green → purple → orange */
+@keyframes fl-colors {
+  0%, 100% { fill: #ef4444; }
+  20%      { fill: #3b82f6; }
+  40%      { fill: #22c55e; }
+  60%      { fill: #a855f7; }
+  80%      { fill: #f97316; }
+}
+/* A bubble drifts to the neck, rises out of the mouth as purple vapour and pops */
+@keyframes fl-bub {
+  0%   { transform: translate(0, 0); opacity: 0; fill: #fff; }
+  15%  { opacity: .9; }
+  45%  { fill: #fff; }
+  50%  { transform: translate(var(--dx), calc(var(--dy) * .5)); }
+  60%  { fill: #8b5cf6; }
+  85%  { opacity: .9; }
+  100% { transform: translate(var(--dx), var(--dy)); opacity: 0; fill: #c4b5fd; }
+}
+
 /* The kitchen TV flickers when the channel changes */
 @keyframes fx-tv {
   0%   { filter: brightness(1.8) contrast(.6); }

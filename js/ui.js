@@ -14,6 +14,7 @@
      plan:lang     { lang }       the language changed
      plan:config   { excluded, experimental }  the recipe choices changed
      plan:panel    { open }       the recipe-choice panel opened or closed
+     plan:focus    { n, facet, on, picked }  a balance chip was toggled: its meals are highlighted
    js/fx.js turns these into sounds and motion.
    ============================================================ */
 (() => {
@@ -293,16 +294,21 @@ function renderModal() {
 
   byId('m-name').textContent = d.name[lang];
   byId('m-meta').innerHTML =
-    `<span class="meal-badge badge-${d.type}${d.experimental ? ' badge-exp' : ''}">${d.experimental ? BEAKER : mt.icon} ${mt.label}</span>` +
+    `<span class="meal-badge badge-${d.type}${d.experimental ? ' badge-exp' : ''}">${d.experimental ? FLASK : mt.icon} ${mt.label}</span>` +
     `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>` +
-    (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">${BEAKER} ${t('experimental')}</span>` : '');
+    (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">${FLASK} ${t('experimental')}</span>` : '');
 
   const swapBtn = byId('m-swap');
   swapBtn.innerHTML = `<span class="ico">🔄</span> ${t('swap')}`;
   swapBtn.dataset.tip = t('tipSwap')[d.type];
 
-  byId('m-ing').innerHTML = d.ing[lang].map(i =>
-    `<li><label class="check"><input type="checkbox"><span>${i}</span></label></li>`).join('');
+  byId('m-ing').innerHTML = d.ing[lang].map((line, i) => {
+    const alt = Lists.substitute(d.ing.en[i] || '', lang);
+    return alt
+      ? `<li><label class="check has-alt" data-tip="${esc('⇄ ' + t('orUse') + ': ' + alt)}"><input type="checkbox">` +
+        `<span>${line} <span class="alt-mark" aria-hidden="true">⇄</span><span class="sr-only">(${t('orUse')}: ${alt})</span></span></label></li>`
+      : `<li><label class="check"><input type="checkbox"><span>${line}</span></label></li>`;
+  }).join('');
   byId('m-steps').innerHTML = d.steps[lang].map(s => t('kidTip').test(s)
     ? `<li class="kid-tip">👶 <strong>${t('kidTipLabel')}</strong> ${s.replace(t('kidTip'), '')}</li>`
     : `<li>${s}</li>`).join('');
@@ -580,6 +586,8 @@ function buildShopList(n) {
       const detail = row.lines.map(l => mealLabel(l.meal) + ': ' + l[lang]);
       if (row.entry && row.entry.note) detail.push('ℹ️ ' + row.entry.note[lang]);
       if (kind === 'staple') detail.push(t('tipStaple'));
+      const alt = Lists.substitute(row, lang);
+      if (alt) detail.push('⇄ ' + t('orUse') + ': ' + alt);
 
       let priceSpan = '';
       if (price != null) {
@@ -592,7 +600,7 @@ function buildShopList(n) {
       return `<li><label class="check">
         <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
         <span class="item-main" data-tip="${esc(detail.join('\n'))}">
-          <span class="item-name">${Lists.name(row, lang)}</span>${amount ? ` <span class="item-amount">${amount}</span>` : ''}${tags}
+          <span class="item-name">${Lists.name(row, lang)}${alt ? ' <span class="alt-mark" aria-hidden="true">⇄</span>' : ''}</span>${amount ? ` <span class="item-amount">${amount}</span>` : ''}${tags}
           <span class="item-meals">${meals.length > 2 ? t('inMeals')(meals.length) : meals.map(mealLabel).join(', ')}</span>
         </span>${priceSpan}
       </label></li>`;
@@ -625,33 +633,73 @@ function buildShopList(n) {
   return `<div class="shop-grid">${shopHtml}</div>${totalHtml}`;
 }
 
-// The week's mix at a glance: breakfasts | proteins of lunches & dinners | snacks
+// The week's mix at a glance: breakfasts | proteins of lunches & dinners | snacks.
+// Each chip is a toggle that highlights its meals (they carry data-facets).
 const BREAKFAST_ICONS = { egg: '🍳', grain: '🥣', dairy: '🥛', fruit: '🍓' };
 const PROTEIN_ICONS   = { fish: '🐟', poultry: '🍗', beef: '🥩', pork: '🐖', plant: '🌱', egg: '🥚' };
 const GROUP_ICONS     = { fruit: '🍎', dairy: '🧀', veg: '🥕', grain: '🌾' };
 
-function buildBalance(meals) {
+// "breakfast:egg", "protein:fish", "group:fruit", plus "exp" for experimental recipes
+const facetsOf = r => [
+  r.type === 'breakfast' ? 'breakfast:' + r.group : r.type === 'snack' ? 'group:' + r.group : 'protein:' + r.protein,
+  r.experimental ? 'exp' : ''
+].filter(Boolean).join(' ');
+
+function buildBalance(meals, n) {
   const s = Planner.summary(meals.map(m => m.recipe.id)), R = Planner.RULES;
   const range = ([lo, hi]) => lo === hi ? String(lo) : `${lo}–${hi}`;
-  const chips = (counts, icons, names) => Object.keys(icons).filter(k => counts[k]).map(k => ({
-    html: `<span class="chip">${icons[k]} ${counts[k]}</span>`,
-    text: `${icons[k]} ${names[k]} ×${counts[k]}`
-  }));
+  const chip = (facet, inner, text, cls = '') =>
+    `<button type="button" class="chip${cls}" data-action="facet" data-n="${n}" data-facet="${facet}" aria-pressed="false"
+      aria-label="${esc(text)}" data-tip="${esc(t('tipChip')(text))}">${inner}</button>`;
+  const chips = (counts, icons, names, prefix) => Object.keys(icons).filter(k => counts[k]).map(k => {
+    const text = `${icons[k]} ${names[k]} ×${counts[k]}`;
+    return { text, html: chip(prefix + k, `${icons[k]} ${counts[k]}`, text) };
+  });
   const groups = [
-    chips(s.breakfast, BREAKFAST_ICONS, t('breakfastNames')),
-    chips(s.protein, PROTEIN_ICONS, t('proteinNames')),
-    chips(s.group, GROUP_ICONS, t('groupNames'))
+    chips(s.breakfast, BREAKFAST_ICONS, t('breakfastNames'), 'breakfast:'),
+    chips(s.protein, PROTEIN_ICONS, t('proteinNames'), 'protein:'),
+    chips(s.group, GROUP_ICONS, t('groupNames'), 'group:')
   ];
   const tip = t('tipBalance')(...groups.map(g => g.map(c => c.text).join(', ')), {
     egg: range(R.breakfasts.group.egg), fish: range(R.mains.protein.fish), plant: R.mains.protein.plant[0],
     red: R.mains.redMeat[1], fruit: range(R.snacks.group.fruit)
   });
-  if (s.experimental) groups.push([{ html: `<span class="chip chip-exp">${BEAKER} ${s.experimental}</span>` }]);
+  if (s.experimental) {
+    groups.push([{ html: chip('exp', `${FLASK} ${s.experimental}`, `${t('experimental')} ×${s.experimental}`, ' chip-exp') }]);
+  }
   const expLine = s.experimental ? '\n' + t('experimentalCount')(s.experimental, R.experimental[1]) : '';
   return `<div class="balance" data-tip="${esc(tip + expLine)}">
     <span class="balance-label">⚖️ ${t('balance')}</span>
     ${groups.map(g => g.map(c => c.html).join('')).join('<span class="balance-sep" aria-hidden="true"></span>')}
+    <button type="button" class="chip chip-clear" data-action="facet" data-n="${n}" data-facet=""
+      data-tip="${esc(t('tipClearFocus'))}" hidden>✕ ${t('clearFocus')}</button>
   </div>`;
+}
+
+/* ── Highlighting the meals behind the picked chips ── */
+const focus = {};            // week tab → the facets picked in its balance bar
+
+function applyFocus(n) {
+  const section = byId('w' + n);
+  const picked = focus[n] || (focus[n] = new Set());
+  const chips = [...section.querySelectorAll('.balance [data-facet]')];
+  const shown = new Set(chips.map(el => el.dataset.facet));
+  picked.forEach(f => { if (!shown.has(f)) picked.delete(f); });     // a shuffle took that chip away
+  chips.forEach(el => { if (el.dataset.facet) el.setAttribute('aria-pressed', picked.has(el.dataset.facet)); });
+  section.querySelector('.chip-clear').hidden = !picked.size;
+  section.classList.toggle('focusing', picked.size > 0);
+  section.querySelectorAll('.meal-slot').forEach(el =>
+    el.classList.toggle('hl', el.dataset.facets.split(' ').some(f => picked.has(f))));
+}
+
+function toggleFacet(n, facet) {
+  const picked = focus[n] || (focus[n] = new Set());
+  const on = !!facet && !picked.has(facet);
+  if (!facet) picked.clear();
+  else if (on) picked.add(facet);
+  else picked.delete(facet);
+  applyFocus(n);
+  emit('focus', { n, facet, on, picked: [...picked] });
 }
 
 /* ============================================================
@@ -670,20 +718,28 @@ const usableCount = (excluded, type) =>
   recipes.filter(r => (!type || r.type === type) && usable(r, excluded)).length;
 const MIN_PER_TYPE = 5;
 
-// Pixel-art beaker: the mark of an experimental recipe
-const BEAKER = (() => {
-  const rows = ['k.....k', 'kg...gk', 'kg...gk', 'kpppppk', 'kpbpppk', 'kpppbpk', 'kpppppk', '.kkkkk.'];
-  const ink = { k: '#4c1d95', g: '#ddd6fe', p: '#8b5cf6', b: '#f5f3ff' };
-  let rects = '';
+// Pixel-art Erlenmeyer flask: the mark of an experimental recipe. css/fx.css
+// cycles the liquid through red, blue, green, purple and orange and floats the
+// bubbles up and out of the neck (the svg lets them overflow).
+const FLASK = (() => {
+  const rows = ['..kkkkk..', '...kgk...', '...kgk...', '...kgk...', '..kgggk..', '..kpppk..',
+                '.kpppppk.', '.kpppppk.', 'kpppppppk', 'kpppppppk', '.kkkkkkk.'];
+  const ink = { k: '#4c1d95', g: '#ede9fe' };
+  let liquid = '', glass = '';
   rows.forEach((row, y) => [...row].forEach((ch, x) => {
-    if (ch !== '.') rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${ink[ch]}"/>`;
+    if (ch === 'p') liquid += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+    else if (ch !== '.') glass += `<rect x="${x}" y="${y}" width="1" height="1" fill="${ink[ch]}"/>`;
   }));
-  return `<svg class="beaker" viewBox="0 0 7 8" aria-hidden="true" shape-rendering="crispEdges">${rects}</svg>`;
+  // [x, y, sideways and upward travel to the mouth]
+  const bubbles = [[3, 8, 1, -10], [5, 7, -1, -9], [4, 9, 0, -11], [2, 9, 2, -11], [6, 9, -2, -11]].map(([x, y, dx, dy], i) =>
+    `<rect class="fl-bub" x="${x}" y="${y}" width="1" height="1" fill="#fff" style="--dx:${dx}px;--dy:${dy}px;--i:${i}"/>`).join('');
+  return `<svg class="flask" viewBox="0 0 9 11" overflow="visible" aria-hidden="true" shape-rendering="crispEdges">` +
+    `<g class="fl-liquid">${liquid}</g>${glass}<rect x="2" y="7" width="1" height="1" fill="#fff" opacity=".55"/>${bubbles}</svg>`;
 })();
 
 const expToggle = () => `<label class="check toggle" data-tip="${esc(t('tipUseExperimental'))}">
     <input type="checkbox" data-pref="experimental"${store.useExperimental ? ' checked' : ''}>
-    <span>${BEAKER} ${t('useExperimental')}</span>
+    <span>${FLASK} ${t('useExperimental')}</span>
   </label>`;
 
 function buildPlanBar() {
@@ -727,7 +783,7 @@ function renderPanel() {
       return `<li data-name="${esc(plain(r.name.en + ' ' + r.name.es))}">
         <label class="check pick${off ? ' off' : ''}">
           <input type="checkbox" data-pick="${r.id}"${draft.has(r.id) ? '' : ' checked'}${off ? ' disabled' : ''}>
-          <span>${iconOf(r)} ${r.name[lang]}${r.experimental ? ' ' + BEAKER : ''}</span>
+          <span>${iconOf(r)} ${r.name[lang]}${r.experimental ? ' ' + FLASK : ''}</span>
         </label></li>`;
     }).join('');
     return `<section class="pick-group" data-type="${type}">
@@ -845,8 +901,8 @@ function buildWeek(n) {
         openHint
       ].filter(Boolean).join('\n');
       return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}"
-        data-day="${di}" data-slot="${slot}" data-type="${recipe.type}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
-        <span class="meal-badge badge-${recipe.type}${recipe.experimental ? ' badge-exp' : ''}">${recipe.experimental ? BEAKER : mt.icon} ${mt.label}</span>
+        data-day="${di}" data-slot="${slot}" data-type="${recipe.type}" data-facets="${facetsOf(recipe)}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
+        <span class="meal-badge badge-${recipe.type}${recipe.experimental ? ' badge-exp' : ''}">${recipe.experimental ? FLASK : mt.icon} ${mt.label}</span>
         <span class="meal-name">${recipe.name[lang]}</span>
         <span class="chev" aria-hidden="true">›</span>
       </button>`;
@@ -877,7 +933,7 @@ function buildWeek(n) {
         ${savedMenu(w.iso) ? tool('reset', '↺', 'resetMenu', 'tipReset', n) : ''}
       </div>
     </div>
-    ${buildBalance(meals)}
+    ${buildBalance(meals, n)}
     <div class="sunday-prep">
       <button type="button" class="prep-head${prepOpen ? ' open' : ''}" id="prep-toggle-${n}" data-action="prep" data-n="${n}"
         aria-expanded="${prepOpen}" aria-controls="prep-list-${n}" data-tip="${esc(t('tipPrepToggle'))}">
@@ -901,6 +957,7 @@ function buildWeek(n) {
       </div>
     </div>`;
 
+  applyFocus(n);
   updateProgress(n);
 }
 
@@ -928,6 +985,7 @@ const actions = {
   'close-panel': () => closePanel(),
   'pick-all':    el => pickType(el.dataset.type, true),
   'pick-none':   el => pickType(el.dataset.type, false),
+  facet:         el => toggleFacet(+el.dataset.n, el.dataset.facet),
   'use-all':     () => { draft.clear(); renderPanel(); }
 };
 

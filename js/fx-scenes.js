@@ -592,6 +592,11 @@
   }
   // Reading a recipe: the cook gets busy
   document.addEventListener('plan:modal', e => { if (e.detail.open) setScene('cooking'); });
+  // A balance chip picked: show that kind of meal
+  document.addEventListener('plan:focus', e => {
+    const f = e.detail.on && e.detail.facet;
+    if (f) setScene(f.startsWith('breakfast') ? 'breakfast' : f.startsWith('group') ? 'snack' : f === 'exp' ? 'cooking' : 'dinner');
+  });
   document.addEventListener('plan:lang', () => {
     caption.textContent = SCENES[scene.name].caption[document.documentElement.lang === 'es' ? 'es' : 'en'];
     label();
@@ -615,21 +620,143 @@
   show.className = 'fx-stage-open';
   show.textContent = '📺';
 
+  const grip = document.createElement('button');
+  grip.type = 'button';
+  grip.className = 'fx-stage-grip';
+  stage.append(grip);
+  bar.tabIndex = 0;
+
   const LABELS = {
-    en: { hide: 'Hide the kitchen TV', show: 'Show the kitchen TV — pixel scenes that follow what you look at' },
-    es: { hide: 'Ocultar la tele de la cocina', show: 'Mostrar la tele de la cocina — escenas pixeladas según lo que mirás' }
+    en: { hide: 'Hide the kitchen TV', show: 'Show the kitchen TV — pixel scenes that follow what you look at',
+          move: 'Drag to move the kitchen TV · double-click to put it back · arrow keys work too',
+          size: 'Drag to resize the kitchen TV · arrow keys work too' },
+    es: { hide: 'Ocultar la tele de la cocina', show: 'Mostrar la tele de la cocina — escenas pixeladas según lo que mirás',
+          move: 'Arrastrá para mover la tele · doble clic para devolverla a su lugar · también con las flechas',
+          size: 'Arrastrá para cambiar el tamaño de la tele · también con las flechas' }
   };
   function label() {
     const L = LABELS[document.documentElement.lang === 'es' ? 'es' : 'en'];
     hide.dataset.tip = L.hide; hide.setAttribute('aria-label', L.hide);
     show.dataset.tip = L.show; show.setAttribute('aria-label', L.show);
+    bar.dataset.tip = L.move; bar.setAttribute('aria-label', L.move);
+    grip.dataset.tip = L.size; grip.setAttribute('aria-label', L.size);
   }
+
+  /* ── Moving and resizing ──────────────────────────────────── */
+  // Drag the bar to move the TV and the corner grip to resize it. The
+  // spot is saved as a share of the free space on each axis, so it
+  // keeps its corner when the window changes size.
+  const BOX_KEY = 'meal-plan-tv-box';
+  const MIN_W = 200, GAP = 8;
+  let box = null;                                     // { x, y: 0 (left/top) … 1, w: px }
+  try { box = JSON.parse(localStorage.getItem(BOX_KEY)); } catch (e) {}
+  if (!box || !(box.w > 0)) box = null;
+
+  const view = () => ({ w: document.documentElement.clientWidth, h: window.innerHeight });
+  const frame = () => ({ w: stage.offsetWidth - canvas.clientWidth, h: stage.offsetHeight - canvas.clientHeight });
+  const heightFor = w => (w - frame().w) * H / W + frame().h;
+  const within = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  function maxWidth() {
+    const v = view(), f = frame();
+    return Math.max(MIN_W, Math.min(v.w - 2 * GAP, (v.h - 2 * GAP - f.h) * W / H + f.w));
+  }
+  // Close to a whole number of screen pixels per scene pixel? Snap to it, so the art stays crisp
+  function snap(w) {
+    const f = frame().w, k = Math.round((w - f) / W);
+    return k >= 1 && Math.abs(k * W + f - w) < 10 ? k * W + f : Math.round(w);
+  }
+  function put(left, top, width) {
+    const v = view();
+    stage.style.width = width + 'px';
+    const h = stage.offsetHeight;
+    stage.style.left = within(left, GAP, v.w - width - GAP) + 'px';
+    stage.style.top = within(top, GAP, v.h - h - GAP) + 'px';
+    stage.style.right = stage.style.bottom = 'auto';
+  }
+  // The grip goes on the corner that faces the middle of the screen
+  function corner() {
+    const v = view(), r = stage.getBoundingClientRect();
+    stage.dataset.grip = (r.top + r.height / 2 < v.h / 2 ? 'b' : 't') + (r.left + r.width / 2 < v.w / 2 ? 'r' : 'l');
+  }
+  function place() {
+    if (stage.hidden) return;
+    if (!box) {
+      stage.removeAttribute('style');
+    } else {
+      const v = view(), w = Math.min(box.w, maxWidth()), h = heightFor(w);
+      put(GAP + box.x * Math.max(0, v.w - w - 2 * GAP), GAP + box.y * Math.max(0, v.h - h - 2 * GAP), w);
+    }
+    corner();
+  }
+  function remember() {
+    const v = view(), r = stage.getBoundingClientRect();
+    const share = (pos, free) => free > 0 ? within((pos - GAP) / free, 0, 1) : 0;
+    box = { x: share(r.left, v.w - r.width - 2 * GAP), y: share(r.top, v.h - r.height - 2 * GAP), w: Math.round(r.width) };
+    try { localStorage.setItem(BOX_KEY, JSON.stringify(box)); } catch (e) {}
+    corner();
+  }
+  // New width with the corner opposite the grip held still
+  function resizeFrom(start, width) {
+    const g = stage.dataset.grip, w = snap(within(width, MIN_W, maxWidth())), h = heightFor(w);
+    put(g[1] === 'r' ? start.left : start.right - w, g[0] === 'b' ? start.top : start.bottom - h, w);
+  }
+
+  function drag(e, resizing) {
+    if (e.button !== 0 || (!resizing && e.target.closest('button'))) return;
+    e.preventDefault();
+    const el = e.currentTarget, start = stage.getBoundingClientRect(), x0 = e.clientX, y0 = e.clientY;
+    const g = stage.dataset.grip, sx = g[1] === 'r' ? 1 : -1, sy = g[0] === 'b' ? 1 : -1;
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+    stage.classList.add(resizing ? 'resizing' : 'dragging');
+    const move = ev => {
+      const dx = ev.clientX - x0, dy = ev.clientY - y0;
+      if (!resizing) return put(start.left + dx, start.top + dy, start.width);
+      const across = sx * dx, down = sy * dy * W / H;   // vertical drag counted in width
+      resizeFrom(start, start.width + (Math.abs(across) > Math.abs(down) ? across : down));
+    };
+    const end = () => {
+      ['pointermove', 'pointerup', 'pointercancel'].forEach((type, i) => el.removeEventListener(type, i ? end : move));
+      stage.classList.remove('dragging', 'resizing');
+      remember();
+    };
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+  }
+  bar.addEventListener('pointerdown', e => drag(e, false));
+  grip.addEventListener('pointerdown', e => drag(e, true));
+  bar.addEventListener('dblclick', e => {
+    if (e.target.closest('button')) return;
+    box = null;
+    try { localStorage.removeItem(BOX_KEY); } catch (err) {}
+    place();
+  });
+
+  const ARROWS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+  bar.addEventListener('keydown', e => {
+    const a = ARROWS[e.key];
+    if (!a || e.target !== bar) return;
+    e.preventDefault();
+    const r = stage.getBoundingClientRect();
+    put(r.left + a[0] * 24, r.top + a[1] * 24, r.width);
+    remember();
+  });
+  grip.addEventListener('keydown', e => {
+    const a = ARROWS[e.key];
+    if (!a) return;
+    e.preventDefault();
+    const r = stage.getBoundingClientRect();
+    resizeFrom(r, r.width + (a[0] || -a[1]) * 36);
+    remember();
+  });
+  window.addEventListener('resize', place);
   function setOpen(open) {
     stage.hidden = !open;
     show.hidden = open;
     document.body.classList.toggle('fx-stage-on', open);
     try { localStorage.setItem(PREF_KEY, open ? 'on' : 'off'); } catch (e) {}
-    if (open) render(performance.now());
+    if (open) { place(); render(performance.now()); }
   }
   hide.addEventListener('click', () => setOpen(false));
   show.addEventListener('click', () => setOpen(true));

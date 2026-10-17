@@ -348,8 +348,8 @@
   document.addEventListener('plan:action', e => {
     const { name, el } = e.detail;
     switch (name) {
-      case 'open': case 'close': case 'shuffle': case 'reset': case 'swap':
-        return;                            // these sound in plan:modal / plan:rendered
+      case 'open': case 'close': case 'shuffle': case 'reset': case 'swap': case 'facet':
+        return;                            // these sound in plan:modal / plan:rendered / plan:focus
       case 'lang':   return play('lang');
       case 'week':   return play('page');
       case 'step':   return play('step', +el.dataset.step);
@@ -364,6 +364,12 @@
   });
 
   document.addEventListener('plan:modal', e => play(e.detail.open ? 'open' : 'close'));
+
+  // A balance chip picked: chime and bounce the meals it lights up
+  document.addEventListener('plan:focus', e => {
+    play(e.detail.on ? 'tickOn' : 'tickOff');
+    if (e.detail.on) animate(all(`#w${e.detail.n} .meal-slot.hl`), 'fx-pop');
+  });
 
   document.addEventListener('plan:week', e => animate(all(`#w${e.detail.n} .day-col`), 'fx-rise'));
 
