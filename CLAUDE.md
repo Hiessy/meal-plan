@@ -24,13 +24,15 @@ above it. The README has the full table.
 
 - Recipe `id`s must stay stable, because saved swaps refer to them.
   - Every recipe needs its balance facts: `protein` and `base` for lunches and dinners, `group`
-    for snacks, and optional `tags`.
+    for breakfasts and snacks, and optional `tags`.
   - Recipes must be self-contained, with no "leftovers" or "made on Sunday" ingredients, because
     any recipe can land on any day.
   - Make-ahead work goes in `prep`, as keys of `prepTasks`.
 - `data/ingredients.js` is an ordered regex dictionary. The first match on an English ingredient
   line picks its shopping-list row, so specific entries go above general ones. After adding
   recipes, check that each new line matches the intended entry and not "Other".
+- A menu is 20 recipe ids, day by day in `Planner.TYPES` order (breakfast, lunch, snack, dinner);
+  slot k is day `Math.floor(k / Planner.SLOTS)`.
 - In `js/planner.js`, menus are seeded by week number counted from `EPOCH` (2026-10-05). Each week
   avoids the two before it, so a page load computes every week since `EPOCH`, at about a
   millisecond per week. Changing the recipes, `RULES` or `EPOCH` changes every menu. A quick check

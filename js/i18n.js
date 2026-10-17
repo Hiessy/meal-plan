@@ -5,7 +5,7 @@
 const i18n = {
   en: {
     pageTitle:       'Family Meal Plan',
-    subtitle:        '4 people · Lunch + Afternoon Snack + Dinner · Monday–Friday',
+    subtitle:        '4 people · Breakfast + Lunch + Afternoon Snack + Dinner · Monday–Friday',
     headerDates:     (range, n) => `📅 ${range} · 🎲 balanced menus from ${n} recipes`,
     relWeek:         n => n === 0 ? 'This week' : n === 1 ? 'Next week' : `In ${n} weeks`,
     days:            ['Monday','Tuesday','Wednesday','Thursday','Friday'],
@@ -13,10 +13,12 @@ const i18n = {
     months:          ['January','February','March','April','May','June','July','August','September','October','November','December'],
     monthsShort:     ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
     mealTypes:       {
-      lunch:  { label:'Lunch',     icon:'🥗' },
-      snack:  { label:'Snack',     icon:'🍎' },
-      dinner: { label:'Dinner',    icon:'🍽' }
+      breakfast: { label:'Breakfast', icon:'☕' },
+      lunch:     { label:'Lunch',     icon:'🥗' },
+      snack:     { label:'Snack',     icon:'🍎' },
+      dinner:    { label:'Dinner',    icon:'🍽' }
     },
+    breakfastNames:  { egg: 'eggs', grain: 'oats & toast', dairy: 'yogurt & dairy', fruit: 'fruit' },
     proteinNames:    { fish: 'fish', poultry: 'chicken', beef: 'beef', pork: 'pork', plant: 'vegetarian', egg: 'eggs' },
     groupNames:      { fruit: 'fruit', dairy: 'dairy', veg: 'veggies', grain: 'grains' },
     ingredients:     'Ingredients',
@@ -69,12 +71,13 @@ const i18n = {
     tipShuffle:      'Draw a new balanced menu for this week',
     tipReset:        'Go back to the menu this week started with',
     tipToday:        'Jump to today’s meals',
-    tipSwap:         { lunch: 'Swap for another lunch that keeps the week balanced',
+    tipSwap:         { breakfast: 'Swap for another breakfast that keeps the week balanced',
+                       lunch: 'Swap for another lunch that keeps the week balanced',
                        snack: 'Swap for another snack that keeps the week balanced',
                        dinner: 'Swap for another dinner that keeps the week balanced' },
-    tipBalance:      (mains, snacks, r) => `Lunches & dinners: ${mains}\nSnacks: ${snacks}\n` +
-                     `Every week gets ${r.fish} fish meals, at least ${r.plant} vegetarian, at most ${r.red} with red meat ` +
-                     `and ${r.fruit} fruit snacks — and lunch and dinner differ every day.`,
+    tipBalance:      (breakfasts, mains, snacks, r) => `Breakfasts: ${breakfasts}\nLunches & dinners: ${mains}\nSnacks: ${snacks}\n` +
+                     `Every week gets ${r.egg} egg breakfasts, ${r.fish} fish meals, at least ${r.plant} vegetarian, ` +
+                     `at most ${r.red} with red meat and ${r.fruit} fruit snacks — and lunch and dinner differ every day.`,
     tipPrep:         'Tick it off once it is done — saved on this device',
     tipPrepToggle:   'Show or hide the prep tasks',
     tipPrepCount:    'Prep tasks ticked off',
@@ -104,7 +107,7 @@ const i18n = {
   },
   es: {
     pageTitle:       'Plan de Comidas Familiar',
-    subtitle:        '4 personas · Almuerzo + Merienda + Cena · Lunes–Viernes',
+    subtitle:        '4 personas · Desayuno + Almuerzo + Merienda + Cena · Lunes–Viernes',
     headerDates:     (range, n) => `📅 ${range} · 🎲 menús balanceados entre ${n} recetas`,
     relWeek:         n => n === 0 ? 'Esta semana' : n === 1 ? 'La próxima' : `En ${n} semanas`,
     days:            ['Lunes','Martes','Miércoles','Jueves','Viernes'],
@@ -112,10 +115,12 @@ const i18n = {
     months:          ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
     monthsShort:     ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],
     mealTypes:       {
-      lunch:  { label:'Almuerzo',  icon:'🥗' },
-      snack:  { label:'Merienda',  icon:'🍎' },
-      dinner: { label:'Cena',      icon:'🍽' }
+      breakfast: { label:'Desayuno',  icon:'☕' },
+      lunch:     { label:'Almuerzo',  icon:'🥗' },
+      snack:     { label:'Merienda',  icon:'🍎' },
+      dinner:    { label:'Cena',      icon:'🍽' }
     },
+    breakfastNames:  { egg: 'huevo', grain: 'avena y tostadas', dairy: 'yogur y lácteos', fruit: 'fruta' },
     proteinNames:    { fish: 'pescado', poultry: 'pollo', beef: 'carne', pork: 'cerdo', plant: 'vegetariano', egg: 'huevo' },
     groupNames:      { fruit: 'fruta', dairy: 'lácteos', veg: 'verduras', grain: 'cereales' },
     ingredients:     'Ingredientes',
@@ -168,12 +173,13 @@ const i18n = {
     tipShuffle:      'Sortear un menú nuevo y balanceado para esta semana',
     tipReset:        'Volver al menú con el que empezó la semana',
     tipToday:        'Ir a las comidas de hoy',
-    tipSwap:         { lunch: 'Cambiar por otro almuerzo que mantenga la semana balanceada',
+    tipSwap:         { breakfast: 'Cambiar por otro desayuno que mantenga la semana balanceada',
+                       lunch: 'Cambiar por otro almuerzo que mantenga la semana balanceada',
                        snack: 'Cambiar por otra merienda que mantenga la semana balanceada',
                        dinner: 'Cambiar por otra cena que mantenga la semana balanceada' },
-    tipBalance:      (mains, snacks, r) => `Almuerzos y cenas: ${mains}\nMeriendas: ${snacks}\n` +
-                     `Cada semana tiene ${r.fish} comidas con pescado, al menos ${r.plant} vegetariana, como máximo ${r.red} ` +
-                     `con carne roja y ${r.fruit} meriendas con fruta — y el almuerzo y la cena cambian todos los días.`,
+    tipBalance:      (breakfasts, mains, snacks, r) => `Desayunos: ${breakfasts}\nAlmuerzos y cenas: ${mains}\nMeriendas: ${snacks}\n` +
+                     `Cada semana tiene ${r.egg} desayunos con huevo, ${r.fish} comidas con pescado, al menos ${r.plant} vegetariana, ` +
+                     `como máximo ${r.red} con carne roja y ${r.fruit} meriendas con fruta — y el almuerzo y la cena cambian todos los días.`,
     tipPrep:         'Marcala cuando esté lista — se guarda en este dispositivo',
     tipPrepToggle:   'Mostrar u ocultar las tareas de preparación',
     tipPrepCount:    'Tareas de preparación completadas',

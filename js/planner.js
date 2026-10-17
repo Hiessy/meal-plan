@@ -1,28 +1,36 @@
 /* ============================================================
    Planner — balanced random weekly menus (logic only, no DOM)
 
-   Reads `recipes` (data/recipes.js). A week is 5 lunches, 5 snacks
-   and 5 dinners, Monday–Friday.
+   Reads `recipes` (data/recipes.js). A week is 5 breakfasts,
+   5 lunches, 5 snacks and 5 dinners, Monday–Friday. A menu is a
+   list of 20 recipe ids, day by day: breakfast, lunch, snack,
+   dinner, then the next day.
 
    How a week is drawn:
-   1. The 15 meal slots are filled in random order. Each slot takes
+   1. The 20 meal slots are filled in random order. Each slot takes
       the recipe that adds the least COST to what is already picked
       (a rule broken or a recipe eaten lately costs; one still
       missing — say a second fish meal — is a saving). Ties are
       broken at random.
-   2. The dinners are matched to the lunches so the two meals of a
-      day differ in protein and starch.
+   2. The days are then put in order: dinners are matched to the
+      lunches so the two main meals of a day differ in protein and
+      starch, and an egg breakfast never lands on an egg lunch.
    3. This is repeated a few times and the cheapest week wins.
 
    The randomness is seeded by the week number, so every device
    shows the same menu for the same week.
    ============================================================ */
 const Planner = (() => {
-  const TYPES = ['lunch', 'snack', 'dinner'];
+  const TYPES = ['breakfast', 'lunch', 'snack', 'dinner'];
+  const SLOTS = TYPES.length;                  // meals per day
   const DAYS = 5;
+  const BREAKFAST = TYPES.indexOf('breakfast'), LUNCH = TYPES.indexOf('lunch'), DINNER = TYPES.indexOf('dinner');
 
   /* What a balanced week looks like — [min, max] meals per week */
   const RULES = {
+    breakfasts: {
+      group: { egg: [1, 2], grain: [1, 3], dairy: [0, 2], fruit: [0, 2] }
+    },
     mains: {                                   // the 10 lunches + dinners
       protein: { fish: [2, 3], poultry: [1, 4], beef: [0, 2], pork: [0, 2], plant: [1, 3], egg: [0, 1] },
       redMeat: [0, 3],                         // beef and pork together
@@ -31,7 +39,7 @@ const Planner = (() => {
     snacks: {
       group: { fruit: [2, 3], dairy: [1, 2], veg: [0, 1], grain: [0, 2] }
     },
-    tagCap: { soup: 2 },                       // any other tag: at most once a week
+    tagCap: { soup: 2, toast: 2 },             // any other tag: at most once a week
     recentWeeks: 2                             // stay away from the last two weeks' recipes
   };
 
@@ -69,16 +77,18 @@ const Planner = (() => {
   const bump = (counts, key) => { if (key) counts[key] = (counts[key] || 0) + 1; };
   const outside = (n, [min, max]) => n < min ? min - n : n > max ? n - max : 0;
   const isRed = r => r.protein === 'beef' || r.protein === 'pork';
+  const newCounts = () => ({ breakfast: {}, protein: {}, base: {}, group: {}, tag: {}, red: 0 });
 
   function add(r, s) {
-    if (r.type === 'snack') bump(s.group, r.group);
+    if (r.type === 'breakfast') bump(s.breakfast, r.group);
+    else if (r.type === 'snack') bump(s.group, r.group);
     else { bump(s.protein, r.protein); bump(s.base, r.base); if (isRed(r)) s.red++; }
     (r.tags || []).forEach(tag => bump(s.tag, tag));
   }
 
-  // How many of each protein, starch, snack group and tag a menu has
+  // How many of each breakfast group, protein, starch, snack group and tag a menu has
   function summary(ids) {
-    const s = { protein: {}, base: {}, group: {}, tag: {}, red: 0 };
+    const s = newCounts();
     ids.forEach(id => add(byId[id], s));
     return s;
   }
@@ -89,7 +99,8 @@ const Planner = (() => {
   // What adding recipe r to a partly picked week (counts in s) would cost
   function addCost(r, s, avoid) {
     let c = avoid.get(r.id) || 0;
-    if (r.type === 'snack') c += step(s.group[r.group], RULES.snacks.group[r.group]);
+    if (r.type === 'breakfast') c += step(s.breakfast[r.group], RULES.breakfasts.group[r.group]);
+    else if (r.type === 'snack') c += step(s.group[r.group], RULES.snacks.group[r.group]);
     else {
       c += step(s.protein[r.protein], RULES.mains.protein[r.protein]);
       c += step(s.base[r.base], RULES.mains.base[r.base]);
@@ -103,44 +114,59 @@ const Planner = (() => {
   const clashes = (lunch, dinner) =>
     (lunch.protein === dinner.protein ? 1 : 0) +
     (lunch.base === dinner.base && lunch.base !== 'none' ? 1 : 0);
+  // Eggs for breakfast and an egg lunch on the same day
+  const eggTwice = (breakfast, lunch) => breakfast.group === 'egg' && lunch.protein === 'egg' ? 1 : 0;
 
   function cost(ids, avoid) {
-    const s = summary(ids), { mains, snacks } = RULES;
+    const s = summary(ids), { breakfasts, mains, snacks } = RULES;
     let total = 0;
+    for (const g in breakfasts.group) total += COST.rule * outside(s.breakfast[g] || 0, breakfasts.group[g]);
     for (const p in mains.protein) total += COST.rule * outside(s.protein[p] || 0, mains.protein[p]);
     total += COST.rule * outside(s.red, mains.redMeat);
     for (const b in mains.base) total += COST.rule * outside(s.base[b] || 0, mains.base[b]);
     for (const g in snacks.group) total += COST.rule * outside(s.group[g] || 0, snacks.group[g]);
     for (const tag in s.tag) total += COST.rule * Math.max(0, s.tag[tag] - (RULES.tagCap[tag] || 1));
     ids.forEach(id => { total += avoid.get(id) || 0; });
-    for (let d = 0; d < DAYS; d++) total += COST.sameDay * clashes(byId[ids[d * 3]], byId[ids[d * 3 + 2]]);
+    for (let d = 0; d < DAYS; d++) {
+      const day = i => byId[ids[d * SLOTS + i]];
+      total += COST.sameDay * (clashes(day(LUNCH), day(DINNER)) + eggTwice(day(BREAKFAST), day(LUNCH)));
+    }
     return total;
   }
 
   /* ── Drawing a week ────────────────────────────────────────── */
-  const ORDERS = (function permute(rest) {    // every order of the 5 dinners
+  const ORDERS = (function permute(rest) {    // every order of 5 days
     if (rest.length < 2) return [rest];
     return rest.flatMap((x, i) => permute(rest.filter((_, j) => j !== i)).map(p => [x, ...p]));
   })([0, 1, 2, 3, 4]);
 
-  // → 15 ids: Monday lunch, snack, dinner, Tuesday lunch, … — dinners
-  //   matched to the lunches with the fewest same-day clashes
-  function arrange({ lunch, snack, dinner }) {
+  // The order of `meals` that clashes least with the lunches
+  function bestOrder(lunch, meals, clash) {
     let order = ORDERS[0], fewest = Infinity;
     for (const o of ORDERS) {
       let n = 0;
-      for (let d = 0; d < DAYS && n < fewest; d++) n += clashes(lunch[d], dinner[o[d]]);
+      for (let d = 0; d < DAYS && n < fewest; d++) n += clash(lunch[d], meals[o[d]]);
       if (n < fewest) { fewest = n; order = o; if (!n) break; }
     }
+    return order.map(i => meals[i]);
+  }
+
+  // → the menu, day by day — dinners and breakfasts placed around the lunches
+  function arrange({ breakfast, lunch, snack, dinner }) {
+    const placed = {
+      breakfast: bestOrder(lunch, breakfast, (l, b) => eggTwice(b, l)),
+      lunch, snack,
+      dinner: bestOrder(lunch, dinner, clashes)
+    };
     const ids = [];
-    for (let d = 0; d < DAYS; d++) ids.push(lunch[d].id, snack[d].id, dinner[order[d]].id);
+    for (let d = 0; d < DAYS; d++) TYPES.forEach(type => ids.push(placed[type][d].id));
     return ids;
   }
 
-  // Fills the 15 slots in random order, each with the cheapest recipe
+  // Fills the 20 slots in random order, each with the cheapest recipe
   function build(random, avoid) {
-    const s = { protein: {}, base: {}, group: {}, tag: {}, red: 0 };
-    const picks = { lunch: [], snack: [], dinner: [] }, used = new Set();
+    const s = newCounts();
+    const picks = Object.fromEntries(TYPES.map(type => [type, []])), used = new Set();
     for (const type of shuffled(TYPES.flatMap(type => Array(DAYS).fill(type)), random)) {
       let best = null, bestCost = Infinity;
       for (const r of shuffled(pools[type], random)) {
@@ -214,10 +240,10 @@ const Planner = (() => {
     return best || ids;
   }
 
-  const isMenu = ids => Array.isArray(ids) && ids.length === DAYS * 3 && ids.every(id => byId[id]);
+  const isMenu = ids => Array.isArray(ids) && ids.length === DAYS * SLOTS && ids.every(id => byId[id]);
 
   return {
-    TYPES, RULES,
+    TYPES, SLOTS, RULES,
     recipe: id => byId[id],
     count: recipes.length,
     weekNumber, mondayOfWeek,

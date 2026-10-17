@@ -49,6 +49,8 @@
   --border-green: var(--color-primary-light);
 
   /* Meal-type badge colours */
+  --badge-breakfast-bg:  #fefce8;
+  --badge-breakfast-txt: #a16207;
   --badge-lunch-bg:   #eff6ff;
   --badge-lunch-txt:  #1d4ed8;
   --badge-snack-bg:   #fff7ed;
@@ -519,6 +521,7 @@ main {
   letter-spacing: .5px;
   white-space: nowrap;
 }
+.badge-breakfast { background: var(--badge-breakfast-bg); color: var(--badge-breakfast-txt); }
 .badge-lunch  { background: var(--badge-lunch-bg);  color: var(--badge-lunch-txt); }
 .badge-snack  { background: var(--badge-snack-bg);  color: var(--badge-snack-txt); }
 .badge-dinner { background: var(--badge-dinner-bg); color: var(--badge-dinner-txt); }

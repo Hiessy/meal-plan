@@ -129,7 +129,7 @@ const neighbours = num => [menuOf(num - 1), menuOf(num + 1)];
 const newSeed   = () => Math.floor(Math.random() * 4294967296);
 
 function weekMeals(w) {
-  return menuOf(w.num).map((id, k) => ({ recipe: Planner.recipe(id), di: Math.floor(k / 3), k }));
+  return menuOf(w.num).map((id, k) => ({ recipe: Planner.recipe(id), di: Math.floor(k / Planner.SLOTS), k }));
 }
 const mealLabel = m => t('daysShort')[m.di] + ' · ' + t('mealTypes')[m.recipe.type].label;
 
@@ -261,7 +261,7 @@ function jumpToday() {
    Recipe sheet — previous / next through the week, swap
    ============================================================ */
 const modalEl = byId('modal');
-let modalAt = null;     // { n, k } — week tab and slot (0–14) in its menu
+let modalAt = null;     // { n, k } — week tab and slot (0–19) in its menu
 let lastFocus = null;
 
 function openModal(n, k) {
@@ -318,7 +318,7 @@ function renderModal() {
 }
 
 function stepModal(delta) {
-  if (!modalAt || modalAt.k + delta < 0 || modalAt.k + delta > 14) return;
+  if (!modalAt || modalAt.k + delta < 0 || modalAt.k + delta >= 5 * Planner.SLOTS) return;
   modalAt.k += delta;
   Tooltip.hide();
   renderModal();
@@ -607,9 +607,10 @@ function buildShopList(n) {
   return `<div class="shop-grid">${shopHtml}</div>${totalHtml}`;
 }
 
-// The week's mix at a glance: proteins of lunches & dinners | snack groups
-const PROTEIN_ICONS = { fish: '🐟', poultry: '🍗', beef: '🥩', pork: '🐖', plant: '🌱', egg: '🥚' };
-const GROUP_ICONS   = { fruit: '🍎', dairy: '🧀', veg: '🥕', grain: '🌾' };
+// The week's mix at a glance: breakfasts | proteins of lunches & dinners | snacks
+const BREAKFAST_ICONS = { egg: '🍳', grain: '🥣', dairy: '🥛', fruit: '🍓' };
+const PROTEIN_ICONS   = { fish: '🐟', poultry: '🍗', beef: '🥩', pork: '🐖', plant: '🌱', egg: '🥚' };
+const GROUP_ICONS     = { fruit: '🍎', dairy: '🧀', veg: '🥕', grain: '🌾' };
 
 function buildBalance(meals) {
   const s = Planner.summary(meals.map(m => m.recipe.id)), R = Planner.RULES;
@@ -618,15 +619,18 @@ function buildBalance(meals) {
     html: `<span class="chip">${icons[k]} ${counts[k]}</span>`,
     text: `${icons[k]} ${names[k]} ×${counts[k]}`
   }));
-  const mains  = chips(s.protein, PROTEIN_ICONS, t('proteinNames'));
-  const snacks = chips(s.group, GROUP_ICONS, t('groupNames'));
-  const tip = t('tipBalance')(mains.map(c => c.text).join(', '), snacks.map(c => c.text).join(', '), {
-    fish: range(R.mains.protein.fish), plant: R.mains.protein.plant[0],
+  const groups = [
+    chips(s.breakfast, BREAKFAST_ICONS, t('breakfastNames')),
+    chips(s.protein, PROTEIN_ICONS, t('proteinNames')),
+    chips(s.group, GROUP_ICONS, t('groupNames'))
+  ];
+  const tip = t('tipBalance')(...groups.map(g => g.map(c => c.text).join(', ')), {
+    egg: range(R.breakfasts.group.egg), fish: range(R.mains.protein.fish), plant: R.mains.protein.plant[0],
     red: R.mains.redMeat[1], fruit: range(R.snacks.group.fruit)
   });
   return `<div class="balance" data-tip="${esc(tip)}">
     <span class="balance-label">⚖️ ${t('balance')}</span>
-    ${mains.map(c => c.html).join('')}<span class="balance-sep" aria-hidden="true"></span>${snacks.map(c => c.html).join('')}
+    ${groups.map(g => g.map(c => c.html).join('')).join('<span class="balance-sep" aria-hidden="true"></span>')}
   </div>`;
 }
 
@@ -656,13 +660,15 @@ function buildWeek(n) {
     const iso = isoDate(date);
     const state = iso === todayIso ? ' today' : iso < todayIso ? ' past' : '';
     const mealsHtml = meals.filter(m => m.di === di).map(({ recipe, k }) => {
+      const slot = k % Planner.SLOTS;
       const mt = mealTypes[recipe.type];
       const tip = [
         t('tipMeal')(recipe.ing[lang].length, recipe.steps[lang].length),
         recipe.tip && recipe.tip[lang] && '💚 ' + recipe.tip[lang],
         openHint
       ].filter(Boolean).join('\n');
-      return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}" data-tip="${esc(tip)}">
+      return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}"
+        data-day="${di}" data-slot="${slot}" data-tip="${esc(tip)}">
         <span class="meal-badge badge-${recipe.type}">${mt.icon} ${mt.label}</span>
         <span class="meal-name">${recipe.name[lang]}</span>
         <span class="chev" aria-hidden="true">›</span>
@@ -763,6 +769,18 @@ if (history.state && history.state.modal) {
 
 // Forget ticks of past weeks (and of the old fixed plan) and swaps older than last week —
 // not while previewing another date, which would throw away this week's
+// Menus saved before breakfasts existed (3 meals a day): keep them and add the week's breakfasts
+Object.keys(store.menus).forEach(iso => {
+  const old = store.menus[iso];
+  if (!Array.isArray(old) || old.length !== 15) return;
+  const [y, m, d] = iso.split('-').map(Number);
+  const base = Planner.baseMenu(Planner.weekNumber(new Date(y, m - 1, d)));
+  const ids = [];
+  for (let day = 0; day < 5; day++) ids.push(base[day * Planner.SLOTS], ...old.slice(day * 3, day * 3 + 3));
+  if (Planner.isMenu(ids)) store.menus[iso] = ids;
+  else delete store.menus[iso];
+});
+
 if (!dateParam) {
   const keepMenusFrom = isoDate(addDays(firstMonday, -7));
   Object.keys(store.ticks).forEach(k => {

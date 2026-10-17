@@ -1,10 +1,10 @@
 /* ============================================================
    Meals & recipes — the list each week's menu is drawn from
-   (5 lunches, 5 snacks and 5 dinners, Monday–Friday).
+   (5 breakfasts, 5 lunches, 5 snacks and 5 dinners, Monday–Friday).
 
    Text fields are bilingual: field[lang], lang = 'en' | 'es'
    id      : unique and stable — saved swaps refer to it
-   type    : 'lunch' | 'snack' | 'dinner'
+   type    : 'breakfast' | 'lunch' | 'snack' | 'dinner'
 
    Balance facts — js/planner.js uses these to keep each week varied:
    protein : lunches & dinners — 'fish' | 'poultry' | 'beef' | 'pork'
@@ -12,9 +12,11 @@
    base    : lunches & dinners — main starch: 'rice' | 'pasta' |
              'bread' (incl. tortillas, wraps, buns) | 'potato' |
              'grain' (quinoa, couscous) | 'none'
-   group   : snacks — 'fruit' | 'dairy' | 'veg' | 'grain'
+   group   : breakfasts — 'egg' | 'grain' (oats, bread, pancakes) |
+             'dairy' | 'fruit'
+             snacks — 'fruit' | 'dairy' | 'veg' | 'grain'
    tags    : optional; recipes sharing a tag are similar dishes, so a
-             week gets at most one of each ("soup": at most two)
+             week gets at most one of each ("soup" and "toast": two)
 
    ing     : ingredients for 4 people; the shopping list is built from
              these lines (see data/ingredients.js)
@@ -28,6 +30,810 @@
    self-contained: any recipe can land on any day.
    ============================================================ */
 const recipes = [
+  {
+    "id": "scrambled-eggs-on-whole-grain-toast",
+    "type": "breakfast",
+    "group": "egg",
+    "name": {
+      "en": "Scrambled Eggs on Whole-Grain Toast",
+      "es": "Huevos Revueltos con Tostadas Integrales"
+    },
+    "ing": {
+      "en": [
+        "8 eggs",
+        "4 tbsp milk",
+        "1 tbsp butter",
+        "8 slices whole-grain bread",
+        "1 cup cherry tomatoes, halved",
+        "Salt & pepper"
+      ],
+      "es": [
+        "8 huevos",
+        "4 cdas leche",
+        "1 cda manteca",
+        "8 rebanadas de pan integral",
+        "1 taza tomates cherry en mitades",
+        "Sal y pimienta"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Whisk eggs with milk, salt, and pepper.",
+        "Melt butter in a non-stick pan over medium-low heat.",
+        "Add eggs; stir gently with a spatula until softly set but fully cooked, 3–4 min.",
+        "Toast the bread and serve the eggs on top, with cherry tomatoes on the side.",
+        "Toddler tip: cut toast into fingers and serve the eggs in small spoonfuls."
+      ],
+      "es": [
+        "Batir los huevos con la leche, sal y pimienta.",
+        "Derretir la manteca en una sartén antiadherente a fuego medio-bajo.",
+        "Agregar los huevos; revolver suavemente con espátula hasta que estén cremosos pero bien cocidos, 3–4 min.",
+        "Tostar el pan y servir los huevos encima, con los tomates cherry al costado.",
+        "Consejo para pequeños: cortar la tostada en bastones y servir el huevo en cucharadas chicas."
+      ]
+    },
+    "tip": {
+      "en": "Eggs give choline and protein — great for baby’s brain. For mom, cook them until fully set (no runny egg).",
+      "es": "Los huevos aportan colina y proteína — excelentes para el cerebro del bebé. Para mamá, cocinarlos hasta que estén bien firmes (nada de huevo crudo)."
+    }
+  },
+  {
+    "id": "spinach-and-pepper-omelette",
+    "type": "breakfast",
+    "group": "egg",
+    "name": {
+      "en": "Spinach & Pepper Omelette",
+      "es": "Omelette de Espinaca y Morrón"
+    },
+    "ing": {
+      "en": [
+        "8 eggs",
+        "2 cups fresh spinach",
+        "1 red bell pepper, diced",
+        "½ cup shredded cheese",
+        "1 tbsp olive oil",
+        "Salt & pepper",
+        "4 slices whole-grain bread, to serve"
+      ],
+      "es": [
+        "8 huevos",
+        "2 tazas espinaca fresca",
+        "1 morrón rojo picado",
+        "½ taza queso rallado",
+        "1 cda aceite de oliva",
+        "Sal y pimienta",
+        "4 rebanadas de pan integral, para acompañar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Whisk eggs with salt and pepper.",
+        "Sauté bell pepper in olive oil 3 min; add spinach and stir until wilted.",
+        "Pour in the eggs; cook over medium-low heat, lifting the edges, until almost set.",
+        "Sprinkle cheese over half, fold, and cook 1 more min until fully set.",
+        "Cut into 4 wedges; serve with toast.",
+        "Toddler tip: cut into small squares and check the egg is cooked through."
+      ],
+      "es": [
+        "Batir los huevos con sal y pimienta.",
+        "Saltear el morrón en aceite de oliva 3 min; agregar la espinaca y revolver hasta que se achique.",
+        "Verter los huevos; cocinar a fuego medio-bajo, levantando los bordes, hasta que casi cuajen.",
+        "Espolvorear el queso sobre una mitad, doblar y cocinar 1 min más hasta que esté bien cocido.",
+        "Cortar en 4 porciones; servir con tostadas.",
+        "Consejo para pequeños: cortar en cuadraditos y verificar que el huevo esté bien cocido."
+      ]
+    },
+    "tip": {
+      "en": "Spinach brings folate and iron — key nutrients in pregnancy.",
+      "es": "La espinaca aporta folato y hierro — nutrientes clave en el embarazo."
+    }
+  },
+  {
+    "id": "breakfast-burritos",
+    "type": "breakfast",
+    "group": "egg",
+    "name": {
+      "en": "Breakfast Burritos",
+      "es": "Burritos de Desayuno"
+    },
+    "ing": {
+      "en": [
+        "6 eggs",
+        "1 can black beans, drained",
+        "4 large flour tortillas",
+        "½ cup shredded cheese",
+        "1 tomato, diced",
+        "1 avocado, sliced",
+        "1 tbsp olive oil",
+        "Salt"
+      ],
+      "es": [
+        "6 huevos",
+        "1 lata porotos negros escurridos",
+        "4 tortillas de harina grandes",
+        "½ taza queso rallado",
+        "1 tomate picado",
+        "1 palta en rodajas",
+        "1 cda aceite de oliva",
+        "Sal"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Warm the beans in a small pot with a pinch of salt; mash lightly.",
+        "Scramble the eggs in olive oil until fully cooked.",
+        "Warm the tortillas in a dry pan.",
+        "Fill each tortilla with beans, eggs, cheese, tomato, and avocado; roll up tightly.",
+        "Toast seam-side down 1 min to seal; cut in half to serve.",
+        "Toddler tip: serve the filling in a bowl with tortilla strips."
+      ],
+      "es": [
+        "Calentar los porotos en una olla chica con una pizca de sal; pisar ligeramente.",
+        "Revolver los huevos en el aceite de oliva hasta que estén bien cocidos.",
+        "Calentar las tortillas en una sartén seca.",
+        "Rellenar cada tortilla con porotos, huevo, queso, tomate y palta; enrollar bien apretado.",
+        "Dorar 1 min con el cierre hacia abajo para sellar; cortar por la mitad para servir.",
+        "Consejo para pequeños: servir el relleno en un bol con tiras de tortilla."
+      ]
+    },
+    "tip": {
+      "en": "Beans plus eggs make a fibre- and protein-packed start that keeps everyone full until lunch.",
+      "es": "Porotos más huevo: un desayuno lleno de fibra y proteína que deja a todos satisfechos hasta el almuerzo."
+    }
+  },
+  {
+    "id": "baked-egg-and-veggie-muffins",
+    "type": "breakfast",
+    "group": "egg",
+    "name": {
+      "en": "Baked Egg & Veggie Muffins",
+      "es": "Muffins de Huevo y Verduras al Horno"
+    },
+    "ing": {
+      "en": [
+        "10 eggs",
+        "1 cup fresh spinach, chopped",
+        "1 red bell pepper, finely diced",
+        "½ cup shredded cheese",
+        "¼ cup milk",
+        "Salt & pepper",
+        "Olive oil, for the tin"
+      ],
+      "es": [
+        "10 huevos",
+        "1 taza espinaca fresca picada",
+        "1 morrón rojo picado fino",
+        "½ taza queso rallado",
+        "¼ taza leche",
+        "Sal y pimienta",
+        "Aceite de oliva, para el molde"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Preheat oven to 180°C / 350°F; oil a 12-cup muffin tin.",
+        "Whisk eggs with milk, salt, and pepper.",
+        "Divide spinach, pepper, and cheese among the cups; pour the egg mix over.",
+        "Bake 18–20 min until puffed and fully set.",
+        "Serve warm, or chill and reheat 30 sec in the microwave (they keep 3 days).",
+        "Toddler tip: cut into quarters — perfect finger food."
+      ],
+      "es": [
+        "Precalentar el horno a 180 °C; aceitar un molde de 12 muffins.",
+        "Batir los huevos con la leche, sal y pimienta.",
+        "Repartir la espinaca, el morrón y el queso en los moldes; verter la mezcla de huevo encima.",
+        "Hornear 18–20 min hasta que se inflen y estén bien cocidos.",
+        "Servir tibios, o enfriar y recalentar 30 seg en el microondas (duran 3 días).",
+        "Consejo para pequeños: cortar en cuartos — ideales para comer con la mano."
+      ]
+    },
+    "tip": {
+      "en": "Make a batch ahead and breakfast is ready in seconds on busy mornings.",
+      "es": "Hacé una tanda de antemano y el desayuno está listo en segundos las mañanas con apuro."
+    },
+    "prep": [
+      "egg-muffins"
+    ]
+  },
+  {
+    "id": "avocado-toast-with-fried-eggs",
+    "type": "breakfast",
+    "group": "egg",
+    "tags": [
+      "toast"
+    ],
+    "name": {
+      "en": "Avocado Toast with Fried Eggs",
+      "es": "Tostadas con Palta y Huevo a la Plancha"
+    },
+    "ing": {
+      "en": [
+        "8 slices whole-grain bread",
+        "2 ripe avocados",
+        "4 eggs",
+        "Juice of 1 lime",
+        "1 tbsp olive oil",
+        "Salt & pepper",
+        "Chili flakes (optional, adults only)"
+      ],
+      "es": [
+        "8 rebanadas de pan integral",
+        "2 paltas maduras",
+        "4 huevos",
+        "Jugo de 1 lima",
+        "1 cda aceite de oliva",
+        "Sal y pimienta",
+        "Ají en hojuelas (opcional, solo para adultos)"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Mash avocados with lime juice and a pinch of salt.",
+        "Fry eggs in olive oil over medium heat; flip and cook until the yolks are firm.",
+        "Toast the bread and spread thickly with avocado.",
+        "Top with the eggs; season with pepper and, for adults, chili flakes.",
+        "Toddler tip: avocado toast fingers with chopped egg on the side."
+      ],
+      "es": [
+        "Pisar las paltas con el jugo de lima y una pizca de sal.",
+        "Freír los huevos en aceite de oliva a fuego medio; dar vuelta y cocinar hasta que la yema esté firme.",
+        "Tostar el pan y untar con abundante palta.",
+        "Coronar con los huevos; condimentar con pimienta y, para los adultos, ají.",
+        "Consejo para pequeños: bastones de tostada con palta y el huevo picado al costado."
+      ]
+    },
+    "tip": {
+      "en": "Avocado’s healthy fats help the body absorb vitamins A, D, E and K.",
+      "es": "Las grasas saludables de la palta ayudan a absorber las vitaminas A, D, E y K."
+    }
+  },
+  {
+    "id": "overnight-oats-with-berries",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "oats"
+    ],
+    "name": {
+      "en": "Overnight Oats with Berries",
+      "es": "Avena Remojada con Frutas del Bosque"
+    },
+    "ing": {
+      "en": [
+        "2 cups rolled oats",
+        "2 cups milk",
+        "1 cup Greek yogurt",
+        "2 tbsp chia seeds",
+        "2 tbsp honey",
+        "1 cup mixed berries (fresh or frozen)"
+      ],
+      "es": [
+        "2 tazas avena arrollada",
+        "2 tazas leche",
+        "1 taza yogur griego",
+        "2 cdas semillas de chía",
+        "2 cdas miel",
+        "1 taza frutas del bosque (frescas o congeladas)"
+      ]
+    },
+    "steps": {
+      "en": [
+        "The evening before: mix oats, milk, yogurt, chia seeds, and honey in 4 jars or a bowl.",
+        "Cover and refrigerate overnight.",
+        "In the morning, stir and top with berries.",
+        "Toddler tip: stir in a little extra milk for a softer texture; no honey under 1."
+      ],
+      "es": [
+        "La noche anterior: mezclar la avena, la leche, el yogur, la chía y la miel en 4 frascos o un bol.",
+        "Tapar y llevar a la heladera toda la noche.",
+        "A la mañana, revolver y cubrir con las frutas del bosque.",
+        "Consejo para pequeños: agregar un poco más de leche para que quede más suave; sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "Oats give slow-release energy and fibre — helpful against pregnancy constipation.",
+      "es": "La avena da energía de liberación lenta y fibra — ayuda contra el estreñimiento del embarazo."
+    },
+    "prep": [
+      "overnight-oats"
+    ]
+  },
+  {
+    "id": "apple-and-cinnamon-porridge",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "oats"
+    ],
+    "name": {
+      "en": "Apple & Cinnamon Porridge",
+      "es": "Avena Caliente con Manzana y Canela"
+    },
+    "ing": {
+      "en": [
+        "1½ cups rolled oats",
+        "3 cups milk",
+        "2 apples, grated",
+        "1 tsp cinnamon",
+        "2 tbsp honey",
+        "2 tbsp mixed nuts, chopped (optional)"
+      ],
+      "es": [
+        "1½ tazas avena arrollada",
+        "3 tazas leche",
+        "2 manzanas ralladas",
+        "1 cdita canela",
+        "2 cdas miel",
+        "2 cdas frutos secos picados (opcional)"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Bring milk to a simmer in a saucepan.",
+        "Stir in oats, grated apple, and cinnamon; cook 5–6 min, stirring, until creamy.",
+        "Sweeten with honey and serve topped with chopped nuts.",
+        "Toddler tip: no nuts (choking hazard) and no honey under 1 — the apple sweetens it enough."
+      ],
+      "es": [
+        "Llevar la leche a un hervor suave en una olla.",
+        "Incorporar la avena, la manzana rallada y la canela; cocinar 5–6 min revolviendo hasta que quede cremosa.",
+        "Endulzar con miel y servir con frutos secos picados por encima.",
+        "Consejo para pequeños: sin frutos secos (riesgo de atragantamiento) y sin miel antes del año — alcanza con el dulzor de la manzana."
+      ]
+    },
+    "tip": {
+      "en": "A warm, fibre-rich bowl that keeps blood sugar steady through the morning.",
+      "es": "Un bol calentito y rico en fibra que mantiene estable el azúcar en sangre toda la mañana."
+    }
+  },
+  {
+    "id": "banana-oat-pancakes",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "pancakes"
+    ],
+    "name": {
+      "en": "Banana Oat Pancakes",
+      "es": "Pancakes de Banana y Avena"
+    },
+    "ing": {
+      "en": [
+        "2 ripe bananas",
+        "2 eggs",
+        "1½ cups rolled oats",
+        "1 cup milk",
+        "1 tsp baking powder",
+        "½ tsp cinnamon",
+        "1 tbsp butter, for the pan",
+        "1 cup strawberries, sliced",
+        "Honey, to serve"
+      ],
+      "es": [
+        "2 bananas maduras",
+        "2 huevos",
+        "1½ tazas avena arrollada",
+        "1 taza leche",
+        "1 cdita polvo para hornear",
+        "½ cdita canela",
+        "1 cda manteca, para la sartén",
+        "1 taza frutillas en rodajas",
+        "Miel, para servir"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Blend bananas, eggs, oats, milk, baking powder, and cinnamon until smooth; rest 5 min.",
+        "Heat a little butter in a non-stick pan over medium heat.",
+        "Pour small ladlefuls; cook 2 min until bubbles form, flip and cook 1–2 min more.",
+        "Serve with sliced strawberries and a drizzle of honey.",
+        "Toddler tip: cut into strips — no honey under 1."
+      ],
+      "es": [
+        "Licuar las bananas, los huevos, la avena, la leche, el polvo para hornear y la canela hasta que quede liso; dejar reposar 5 min.",
+        "Calentar un poco de manteca en una sartén antiadherente a fuego medio.",
+        "Verter cucharones chicos; cocinar 2 min hasta que aparezcan burbujas, dar vuelta y cocinar 1–2 min más.",
+        "Servir con frutillas en rodajas y un hilo de miel.",
+        "Consejo para pequeños: cortar en tiras — sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "No added sugar — the ripe bananas do the sweetening.",
+      "es": "Sin azúcar agregada — las bananas maduras endulzan solas."
+    }
+  },
+  {
+    "id": "french-toast-with-berries",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "pancakes"
+    ],
+    "name": {
+      "en": "French Toast with Berries",
+      "es": "Tostadas Francesas con Frutas del Bosque"
+    },
+    "ing": {
+      "en": [
+        "8 slices whole-grain bread",
+        "4 eggs",
+        "1 cup milk",
+        "1 tsp cinnamon",
+        "1 tsp vanilla",
+        "1 tbsp butter",
+        "1 cup mixed berries (fresh or frozen)",
+        "½ cup Greek yogurt, to serve"
+      ],
+      "es": [
+        "8 rebanadas de pan integral",
+        "4 huevos",
+        "1 taza leche",
+        "1 cdita canela",
+        "1 cdita vainilla",
+        "1 cda manteca",
+        "1 taza frutas del bosque (frescas o congeladas)",
+        "½ taza yogur griego, para servir"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Whisk eggs, milk, cinnamon, and vanilla in a shallow dish.",
+        "Dip each slice of bread for a few seconds per side.",
+        "Cook in butter over medium heat, 2–3 min per side, until golden and set in the middle.",
+        "Serve topped with berries and a spoonful of yogurt.",
+        "Toddler tip: cut into fingers; mash the berries if they are large."
+      ],
+      "es": [
+        "Batir los huevos, la leche, la canela y la vainilla en una fuente baja.",
+        "Pasar cada rebanada de pan unos segundos por cada lado.",
+        "Cocinar en manteca a fuego medio, 2–3 min por lado, hasta que estén doradas y cocidas por dentro.",
+        "Servir con las frutas del bosque y una cucharada de yogur.",
+        "Consejo para pequeños: cortar en bastones; pisar las frutas si son grandes."
+      ]
+    },
+    "tip": {
+      "en": "Berries add vitamin C, which helps the body absorb the iron in eggs and whole grains.",
+      "es": "Las frutas del bosque aportan vitamina C, que ayuda a absorber el hierro del huevo y los cereales integrales."
+    }
+  },
+  {
+    "id": "peanut-butter-and-banana-toast",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "toast",
+      "nut-butter"
+    ],
+    "name": {
+      "en": "Peanut Butter & Banana Toast",
+      "es": "Tostadas con Mantequilla de Maní y Banana"
+    },
+    "ing": {
+      "en": [
+        "8 slices whole-grain bread",
+        "6 tbsp peanut butter",
+        "3 bananas, sliced",
+        "1 tsp cinnamon",
+        "2 cups milk, to drink"
+      ],
+      "es": [
+        "8 rebanadas de pan integral",
+        "6 cdas mantequilla de maní",
+        "3 bananas en rodajas",
+        "1 cdita canela",
+        "2 tazas leche, para tomar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Toast the bread.",
+        "Spread with peanut butter and top with banana slices.",
+        "Dust with cinnamon and serve with a glass of milk.",
+        "Toddler tip: spread the peanut butter thinly (thick globs are a choking risk) and cut into fingers."
+      ],
+      "es": [
+        "Tostar el pan.",
+        "Untar con mantequilla de maní y cubrir con rodajas de banana.",
+        "Espolvorear con canela y servir con un vaso de leche.",
+        "Consejo para pequeños: untar la mantequilla de maní en capa fina (los pegotes gruesos son riesgo de atragantamiento) y cortar en bastones."
+      ]
+    },
+    "tip": {
+      "en": "Quick, filling and kid-approved: protein and healthy fats from the peanut butter, potassium from the banana.",
+      "es": "Rápido, rendidor y aprobado por los chicos: proteína y grasas saludables del maní, potasio de la banana."
+    }
+  },
+  {
+    "id": "cream-cheese-and-strawberry-toast",
+    "type": "breakfast",
+    "group": "grain",
+    "tags": [
+      "toast"
+    ],
+    "name": {
+      "en": "Cream Cheese & Strawberry Toast",
+      "es": "Tostadas con Queso Crema y Frutillas"
+    },
+    "ing": {
+      "en": [
+        "8 slices whole-grain bread",
+        "200g cream cheese",
+        "2 cups strawberries, sliced",
+        "1 tbsp honey",
+        "2 oranges, to serve"
+      ],
+      "es": [
+        "8 rebanadas de pan integral",
+        "200 g queso crema",
+        "2 tazas frutillas en rodajas",
+        "1 cda miel",
+        "2 naranjas, para acompañar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Toast the bread.",
+        "Spread with cream cheese and top with strawberry slices.",
+        "Drizzle lightly with honey.",
+        "Serve with orange wedges.",
+        "Toddler tip: cut into small squares; no honey under 1."
+      ],
+      "es": [
+        "Tostar el pan.",
+        "Untar con queso crema y cubrir con las frutillas en rodajas.",
+        "Rociar con un poco de miel.",
+        "Servir con gajos de naranja.",
+        "Consejo para pequeños: cortar en cuadraditos; sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "Strawberries and oranges: a big dose of vitamin C to start the day.",
+      "es": "Frutillas y naranja: una gran dosis de vitamina C para empezar el día."
+    }
+  },
+  {
+    "id": "greek-yogurt-bowl-with-granola-and-fruit",
+    "type": "breakfast",
+    "group": "dairy",
+    "tags": [
+      "yogurt"
+    ],
+    "name": {
+      "en": "Greek Yogurt Bowl with Granola & Fruit",
+      "es": "Bowl de Yogur Griego con Granola y Fruta"
+    },
+    "ing": {
+      "en": [
+        "3 cups Greek yogurt",
+        "1 cup granola",
+        "2 bananas, sliced",
+        "1 cup strawberries, chopped",
+        "2 tbsp honey",
+        "2 tbsp chia seeds"
+      ],
+      "es": [
+        "3 tazas yogur griego",
+        "1 taza granola",
+        "2 bananas en rodajas",
+        "1 taza frutillas picadas",
+        "2 cdas miel",
+        "2 cdas semillas de chía"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Spoon yogurt into 4 bowls.",
+        "Top with banana, strawberries, granola, and chia seeds.",
+        "Drizzle with honey and serve right away so the granola stays crunchy.",
+        "Toddler tip: swap the granola for soft oats and skip the honey under 1."
+      ],
+      "es": [
+        "Repartir el yogur en 4 bols.",
+        "Cubrir con banana, frutillas, granola y chía.",
+        "Rociar con miel y servir enseguida para que la granola quede crocante.",
+        "Consejo para pequeños: cambiar la granola por avena blanda y sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "Greek yogurt is rich in calcium and protein — both important for baby’s bones.",
+      "es": "El yogur griego es rico en calcio y proteína — ambos importantes para los huesos del bebé."
+    }
+  },
+  {
+    "id": "vanilla-chia-pudding-with-mango",
+    "type": "breakfast",
+    "group": "dairy",
+    "name": {
+      "en": "Vanilla Chia Pudding with Mango",
+      "es": "Pudín de Chía con Vainilla y Mango"
+    },
+    "ing": {
+      "en": [
+        "½ cup chia seeds",
+        "2 cups milk",
+        "1 cup Greek yogurt",
+        "1 tsp vanilla",
+        "2 tbsp honey",
+        "1 mango, diced (or 1½ cups frozen mango)"
+      ],
+      "es": [
+        "½ taza semillas de chía",
+        "2 tazas leche",
+        "1 taza yogur griego",
+        "1 cdita vainilla",
+        "2 cdas miel",
+        "1 mango en cubos (o 1½ tazas de mango congelado)"
+      ]
+    },
+    "steps": {
+      "en": [
+        "The evening before: whisk chia seeds, milk, yogurt, vanilla, and honey.",
+        "Rest 10 min, whisk again to break up clumps, then cover and chill overnight.",
+        "In the morning, spoon into bowls and top with mango.",
+        "Toddler tip: blend the pudding smooth for little ones; no honey under 1."
+      ],
+      "es": [
+        "La noche anterior: batir la chía con la leche, el yogur, la vainilla y la miel.",
+        "Dejar reposar 10 min, volver a batir para deshacer los grumos, tapar y llevar a la heladera toda la noche.",
+        "A la mañana, servir en bols y cubrir con el mango.",
+        "Consejo para pequeños: licuar el pudín para que quede liso; sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "Chia seeds bring omega-3s, fibre, and calcium in a tiny package.",
+      "es": "Las semillas de chía aportan omega-3, fibra y calcio en un tamaño mínimo."
+    },
+    "prep": [
+      "chia-pudding"
+    ]
+  },
+  {
+    "id": "cheese-and-tomato-toasties",
+    "type": "breakfast",
+    "group": "dairy",
+    "tags": [
+      "toast"
+    ],
+    "name": {
+      "en": "Cheese & Tomato Toasties",
+      "es": "Tostados de Queso y Tomate"
+    },
+    "ing": {
+      "en": [
+        "8 slices whole-grain bread",
+        "200g cheddar cheese, sliced",
+        "2 tomatoes, sliced",
+        "1 tbsp butter",
+        "2 apples, to serve"
+      ],
+      "es": [
+        "8 rebanadas de pan integral",
+        "200 g queso cheddar en fetas",
+        "2 tomates en rodajas",
+        "1 cda manteca",
+        "2 manzanas, para acompañar"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Make 4 sandwiches with the cheese and tomato slices.",
+        "Butter the outsides lightly.",
+        "Toast in a pan over medium heat, pressing down, 3 min per side until golden and melted.",
+        "Cut into triangles; serve with apple slices.",
+        "Toddler tip: cut into small squares once cooled a little."
+      ],
+      "es": [
+        "Armar 4 sándwiches con las fetas de queso y las rodajas de tomate.",
+        "Untar apenas el exterior con manteca.",
+        "Tostar en sartén a fuego medio, presionando, 3 min por lado hasta que esté dorado y el queso derretido.",
+        "Cortar en triángulos; servir con gajos de manzana.",
+        "Consejo para pequeños: cortar en cuadraditos cuando se enfríe un poco."
+      ]
+    },
+    "tip": {
+      "en": "Choose pasteurised cheese during pregnancy — cheddar is a safe, calcium-rich pick.",
+      "es": "En el embarazo elegí quesos pasteurizados — el cheddar es una opción segura y rica en calcio."
+    }
+  },
+  {
+    "id": "berry-smoothie-bowl",
+    "type": "breakfast",
+    "group": "fruit",
+    "tags": [
+      "smoothie"
+    ],
+    "name": {
+      "en": "Berry Smoothie Bowl",
+      "es": "Smoothie Bowl de Frutas del Bosque"
+    },
+    "ing": {
+      "en": [
+        "2 cups frozen mixed berries",
+        "2 frozen bananas",
+        "1 cup Greek yogurt",
+        "1 cup milk",
+        "½ cup granola",
+        "1 kiwi, sliced",
+        "1 tbsp chia seeds"
+      ],
+      "es": [
+        "2 tazas frutas del bosque congeladas",
+        "2 bananas congeladas",
+        "1 taza yogur griego",
+        "1 taza leche",
+        "½ taza granola",
+        "1 kiwi en rodajas",
+        "1 cda semillas de chía"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Blend berries, bananas, yogurt, and milk until thick and smooth.",
+        "Pour into 4 bowls.",
+        "Top with granola, kiwi, and chia seeds; serve right away.",
+        "Toddler tip: serve as a thick smoothie in a cup, without the granola."
+      ],
+      "es": [
+        "Licuar las frutas del bosque, las bananas, el yogur y la leche hasta que quede espeso y liso.",
+        "Servir en 4 bols.",
+        "Cubrir con granola, kiwi y chía; servir enseguida.",
+        "Consejo para pequeños: servir como licuado espeso en vaso, sin la granola."
+      ]
+    },
+    "tip": {
+      "en": "Frozen fruit is picked ripe and keeps its vitamins — a colourful, antioxidant-rich start.",
+      "es": "La fruta congelada se cosecha madura y conserva sus vitaminas — un comienzo colorido y lleno de antioxidantes."
+    },
+    "prep": [
+      "freeze-bananas"
+    ]
+  },
+  {
+    "id": "banana-licuado-with-toast",
+    "type": "breakfast",
+    "group": "fruit",
+    "tags": [
+      "smoothie"
+    ],
+    "name": {
+      "en": "Banana Licuado with Toast",
+      "es": "Licuado de Banana con Tostadas"
+    },
+    "ing": {
+      "en": [
+        "3 ripe bananas",
+        "3 cups milk",
+        "1 tbsp honey",
+        "8 slices whole-grain bread",
+        "4 tbsp cream cheese"
+      ],
+      "es": [
+        "3 bananas maduras",
+        "3 tazas leche",
+        "1 cda miel",
+        "8 rebanadas de pan integral",
+        "4 cdas queso crema"
+      ]
+    },
+    "steps": {
+      "en": [
+        "Blend bananas, milk, and honey until frothy.",
+        "Toast the bread and spread with cream cheese.",
+        "Serve the licuado right away, with the toast on the side.",
+        "Toddler tip: serve in a cup with a lid; no honey under 1."
+      ],
+      "es": [
+        "Licuar las bananas con la leche y la miel hasta que haga espuma.",
+        "Tostar el pan y untar con queso crema.",
+        "Servir el licuado enseguida, con las tostadas al costado.",
+        "Consejo para pequeños: servir en vaso con tapa; sin miel antes del año."
+      ]
+    },
+    "tip": {
+      "en": "A classic, comforting breakfast: calcium from the milk and quick energy from the bananas.",
+      "es": "Un desayuno clásico y reconfortante: calcio de la leche y energía rápida de la banana."
+    }
+  },
   {
     "id": "chicken-stir-fry-rice-bowl",
     "type": "lunch",
@@ -3365,5 +4171,17 @@ const prepTasks = {
   "rub-ribs": {
     "en": "Rub the ribs with spices and shred the coleslaw veg (store dry)",
     "es": "Condimentar las costillas y rallar las verduras de la ensalada (guardarlas secas)"
+  },
+  "egg-muffins": {
+    "en": "Bake the egg & veggie muffins — they keep 3 days in the fridge",
+    "es": "Hornear los muffins de huevo y verduras — duran 3 días en la heladera"
+  },
+  "overnight-oats": {
+    "en": "Mix the overnight oats the evening before (they keep 2 days)",
+    "es": "Preparar la avena remojada la noche anterior (dura 2 días)"
+  },
+  "chia-pudding": {
+    "en": "Stir the chia pudding the evening before (it keeps 3 days)",
+    "es": "Preparar el pudín de chía la noche anterior (dura 3 días)"
   }
 };

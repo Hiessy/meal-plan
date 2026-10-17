@@ -2,20 +2,22 @@
 
 **Live:** https://hiessy.github.io/meal-plan/
 
-Weekly meal planner for a family of 4: **lunch, afternoon snack and dinner, Monday–Friday**.
+Weekly meal planner for a family of 4: **breakfast, lunch, afternoon snack and dinner, Monday–Friday**.
 Every week gets a balanced random menu drawn from the recipe list and dated with the real calendar.
 The recipes include pregnancy-friendly nutrition notes and toddler tips.
 
 ## Features
 
-- **A balanced random menu every week**: 5 lunches, 5 snacks and 5 dinners picked from 58 recipes.
-  - Each week aims for 2–3 fish meals, at least one vegetarian meal, at most 3 red-meat meals and
-    2–3 fruit snacks.
-  - Lunch and dinner on the same day differ in protein and starch.
+- **A balanced random menu every week**: 5 breakfasts, 5 lunches, 5 snacks and 5 dinners picked
+  from 74 recipes.
+  - Each week aims for 1–2 egg breakfasts, 2–3 fish meals, at least one vegetarian meal, at most
+    3 red-meat meals and 2–3 fruit snacks.
+  - Lunch and dinner on the same day differ in protein and starch, and an egg breakfast never
+    lands on the day of an egg lunch.
   - No recipe repeats within a week or from the week before. Similar dishes (two salmon dinners,
-    three soups…) are kept apart.
+    three soups, two pancake breakfasts…) are kept apart.
   - The draw is seeded by the week, so everyone who opens the page sees the same menu.
-  - A ⚖️ balance bar under each week shows its mix of proteins and snacks.
+  - A ⚖️ balance bar under each week shows its mix of breakfasts, proteins and snacks.
 - **Real dates**: the page shows this week and the next three. On Saturday and Sunday it starts
   with the coming week. Today's card is highlighted and past days fade.
 - **🎲 Shuffle** a whole week or **🔄 swap** one meal; both keep the week balanced.
@@ -65,15 +67,16 @@ quietly and without motion. `js/ui.js` sends `plan:*` events (listed at the top 
 ## Customising
 
 **Recipes**: add one to `data/recipes.js` by copying a recipe of the same type and editing it.
-- Fill in its balance facts: `protein` and `base` for lunches and dinners, `group` for snacks, and
-  optional `tags` for similar dishes. The comment at the top of the file explains each one.
+- Fill in its balance facts: `protein` and `base` for lunches and dinners, `group` for breakfasts
+  and snacks, and optional `tags` for similar dishes. The comment at the top of the file explains
+  each one.
 - Keep every recipe self-contained, because any recipe can land on any day. Avoid lines like
   "leftover chicken from Monday".
 - Keep at least 5 recipes of each type.
 - Changing the list reshuffles the menus.
 
 **Balance rules**: edit `RULES` at the top of `js/planner.js`. For example, change `fish: [2, 3]`
-to `[3, 4]` for more fish.
+to `[3, 4]` for more fish, or `egg: [1, 2]` under `breakfasts` for more egg breakfasts.
 
 **Shopping list**: each English ingredient line is matched against `data/ingredients.js` from top
 to bottom. The first match decides which row it joins. Lines that match nothing are listed under

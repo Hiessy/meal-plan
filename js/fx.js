@@ -91,12 +91,12 @@
 
   /* ── The sounds ───────────────────────────────────────────── */
   // C major pentatonic from C5: any notes in a row sound good together
-  const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 1567.98, 1760];
+  const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 1567.98, 1760, 2093, 2349.32];
 
   const sounds = {
     // hovers — quiet, short
-    meal: k => {                          // each meal of the week its own note
-      const f = SCALE[Math.floor(k / 3) + (k % 3) * 2] || SCALE[0];
+    meal: (day, slot) => {                // each meal of the week its own note
+      const f = SCALE[Math.min(day + slot * 2, SCALE.length - 1)];
       tone(f, { dur: 0.3, vol: 0.05 });
       tone(f * 2, { dur: 0.14, vol: 0.012 });
     },
@@ -152,7 +152,7 @@
 
   /* ── Hover sounds (mouse and pen; touch has no hover) ─────── */
   const HOVERS = [
-    ['.meal-slot', el => sounds.meal(+el.dataset.k || 0)],
+    ['.meal-slot', el => sounds.meal(+el.dataset.day || 0, +el.dataset.slot || 0)],
     ['.tab-btn',   () => sounds.tab()],
     ['.check',     () => sounds.row()],
     ['button',     () => sounds.button()]
