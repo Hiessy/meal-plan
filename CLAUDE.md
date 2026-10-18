@@ -47,10 +47,12 @@ above it. The README has the full table.
     for breakfasts and snacks, and optional `tags`.
   - Recipes must be self-contained, with no "leftovers" or "made on Sunday" ingredients, because
     any recipe can land on any day.
-  - Make-ahead work goes in `prep`, as keys of `prepTasks`.
-  - `experimental: true` marks a new, not yet family-tested recipe. Its meal-type badge shows
-    `FLASK` from `ui.js`, a pixel Erlenmeyer flask; `fx.css` cycles its colour and floats its
-    bubbles. `RULES.experimental` caps how many land in a week.
+  - Make-ahead work goes in `prep`, as keys of `prepTasks`. Task texts stay generic ("Marinate
+    the meat the night before…"), because the prep card names the dishes under each task.
+    Washing and chopping is not a key: `Lists.prep` lists the week's vegetables itself.
+  - `experimental: true` marks a new, not yet family-tested recipe. A separate `.exp-badge` next
+    to the meal-type badge (never inside it) shows `FLASK` from `ui.js`, a pixel Erlenmeyer flask;
+    `fx.css` cycles its colour and floats its bubbles. `RULES.experimental` caps them at one a week.
 - `Planner.configure({ exclude, experimental, allow })` narrows the pools the draw uses. The UI
   calls it with the visitor's saved choices from the recipe panel (left-out recipes, countries,
   AI-created, blood types, ages) and the Use-experimental checkbox, so those choices change that
@@ -70,10 +72,13 @@ above it. The README has the full table.
 - A menu is 20 recipe ids, day by day in `Planner.TYPES` order (breakfast, lunch, snack, dinner);
   slot k is day `Math.floor(k / Planner.SLOTS)`.
 - In `js/planner.js`, menus are seeded by week number counted from `EPOCH` (2026-10-05). Each week
-  avoids the two before it, so a page load computes every week since `EPOCH`, at about a
-  millisecond per week. Changing the recipes, `RULES` or `EPOCH` changes every menu. A quick check
-  is to run a script that loads `data/recipes.js` and `js/planner.js` in Node and checks
-  `Planner.cost(Planner.baseMenu(n)) === 0` over a few hundred weeks.
+  avoids the three before it (the page shows four), so a page load computes every week since
+  `EPOCH`, at about a millisecond per week. Shuffles and swaps avoid the three weeks either side.
+  Changing the recipes, `RULES` or `EPOCH` changes every menu.
+- Run `node tools/check-weeks.js [weeks]` after changing recipes, prep tasks, the dictionary or
+  the planner. It checks balance (`Planner.cost === 0`), repeats, the experimental cap, that every
+  ingredient line lands on the shopping list once, that amounts add up the same in both languages,
+  and that each prep task fits its recipes (`fits` in the script) and lists only that week's meals.
 - When a CSS or JS file changes, bump the `?v=` query on its tag in `index.html` so Pages caches refresh.
 - To test locally, run `python -m http.server 8123` and open `http://localhost:8123/`. Add
   `?date=YYYY-MM-DD` to preview another date; saved data is not pruned while previewing.

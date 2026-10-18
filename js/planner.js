@@ -41,12 +41,12 @@ const Planner = (() => {
       group: { fruit: [2, 3], dairy: [1, 2], veg: [0, 2], grain: [0, 2] }
     },
     tagCap: { soup: 2, toast: 2, tortilla: 2 }, // any other tag: at most once a week
-    experimental: [0, 2],                      // new, not yet family-tested recipes
-    recentWeeks: 2                             // stay away from the last two weeks' recipes
+    experimental: [0, 1],                      // new, not yet family-tested recipes
+    recentWeeks: 3                             // stay away from the last three weeks' recipes (the page shows four)
   };
 
   /* What breaking each rule costs; the cheapest week wins */
-  const COST = { rule: 10, lastWeek: 8, earlierWeek: 4, sameDay: 3 };
+  const COST = { rule: 10, lastWeek: 8, earlierWeek: 6, sameDay: 3 };
   const ATTEMPTS = 12;
 
   const byId = Object.fromEntries(recipes.map(r => [r.id, r]));
@@ -222,7 +222,7 @@ const Planner = (() => {
 
   /* ── Weeks ─────────────────────────────────────────────────── */
   // Weeks are numbered from this Monday and week n always draws the same
-  // menu. Each week depends on the two before it, so a page load works
+  // menu. Each week depends on the three before it, so a page load works
   // through every week since then (about a millisecond each).
   const EPOCH = new Date(2026, 9, 5);
   const weekNumber   = monday => Math.round((monday - EPOCH) / 6048e5);
@@ -243,7 +243,7 @@ const Planner = (() => {
   }
 
   /* ── Changing a week ───────────────────────────────────────── */
-  // A fresh balanced menu that keeps away from the neighbouring weeks
+  // A fresh balanced menu that keeps away from the other weeks on screen
   const shuffleMenu = (seed, neighbours) => draw(seed, avoiding(neighbours));
 
   // Replaces slot k with the recipe that keeps the week most balanced

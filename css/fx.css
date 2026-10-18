@@ -376,7 +376,7 @@ header .px-pan { right: 7%; }
   @media (hover: hover) {
     header .px:hover { translate: 0 -3px; transition: translate .15s; }
   }
-  .meal-slot:hover .badge-exp .flask { animation: fx-flask .9s ease-in-out infinite; }
+  .meal-slot:hover .exp-badge .flask { animation: fx-flask .9s ease-in-out infinite; }
   /* The experimental flask: the liquid changes colour and bubbles float out of the neck */
   .flask .fl-liquid { animation: fl-colors 7.5s linear infinite; }
   .flask .fl-bub { animation: fl-bub 1.8s ease-in infinite; animation-delay: calc(var(--i) * -.36s); }

@@ -129,12 +129,15 @@ function fmtPlanRange() {
 const isoOfWeek = num => isoDate(Planner.mondayOfWeek(num));
 const savedMenu = iso => Planner.isMenu(store.menus[iso]) ? store.menus[iso] : null;
 const menuOf    = num => savedMenu(isoOfWeek(num)) || Planner.baseMenu(num);
-const neighbours = num => [menuOf(num - 1), menuOf(num + 1)];
+// The weeks a shuffle or swap stays away from: three either side, so
+// no recipe repeats among the four weeks on screen
+const neighbours = num => [-3, -2, -1, 1, 2, 3].map(d => menuOf(num + d));
 const newSeed   = () => Math.floor(Math.random() * 4294967296);
 
 function weekMeals(w) {
   return menuOf(w.num).map((id, k) => ({ recipe: Planner.recipe(id), di: Math.floor(k / Planner.SLOTS), k }));
 }
+const lowerFirst = text => text.charAt(0).toLowerCase() + text.slice(1);
 const mealLabel = m => t('daysShort')[m.di] + ' · ' + t('mealTypes')[m.recipe.type].label;
 
 function shuffleWeek(n) {
@@ -294,7 +297,7 @@ function renderModal() {
 
   byId('m-name').textContent = d.name[lang];
   byId('m-meta').innerHTML =
-    `<span class="meal-badge badge-${d.type}${d.experimental ? ' badge-exp' : ''}">${d.experimental ? FLASK : mt.icon} ${mt.label}</span>` +
+    `<span class="meal-badge badge-${d.type}">${mt.icon} ${mt.label}</span>` +
     `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>` +
     (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">${FLASK} ${t('experimental')}</span>` : '') +
     `<span class="origin-chip">${originHtml(d, true)}</span>`;
@@ -1068,7 +1071,8 @@ function buildWeek(n) {
       ].filter(Boolean).join('\n');
       return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}"
         data-day="${di}" data-slot="${slot}" data-type="${recipe.type}" data-facets="${facetsOf(recipe)}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
-        <span class="meal-badge badge-${recipe.type}${recipe.experimental ? ' badge-exp' : ''}">${recipe.experimental ? FLASK : mt.icon} ${mt.label}</span>
+        <span class="slot-tags"><span class="meal-badge badge-${recipe.type}">${mt.icon} ${mt.label}</span>${recipe.experimental
+          ? `<span class="exp-badge" aria-label="${esc(t('experimental'))}">${FLASK}</span>` : ''}</span>
         <span class="meal-name">${recipe.name[lang]} ${originHtml(recipe)}</span>
         <span class="chev" aria-hidden="true">›</span>
       </button>`;
@@ -1082,8 +1086,11 @@ function buildWeek(n) {
 
   const prepHtml = tasks.map(task => {
     const key = `p:${w.iso}:${task.key}`;
-    const forText = task.meals.length
-      ? `<small class="task-for">${t('prepFor')} ${task.meals.map(mealLabel).join(', ')}</small>` : '';
+    // Chopping lists the week's vegetables; every other task, its dishes
+    const forText = task.key === 'chop-veg'
+      ? `<small class="task-for">${task.items.map((row, i) => i ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ')}</small>`
+      : `<small class="task-for">${task.meals.map(m =>
+          `<span class="task-meal">${mealLabel(m)} — <b>${esc(m.recipe.name[lang])}</b></span>`).join('')}</small>`;
     return `<li><label class="check" data-tip="${esc(t('tipPrep'))}">
       <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
       <span>${prepTasks[task.key][lang]}${forText}</span>

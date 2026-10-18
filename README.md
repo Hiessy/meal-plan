@@ -16,13 +16,14 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     Oceania.
   - **✨ 1,844 AI-created recipes**: original dishes invented by Claude, such as chimichurri
     salmon with crispy potatoes, yerba mate-crusted chicken or dulce de leche BBQ halloumi wraps.
-    They count as experimental, so at most two land in a week; the **AI-created recipes** filter
+    They count as experimental, so at most one lands in a week; the **AI-created recipes** filter
     turns them off.
   - Each week aims for 1–2 egg breakfasts, 2–3 fish meals, at least one vegetarian meal, at most
     3 red-meat meals and 2–3 fruit snacks.
   - Lunch and dinner on the same day differ in protein and starch, and an egg breakfast never
     lands on the day of an egg lunch.
-  - No recipe repeats within a week or from the week before. Similar dishes (two salmon dinners,
+  - No recipe repeats within a week or across the four weeks on screen, shuffles and swaps
+    included (unless the recipe choices leave too few). Similar dishes (two salmon dinners,
     three soups, two pancake breakfasts…) are kept apart.
   - The draw is seeded by the week, so everyone who opens the page sees the same menu.
   - A ⚖️ balance bar under each week shows its mix of breakfasts, proteins and snacks.
@@ -30,10 +31,10 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     rest fade. Pick several at once; **✕ Show all** clears them.
 - **Experimental recipes**: 12 of the recipes are new ideas the family hasn't tried yet, like
   cauliflower-crust pizza, rice-paper rolls and avocado chocolate mousse.
-  - When one comes up, its meal-type badge turns purple with a pixel Erlenmeyer flask, and the
-    tooltip says it is experimental. The flask bubbles, and its liquid cycles through red, blue,
+  - When one comes up, a purple badge with a pixel Erlenmeyer flask sits next to its meal type,
+    and the tooltip says it is experimental. The flask bubbles, and its liquid cycles through red, blue,
     green, purple and orange.
-  - At most two land in a week. Untick **Use experimental recipes** to leave them out.
+  - At most one lands in a week. Untick **Use experimental recipes** to leave them out.
 - **📖 Choose the recipes**: the Recipes button lists every recipe, grouped by meal type, with a
   search box and All/None per group. Untick any you don't want and the menus are drawn again from
   the rest. The choice is saved in the browser, so other devices keep the shared menu.
@@ -58,7 +59,9 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
 - **⇄ Substitutes**: hover an ingredient in a recipe or in the shopping list (press and hold on a
   phone) to see what to use instead. For example tuna → trout or salmon, spinach → Swiss chard
   (acelga), milk → oat, almond or soy milk.
-- **Sunday prep**: the make-ahead tasks of that week's recipes, each with the meals it is for.
+- **Sunday prep**: the make-ahead tasks of that week's recipes, each naming the dishes it is for,
+  plus washing and chopping the week's vegetables. `node tools/check-weeks.js` checks that the
+  prep and the shopping list match every week's meals.
 - **Shopping list built from the week's meals**:
   - one row per ingredient, with the amounts added up
   - grouped by aisle

@@ -68,6 +68,9 @@ const Lists = (() => {
           bunch: ['atado', 'atados'], slice: ['rebanada', 'rebanadas'], sprig: ['rama', 'ramas'] }
   };
 
+  // Units that can come after the ingredient: "3 garlic cloves"
+  const UNIT_AFTER = new Set(['clove', 'stalk', 'head', 'sprig', 'bunch']);
+
   // "1½ cups broccoli florets" → { qty: 1.5, unit: 'cup' } · "Salt" → null
   function parseAmount(text, lang) {
     let s = text.trim().replace(/^(juice of|jugo de)\s+/i, '');
@@ -75,7 +78,9 @@ const Lists = (() => {
     if (!m[1] && !m[2]) return null;
     const qty = (m[1] ? parseFloat(m[1].replace(',', '.')) : 0) + (m[2] ? FRACTIONS[m[2]] : 0);
     s = s.slice(m[0].length).trim();
-    const hit = UNIT_WORDS[lang].find(([, re]) => re.test(s));
+    const after = s.replace(/^\S+\s+/, '');
+    const hit = UNIT_WORDS[lang].find(([, re]) => re.test(s)) ||
+                UNIT_WORDS[lang].find(([unit, re]) => UNIT_AFTER.has(unit) && re.test(after));
     const unit = hit ? hit[0] : '';
     if (unit === 'kg') return { qty: qty * 1000, unit: 'g' };
     if (unit === 'l') return { qty: qty * 1000, unit: 'ml' };
@@ -115,21 +120,33 @@ const Lists = (() => {
       if (same) same.qty += a.qty;
       else totals.push({ qty: a.qty, unit: a.unit });
     });
+    // Pounds and grams in one row: add the pounds to the grams
+    const lb = totals.find(x => x.unit === 'lb'), g = totals.find(x => x.unit === 'g');
+    if (lb && g) { g.qty += lb.qty * 453.6; totals.splice(totals.indexOf(lb), 1); }
     return { text: totals.map(total => fmtAmount(total, row.entry.each, lang)).join(' + '), partial: partial && totals.length > 0 };
   }
 
   /* ── Sunday prep ───────────────────────────────────────────── */
+  // Fresh vegetables that are not washed and chopped ahead
+  const NOT_CHOPPED = new Set(['peas', 'corn', 'edamame', 'avocados', 'coleslaw-mix']);
+
   // The make-ahead tasks of the week's recipes, each once, with the
-  // meals that need it; washing and chopping always comes first
+  // meals that need it, in the order of prepTasks. Washing and chopping
+  // comes first, with the week's vegetables as its `items` (shopping rows).
   function prep(meals) {
-    const tasks = [{ key: 'chop-veg', meals: [] }];
+    const order = Object.keys(prepTasks), tasks = new Map();
+    const task = key => tasks.get(key) || tasks.set(key, { key, meals: [], items: [] }).get(key);
+    shopping(meals).forEach(row => {
+      if (row.cat !== 'Vegetables' || row.entry.kind === 'spice' || NOT_CHOPPED.has(row.key)) return;
+      const chop = task('chop-veg');
+      chop.items.push(row);
+      mealsOf(row).forEach(meal => { if (!chop.meals.includes(meal)) chop.meals.push(meal); });
+    });
     meals.forEach(meal => (meal.recipe.prep || []).forEach(key => {
-      if (!prepTasks[key]) return;
-      let task = tasks.find(x => x.key === key);
-      if (!task) tasks.push(task = { key, meals: [] });
-      task.meals.push(meal);
+      if (prepTasks[key] && key !== 'chop-veg' && !task(key).meals.includes(meal)) task(key).meals.push(meal);
     }));
-    return tasks;
+    tasks.forEach(t => t.meals.sort((a, b) => a.k - b.k));
+    return [...tasks.values()].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
   }
 
   return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, substitute, entryFor: ingredientFor };

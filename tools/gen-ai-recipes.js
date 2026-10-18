@@ -56,7 +56,7 @@ const STYLES = {
         : L(`Toss ${p.the.en} and ${v.the.en} with half the sauce and a little oil and roast at 200°C for ${p.roast} min.`,
             `Mezclá ${p.the.es} y ${v.the.es} con la mitad de la salsa y un poco de aceite y asá a 200°C ${p.roast} min.`),
       b.cook, serveWith(b)] },
-  stew: { type: 'dinner', quota: 120, ok: (p, f, b, v) => f.stew && p.simmer && v.simmer, tags: ['stew'], prep: ['chop-veg'],
+  stew: { type: 'dinner', quota: 120, ok: (p, f, b, v) => f.stew && p.simmer && v.simmer, tags: ['stew'],
     name: (p, f, b, v) => L(`${f.en} ${p.en} & ${v.en} Stew with ${b.en}`, `Guiso de ${p.es} y ${v.es} ${f.es} con ${b.es}`),
     ing: f => f.stewIng,
     steps: (p, f, b, v) => [f.stew, p.simmer, L(`Add ${v.the.en} for the last ${v.simmer} min.`, `Sumá ${v.the.es} los últimos ${v.simmer} min.`),
@@ -98,7 +98,7 @@ const STYLES = {
       p.roast ? L(`Roast ${p.the.en} with half the sauce at 200°C for ${p.roast} min.`, `Asá ${p.the.es} con la mitad de la salsa a 200°C ${p.roast} min.`) : p.pan,
       vegStep(v, vegHow(v, ['roast', 'raw'])), b.cook,
       L(`Fill the breads with ${p.the.en} and ${v.the.en}, add the sauce and roll up.`, `Rellená los panes con ${p.the.es} y ${v.the.es}, sumá la salsa y enrollá.`)] },
-  soup: { type: 'lunch', quota: 60, ok: (p, f, b, v) => f.stew && p.soup && v.simmer, tags: ['soup'], prep: ['chop-veg'],
+  soup: { type: 'lunch', quota: 60, ok: (p, f, b, v) => f.stew && p.soup && v.simmer, tags: ['soup'],
     name: (p, f, b, v) => b.key === 'soup-plain'
       ? L(`${f.en} ${p.en} & ${v.en} Soup`, `Sopa de ${p.es} y ${v.es} ${f.es}`)
       : L(`${f.en} ${p.en} & ${v.en} Soup with ${b.en}`, `Sopa de ${p.es} y ${v.es} ${f.es} con ${b.es}`),
@@ -144,7 +144,7 @@ function mains() {
       if (usedTriple.has(pf) || (usedPF[triple] || 0) >= 3) continue;
       const ing = [...f.ing, ...(S.ing ? S.ing(f, p) : []), ...p.ing, v.ing, ...b.ing];
       const prep = [...(S.prep || [])];
-      if (b.key === 'rice' || b.key === 'coconut-rice') prep.push('rice');
+      if (b.key === 'rice') prep.push('rice');           // coconut rice is cooked in its sauce
       if (b.key === 'quinoa') prep.push('quinoa');
       const ok = add({ type: S.type, protein: p.fact, base: b.fact, tags: [...(S.tags || []), 'ai-' + f.key],
         name: S.name(p, f, b, v), ing, steps: S.steps(p, f, b, v).filter(Boolean), prep });
@@ -421,7 +421,7 @@ function snacks() {
       steps: [L('Cut the fruit into chunks.', 'Cortá la fruta en trozos.'), L('Thread onto skewers, alternating colours.', 'Ensartá en los palitos alternando colores.'),
         L('Squeeze lime over just before serving.', 'Exprimí lima por encima justo antes de servir.')] }); }));
   done('frozen-bites', pickQuota(cross(['banana', 'strawberry', 'mango', 'berries', 'kiwi', 'peach', 'pineapple'], ['coconut', 'granola', 'seeds', 'chia']), 20,
-    (fk, tk) => { const f = F(fk), t = T(tk); return add({ type: 'snack', group: 'fruit', tags: ['frozen'],
+    (fk, tk) => { const f = F(fk), t = T(tk); return add({ type: 'snack', group: 'fruit', tags: ['frozen'], prep: ['chill-ahead'],
       name: L(`Frozen ${f.en} Yogurt Bites with ${t.en}`, `Bocaditos helados de yogur y ${f.es} con ${t.es}`),
       ing: [f.ing, L('1½ cups plain yogurt', '1½ tazas yogur natural'), t.ing],
       steps: [L(`Fold ${f.the.en} into the yogurt.`, `Incorporá ${f.the.es} al yogur.`), L('Spoon small mounds onto a lined tray and sprinkle with the topping.', 'Formá montoncitos sobre una placa con papel y espolvoreá con el topping.'),
@@ -496,7 +496,7 @@ function snacks() {
       steps: [L('Mix the vegetable, cheese, eggs and breadcrumbs.', 'Mezclá la verdura, el queso, los huevos y el pan rallado.'), L('Shape small patties on a lined tray.', 'Formá medallones chicos sobre una placa con papel.'), L('Bake at 200°C for 20 min, turning once.', 'Horneá a 200°C 20 min, dando vuelta una vez.')] }); }));
   // Dairy
   done('yogurt-bark', pickQuota(cross(['strawberry', 'berries', 'mango', 'kiwi', 'banana', 'peach', 'pineapple'], ['granola', 'coconut', 'seeds', 'walnuts', 'chia']), 20,
-    (fk, tk) => { const f = F(fk), t = T(tk); return add({ type: 'snack', group: 'dairy', tags: ['yogurt', 'frozen'],
+    (fk, tk) => { const f = F(fk), t = T(tk); return add({ type: 'snack', group: 'dairy', tags: ['yogurt', 'frozen'], prep: ['yogurt-bark'],
       name: L(`${f.en} Yogurt Bark with ${t.en}`, `Placa helada de yogur con ${f.es} y ${t.es}`),
       ing: [L('2 cups plain yogurt', '2 tazas yogur natural'), L('1 tbsp honey', '1 cda miel'), f.ing, t.ing],
       steps: [L('Spread the yogurt mixed with honey 1 cm thick on a lined tray.', 'Esparcí el yogur con miel en una placa con papel, de 1 cm de alto.'), L(`Scatter ${f.the.en} and the ${low(t.en)} over.`, `Repartí ${f.the.es} y ${t.es} por encima.`), L('Freeze 3 hours and break into pieces.', 'Congelá 3 horas y partí en trozos.')] }); }));
@@ -547,7 +547,7 @@ function snacks() {
     name: L(`${m[0].en} ${flour === 'oat' ? 'Oat ' : 'Wholemeal '}Muffins`, `Muffins ${flour === 'oat' ? 'de avena' : 'integrales'} de ${m[0].es}`),
     ing: [flour === 'oat' ? L('1½ cups oat flour or blended oats', '1½ tazas harina de avena o avena procesada') : L('1½ cups wholemeal flour', '1½ tazas harina integral'),
       L('2 eggs', '2 huevos'), L('½ cup milk', '½ taza leche'), L('3 tbsp sunflower oil', '3 cdas aceite de girasol'), L('2 tsp baking powder', '2 cditas polvo para hornear'), ...m[1]],
-    steps: [L('Whisk the eggs, milk and oil; stir in the flavourings.', 'Batí los huevos, la leche y el aceite; sumá los sabores.'), L('Fold in the flour and baking powder.', 'Incorporá la harina y el polvo de hornear.'), L('Fill a 12-cup tin and bake at 180°C for 20 min.', 'Llená una placa de 12 muffins y horneá a 180°C 20 min.')], prep: ['muffins'] })));
+    steps: [L('Whisk the eggs, milk and oil; stir in the flavourings.', 'Batí los huevos, la leche y el aceite; sumá los sabores.'), L('Fold in the flour and baking powder.', 'Incorporá la harina y el polvo de hornear.'), L('Fill a 12-cup tin and bake at 180°C for 20 min.', 'Llená una placa de 12 muffins y horneá a 180°C 20 min.')], prep: ['bake-ahead'] })));
   const BAR = [[L('Apple-Cinnamon', 'manzana y canela'), [L('1 apple, grated', '1 manzana rallada'), L('1 tsp cinnamon', '1 cdita canela')]], [L('Banana-Peanut', 'banana y maní'), [L('2 bananas', '2 bananas'), L('3 tbsp peanut butter', '3 cdas mantequilla de maní')]],
     [L('Berry', 'frutos rojos'), [L('1 cup mixed berries', '1 taza frutos rojos')]], [L('Date-Coconut', 'dátiles y coco'), [L('6 dates, chopped', '6 dátiles picados'), L('3 tbsp desiccated coconut', '3 cdas coco rallado')]],
     [L('Apricot-Seed', 'orejones y semillas'), [L('½ cup dried apricots, chopped', '½ taza orejones picados'), L('3 tbsp sunflower seeds', '3 cdas semillas de girasol')]], [L('Cocoa-Banana', 'cacao y banana'), [L('2 bananas', '2 bananas'), L('2 tbsp cocoa powder', '2 cdas cacao en polvo')]],
@@ -585,7 +585,7 @@ fs.writeFileSync(path.join(root, 'data/recipes-ai.js'), `/* ====================
    (AI): proteins, sauces, sides and cooking styles from around the
    world put together in new ways. They are not traditional dishes.
    Each has ai: true and experimental: true (an Erlenmeyer flask, at
-   most two a week), and the "AI-created recipes" filter turns them
+   most one a week), and the "AI-created recipes" filter turns them
    on and off. Same fields as data/recipes.js; no country.
    ============================================================ */
 recipes.push(

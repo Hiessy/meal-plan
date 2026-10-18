@@ -29,7 +29,7 @@
    country : where the dish comes from, an ISO code of data/countries.js.
              Everyday dishes common in Argentine homes count as 'AR'.
    experimental : true for a new, not yet family-tested recipe — shown
-             with an Erlenmeyer flask; at most two land in a week
+             with an Erlenmeyer flask; at most one lands in a week
    ai      : true for an original recipe invented by AI (in
              data/recipes-ai.js; they are experimental too)
 
@@ -1115,7 +1115,7 @@ const recipes = [
       "es": "Se hornean una vez y rinden dos desayunos — duran 3 días en lata o se congelan."
     },
     "prep": [
-      "blueberry-muffins"
+      "bake-ahead"
     ]
   },
   {
@@ -1309,7 +1309,7 @@ const recipes = [
       "es": "Ideal para usar bananas muy maduras — dura 4 días envuelto."
     },
     "prep": [
-      "banana-bread"
+      "bake-ahead"
     ]
   },
   {
@@ -1870,7 +1870,7 @@ const recipes = [
       "es": ""
     },
     "prep": [
-      "marinate-chicken",
+      "marinate",
       "rice"
     ]
   },
@@ -2809,7 +2809,7 @@ const recipes = [
       "es": "¡Rico en hierro y reconfortante — ideal para un día con mucha actividad!"
     },
     "prep": [
-      "beef-stew",
+      "cook-ahead",
       "rice"
     ]
   },
@@ -4956,7 +4956,7 @@ const recipes = [
       "es": "¡Estos muffins son naturalmente dulces, perfectos para el bebé, y una merienda nutritiva para todos. La avena también aporta hierro!"
     },
     "prep": [
-      "muffins"
+      "bake-ahead"
     ]
   },
   {
@@ -6002,7 +6002,7 @@ const recipes = [
       "es": "Endulzadas casi solo con banana — mucha menos azúcar que las compradas."
     },
     "prep": [
-      "oat-cookies"
+      "bake-ahead"
     ]
   },
   {
@@ -6566,9 +6566,7 @@ const recipes = [
       "en": "",
       "es": ""
     },
-    "prep": [
-      "marinate-pork-chops"
-    ]
+    "prep": []
   },
   {
     "id": "hearty-beef-stew-with-bread",
@@ -6638,7 +6636,7 @@ const recipes = [
       "es": "El guiso de carne es una de las mejores cenas ricas en hierro — carne roja + verduras en un plato reconfortante y nutritivo."
     },
     "prep": [
-      "beef-stew"
+      "cook-ahead"
     ]
   },
   {
@@ -7301,7 +7299,7 @@ const recipes = [
       "es": "Colorido, nutritivo y naturalmente dulce. ¡Una cena hermosa!"
     },
     "prep": [
-      "marinate-pork-tenderloin"
+      "marinate"
     ]
   },
   {
@@ -8863,8 +8861,8 @@ const recipes = [
 /* Make-ahead tasks — listed once per week, with the meals that need them */
 const prepTasks = {
   "chop-veg": {
-    "en": "Wash and chop the week’s vegetables; store them in containers",
-    "es": "Lavar y picar las verduras de la semana; guardarlas en recipientes"
+    "en": "Wash and chop the vegetables; store them in containers",
+    "es": "Lavar y picar las verduras; guardarlas en recipientes"
   },
   "cook-chicken": {
     "en": "Cook chicken to shred or slice — roast or poach 2–3 breasts, or a whole chicken",
@@ -8879,83 +8877,75 @@ const prepTasks = {
     "es": "Cocinar una olla de quinoa"
   },
   "brown-beef": {
-    "en": "Brown the ground beef",
-    "es": "Dorar la carne picada"
+    "en": "Brown the ground beef (it keeps 3 days in the fridge)",
+    "es": "Dorar la carne picada (dura 3 días en la heladera)"
   },
-  "marinate-chicken": {
-    "en": "Marinate the chicken thighs in soy sauce, garlic, and ginger",
-    "es": "Marinar los muslos de pollo en salsa de soja, ajo y jengibre"
-  },
-  "marinate-pork-chops": {
-    "en": "Marinate the pork chops in garlic, thyme, and olive oil",
-    "es": "Marinar las chuletas de cerdo en ajo, tomillo y aceite de oliva"
-  },
-  "marinate-pork-tenderloin": {
-    "en": "Marinate the pork tenderloin in rosemary, garlic, and olive oil",
-    "es": "Marinar el lomo de cerdo en romero, ajo y aceite de oliva"
+  "cook-ahead": {
+    "en": "Cook the slow dishes ahead — stews and braises taste even better the next day",
+    "es": "Cocinar de antemano lo que lleva horas — los guisos y braseados quedan aún más ricos al día siguiente"
   },
   "roast-veg": {
     "en": "Roast a tray of zucchini, bell peppers, and cherry tomatoes",
     "es": "Asar una bandeja de zapallitos, morrones y tomates cherry"
   },
-  "beef-stew": {
-    "en": "Cook the beef stew ahead — it tastes even better the next day",
-    "es": "Cocinar el guiso de carne de antemano — al día siguiente queda aún más rico"
+  "roast-pumpkin": {
+    "en": "Roast the pumpkin until soft and mash it (it keeps 3 days)",
+    "es": "Asar el zapallo hasta que esté tierno y pisarlo (dura 3 días)"
   },
-  "freeze-bananas": {
-    "en": "Freeze peeled banana halves in bags for smoothies",
-    "es": "Congelar mitades de banana peladas en bolsas para los batidos"
-  },
-  "muffins": {
-    "en": "Bake the banana oat muffins — they keep all week",
-    "es": "Hornear los muffins de banana y avena — duran toda la semana"
-  },
-  "rub-ribs": {
-    "en": "Rub the ribs with spices and shred the coleslaw veg (store dry)",
-    "es": "Condimentar las costillas y rallar las verduras de la ensalada (guardarlas secas)"
+  "bake-ahead": {
+    "en": "Bake ahead — they keep 3–4 days in a closed tin",
+    "es": "Hornear de antemano — duran 3–4 días en un recipiente cerrado"
   },
   "egg-muffins": {
-    "en": "Bake the egg & veggie muffins — they keep 3 days in the fridge",
-    "es": "Hornear los muffins de huevo y verduras — duran 3 días en la heladera"
+    "en": "Bake the egg muffins — they keep 3 days in the fridge",
+    "es": "Hornear los muffins de huevo — duran 3 días en la heladera"
   },
-  "overnight-oats": {
-    "en": "Mix the overnight oats the evening before (they keep 2 days)",
-    "es": "Preparar la avena remojada la noche anterior (dura 2 días)"
-  },
-  "chia-pudding": {
-    "en": "Stir the chia pudding the evening before (it keeps 3 days)",
-    "es": "Preparar el pudín de chía la noche anterior (dura 3 días)"
-  },
-  "blueberry-muffins": {
-    "en": "Bake the blueberry oat muffins (they keep 3 days)",
-    "es": "Hornear los muffins de avena y arándanos (duran 3 días)"
-  },
-  "banana-bread": {
-    "en": "Bake the banana bread — it keeps 4 days wrapped",
-    "es": "Hornear el budín de banana — dura 4 días envuelto"
-  },
-  "arroz-con-leche": {
-    "en": "Cook the arroz con leche and chill it",
-    "es": "Preparar el arroz con leche y enfriarlo"
-  },
-  "banana-pops": {
-    "en": "Dip and freeze the yogurt banana pops",
-    "es": "Bañar y congelar las paletas de banana"
+  "energy-balls": {
+    "en": "Roll the energy balls (they keep a week)",
+    "es": "Armar las bolitas energéticas (duran una semana)"
   },
   "apple-chips": {
     "en": "Bake the apple chips (low oven, about 2 hours)",
     "es": "Hornear los chips de manzana (horno bajo, unas 2 horas)"
   },
+  "freeze-bananas": {
+    "en": "Freeze peeled banana halves in bags for smoothies",
+    "es": "Congelar mitades de banana peladas en bolsas para los batidos"
+  },
+  "banana-pops": {
+    "en": "Dip and freeze the yogurt banana pops",
+    "es": "Bañar y congelar las paletas de banana"
+  },
   "yogurt-bark": {
     "en": "Spread and freeze the yogurt bark",
     "es": "Extender y congelar la barrita de yogur"
   },
-  "energy-balls": {
-    "en": "Roll the oat & date energy balls (they keep a week)",
-    "es": "Armar las bolitas de avena y dátiles (duran una semana)"
+  "arroz-con-leche": {
+    "en": "Cook the arroz con leche and chill it",
+    "es": "Preparar el arroz con leche y enfriarlo"
   },
-  "oat-cookies": {
-    "en": "Bake the oatmeal raisin cookies",
-    "es": "Hornear las galletitas de avena y pasas"
+  "chill-ahead": {
+    "en": "Make the chilled and frozen ones the day before, so they set",
+    "es": "Preparar el día anterior lo que va a la heladera o al freezer, para que tome cuerpo"
+  },
+  "rub-ribs": {
+    "en": "Rub the ribs with spices and shred the coleslaw veg (store dry)",
+    "es": "Condimentar las costillas y rallar las verduras de la ensalada (guardarlas secas)"
+  },
+  "marinate": {
+    "en": "Marinate the meat the night before it is cooked, as its recipe says",
+    "es": "Marinar la carne la noche anterior a cocinarla, como dice su receta"
+  },
+  "soak": {
+    "en": "Soak overnight what its recipe says (dried beans, hominy, salt cod)",
+    "es": "Dejar en remojo desde la noche anterior lo que dice su receta (porotos, maíz, bacalao)"
+  },
+  "overnight-oats": {
+    "en": "Mix the oats the evening before (they keep 2 days)",
+    "es": "Preparar la avena la noche anterior (dura 2 días)"
+  },
+  "chia-pudding": {
+    "en": "Stir the chia pudding the evening before (it keeps 3 days)",
+    "es": "Preparar el pudín de chía la noche anterior (dura 3 días)"
   }
 };
