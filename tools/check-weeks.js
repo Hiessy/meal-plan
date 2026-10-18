@@ -1,6 +1,6 @@
 // node tools/check-weeks.js [weeks=120]
 //
-// Checks that every week's Sunday prep and shopping list match the meals
+// Checks that every week's prep and shopping list match the meals
 // planned for it, and that menus behave: no recipe twice in a week, none
 // repeated within the four weeks on screen, at most RULES.experimental[1]
 // experimental meals a week. Runs the planner the way the page does, for
@@ -145,25 +145,36 @@ function checkWeeks(label, allow, small = false) {
       const nums = s => (s.match(/[\d½¼¾⅓⅔.,]+/g) || []).join(' ').replace(/,/g, '.');
       if (!row.lines.some(l => /\blbs?\b/.test(l.en)) && nums(en) !== nums(es)) report(where, `row ${row.key} adds up to "${en}" in English but "${es}" in Spanish`);
     });
-    // Sunday prep: every task is for meals of this week, and every meal
-    // that needs work ahead gets it
+    // Prep: every task is for meals of this week, done before them and
+    // while its result still keeps; every meal that needs work ahead gets it
     const tasks = Lists.prep(meals);
-    tasks.forEach(task => task.meals.forEach(m => {
-      if (Planner.recipe(ids[m.k]) !== m.recipe) report(where, `prep "${task.key}" names a meal not in the week`);
-    }));
-    meals.forEach(m => (m.recipe.prep || []).forEach(key => {
-      if (key !== 'chop-veg' && !tasks.some(t => t.key === key && t.meals.includes(m))) report(where, `prep "${key}" of ${m.recipe.id} is missing`);
-    }));
     tasks.forEach(task => {
+      const spec = prepTasks[task.key];
       if (!task.meals.length) report(where, `prep "${task.key}" is for no meal`);
-      if (task.key !== 'chop-veg' && task.meals.some(m => !(m.recipe.prep || []).includes(task.key))) report(where, `prep "${task.key}" lists a meal that does not need it`);
+      if (task.day !== -1 && task.day !== 2 && !task.night && task.meals.some(m => m.di - 1 !== task.day))
+        report(where, `prep "${task.key}" on day ${task.day} is neither a big session nor the evening before`);
+      task.meals.forEach(m => {
+        if (Planner.recipe(ids[m.k]) !== m.recipe) report(where, `prep "${task.key}" names a meal not in the week`);
+        if (task.day >= m.di) report(where, `prep "${task.key}" on day ${task.day} is not before ${m.recipe.id} on day ${m.di}`);
+        if (spec.night && task.day !== m.di - 1) report(where, `overnight prep "${task.key}" is not the evening before ${m.recipe.id}`);
+        if (!spec.night && m.di - task.day > spec.keeps) report(where, `prep "${task.key}" on day ${task.day} does not keep ${m.di - task.day} days for ${m.recipe.id}`);
+        if (task.key !== 'chop-veg' && !(m.recipe.prep || []).includes(task.key)) report(where, `prep "${task.key}" lists ${m.recipe.id}, which does not need it`);
+      });
     });
-    const chop = tasks.find(t => t.key === 'chop-veg');
-    (chop ? chop.items : []).forEach(row => { if (!rows.some(x => x.key === row.key)) report(where, `chopping lists ${row.key}, not on the shopping list`); });
+    meals.forEach(m => (m.recipe.prep || []).forEach(key => {
+      if (key !== 'chop-veg' && tasks.filter(t => t.key === key && t.meals.includes(m)).length !== 1) report(where, `prep "${key}" of ${m.recipe.id} is not listed once`);
+    }));
+    if (new Set(tasks.map(t => t.day + ':' + t.key)).size < tasks.length) report(where, 'a prep task is listed twice in one session');
+    // Chopping: each vegetable in the sessions of the meals that use it, nothing else
     rows.filter(row => row.cat === 'Vegetables' && row.entry.kind !== 'spice').forEach(row => {
-      if (chop && !chop.items.some(x => x.key === row.key) && !['peas', 'corn', 'edamame', 'avocados', 'coleslaw-mix'].includes(row.key)) report(where, `${row.key} is bought but not chopped`);
+      const skip = ['peas', 'corn', 'edamame', 'avocados', 'coleslaw-mix', 'potatoes', 'sweet-potatoes'].includes(row.key);
+      const want = skip ? [] : [...new Set(row.lines.map(l => Lists.prepDay(prepTasks['chop-veg'], l.meal.di)))].sort();
+      const got = tasks.filter(t => t.key === 'chop-veg' && t.items.some(x => x.key === row.key)).map(t => t.day).sort();
+      if (want.join() !== got.join()) report(where, `${row.key} is chopped on days [${got}], expected [${want}]`);
     });
-    if (new Set(tasks.map(t => t.key)).size < tasks.length) report(where, 'a prep task is listed twice');
+    tasks.filter(t => t.key === 'chop-veg').forEach(t => t.items.forEach(row => {
+      if (!rows.some(x => x.key === row.key)) report(where, `chopping lists ${row.key}, not on the shopping list`);
+    }));
   });
   console.log(`${label}: ${menus.length} weeks, ${(experimental / menus.length).toFixed(2)} experimental and ` +
     `${(repeats / menus.length).toFixed(2)} repeated meals a week`);

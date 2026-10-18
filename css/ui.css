@@ -388,7 +388,7 @@ button.chip { font: inherit; cursor: pointer; }
 .progress-pill.done { background: var(--done-bg); color: var(--done-txt); }
 
 /* ============================================================
-   Sunday Prep Card
+   Prep Card — Sunday, Wednesday evening and the evenings before
    ============================================================ */
 .sunday-prep {
   background: var(--prep-bg);
@@ -420,12 +420,26 @@ button.chip { font: inherit; cursor: pointer; }
 }
 .sunday-prep .progress-pill { background: #fef3c7; color: #92400e; }
 .sunday-prep .progress-pill.done { background: var(--done-bg); color: var(--done-txt); }
+.prep-list { padding: 0 1.25rem 1.25rem; }
+.prep-session + .prep-session { margin-top: 1rem; }
+.prep-session.past { opacity: .6; }
+.prep-when {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin: 0 0 .45rem;
+  color: #92400e;
+  font-size: .8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
 .sunday-prep ul {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: .5rem .6rem;
-  padding: 0 1.25rem 1.25rem;
+  padding: 0;
 }
 .sunday-prep .check {
   height: 100%;
@@ -1328,7 +1342,7 @@ body.modal-open .toast { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
 
   .sunday-prep { border-radius: var(--r-md); }
   .prep-head { padding: .9rem 1rem; }
-  .sunday-prep ul { padding: 0 1rem 1rem; }
+  .prep-list { padding: 0 1rem 1rem; }
   .sunday-prep .check { font-size: .9rem; padding: .7rem .75rem; }
 
   .meal-name { font-size: .975rem; }
@@ -1373,7 +1387,7 @@ body.modal-open .toast { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
   .lang-btn, .tabs, .hint, .shop-tools, .arrow, .chev, .week-tools,
   .modal-overlay, .tooltip, .toast, .site-footer { display: none !important; }
   .shopping-body { display: block !important; }
-  .sunday-prep ul[hidden] { display: grid !important; }
+  .prep-list[hidden] { display: block !important; }
   .day-col, .shopping-section, .sunday-prep { box-shadow: none; break-inside: avoid; }
 }
 

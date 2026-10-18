@@ -24,8 +24,10 @@
    steps   : a step starting "Toddler tip:" / "Consejo para pequeños:"
              is shown as a highlighted note
    tip     : optional nutrition note ("" for none)
-   prep    : optional make-ahead tasks for the Sunday prep card, as keys
-             of prepTasks at the bottom of this file
+   prep    : optional make-ahead tasks for the prep card, as keys of
+             prepTasks at the bottom of this file. Each task says how many
+             days its result keeps (keeps) or that it is done the evening
+             before (night); js/lists.js picks the prep session from that
    country : where the dish comes from, an ISO code of data/countries.js.
              Everyday dishes common in Argentine homes count as 'AR'.
    experimental : true for a new, not yet family-tested recipe — shown
@@ -8862,90 +8864,112 @@ const recipes = [
 const prepTasks = {
   "chop-veg": {
     "en": "Wash and chop the vegetables; store them in containers",
-    "es": "Lavar y picar las verduras; guardarlas en recipientes"
+    "es": "Lavar y picar las verduras; guardarlas en recipientes",
+    "keeps": 3
   },
   "cook-chicken": {
     "en": "Cook chicken to shred or slice — roast or poach 2–3 breasts, or a whole chicken",
-    "es": "Cocinar pollo para desmenuzar o cortar — asar o hervir 2–3 pechugas, o un pollo entero"
+    "es": "Cocinar pollo para desmenuzar o cortar — asar o hervir 2–3 pechugas, o un pollo entero",
+    "keeps": 3
   },
   "rice": {
     "en": "Cook a big pot of rice",
-    "es": "Cocinar una olla grande de arroz"
+    "es": "Cocinar una olla grande de arroz",
+    "keeps": 3
   },
   "quinoa": {
     "en": "Cook a pot of quinoa",
-    "es": "Cocinar una olla de quinoa"
+    "es": "Cocinar una olla de quinoa",
+    "keeps": 4
   },
   "brown-beef": {
     "en": "Brown the ground beef (it keeps 3 days in the fridge)",
-    "es": "Dorar la carne picada (dura 3 días en la heladera)"
+    "es": "Dorar la carne picada (dura 3 días en la heladera)",
+    "keeps": 3
   },
   "cook-ahead": {
     "en": "Cook the slow dishes ahead — stews and braises taste even better the next day",
-    "es": "Cocinar de antemano lo que lleva horas — los guisos y braseados quedan aún más ricos al día siguiente"
+    "es": "Cocinar de antemano lo que lleva horas — los guisos y braseados quedan aún más ricos al día siguiente",
+    "keeps": 3
   },
   "roast-veg": {
     "en": "Roast a tray of zucchini, bell peppers, and cherry tomatoes",
-    "es": "Asar una bandeja de zapallitos, morrones y tomates cherry"
+    "es": "Asar una bandeja de zapallitos, morrones y tomates cherry",
+    "keeps": 3
   },
   "roast-pumpkin": {
     "en": "Roast the pumpkin until soft and mash it (it keeps 3 days)",
-    "es": "Asar el zapallo hasta que esté tierno y pisarlo (dura 3 días)"
+    "es": "Asar el zapallo hasta que esté tierno y pisarlo (dura 3 días)",
+    "keeps": 3
   },
   "bake-ahead": {
     "en": "Bake ahead — they keep 3–4 days in a closed tin",
-    "es": "Hornear de antemano — duran 3–4 días en un recipiente cerrado"
+    "es": "Hornear de antemano — duran 3–4 días en un recipiente cerrado",
+    "keeps": 4
   },
   "egg-muffins": {
     "en": "Bake the egg muffins — they keep 3 days in the fridge",
-    "es": "Hornear los muffins de huevo — duran 3 días en la heladera"
+    "es": "Hornear los muffins de huevo — duran 3 días en la heladera",
+    "keeps": 3
   },
   "energy-balls": {
     "en": "Roll the energy balls (they keep a week)",
-    "es": "Armar las bolitas energéticas (duran una semana)"
+    "es": "Armar las bolitas energéticas (duran una semana)",
+    "keeps": 7
   },
   "apple-chips": {
     "en": "Bake the apple chips (low oven, about 2 hours)",
-    "es": "Hornear los chips de manzana (horno bajo, unas 2 horas)"
+    "es": "Hornear los chips de manzana (horno bajo, unas 2 horas)",
+    "keeps": 7
   },
   "freeze-bananas": {
     "en": "Freeze peeled banana halves in bags for smoothies",
-    "es": "Congelar mitades de banana peladas en bolsas para los batidos"
+    "es": "Congelar mitades de banana peladas en bolsas para los batidos",
+    "keeps": 7
   },
   "banana-pops": {
     "en": "Dip and freeze the yogurt banana pops",
-    "es": "Bañar y congelar las paletas de banana"
+    "es": "Bañar y congelar las paletas de banana",
+    "keeps": 7
   },
   "yogurt-bark": {
     "en": "Spread and freeze the yogurt bark",
-    "es": "Extender y congelar la barrita de yogur"
+    "es": "Extender y congelar la barrita de yogur",
+    "keeps": 7
   },
   "arroz-con-leche": {
     "en": "Cook the arroz con leche and chill it",
-    "es": "Preparar el arroz con leche y enfriarlo"
+    "es": "Preparar el arroz con leche y enfriarlo",
+    "keeps": 3
   },
   "chill-ahead": {
-    "en": "Make the chilled and frozen ones the day before, so they set",
-    "es": "Preparar el día anterior lo que va a la heladera o al freezer, para que tome cuerpo"
+    "en": "Make the chilled and frozen ones ahead, so they set",
+    "es": "Preparar con tiempo lo que va a la heladera o al freezer, para que tome cuerpo",
+    "keeps": 2
   },
   "rub-ribs": {
     "en": "Rub the ribs with spices and shred the coleslaw veg (store dry)",
-    "es": "Condimentar las costillas y rallar las verduras de la ensalada (guardarlas secas)"
+    "es": "Condimentar las costillas y rallar las verduras de la ensalada (guardarlas secas)",
+    "night": true
   },
   "marinate": {
-    "en": "Marinate the meat the night before it is cooked, as its recipe says",
-    "es": "Marinar la carne la noche anterior a cocinarla, como dice su receta"
+    "en": "Marinate the meat overnight, as its recipe says",
+    "es": "Marinar la carne toda la noche, como dice su receta",
+    "night": true
   },
   "soak": {
     "en": "Soak overnight what its recipe says (dried beans, hominy, salt cod)",
-    "es": "Dejar en remojo desde la noche anterior lo que dice su receta (porotos, maíz, bacalao)"
+    "es": "Dejar en remojo toda la noche lo que dice su receta (porotos, maíz, bacalao)",
+    "night": true
   },
   "overnight-oats": {
-    "en": "Mix the oats the evening before (they keep 2 days)",
-    "es": "Preparar la avena la noche anterior (dura 2 días)"
+    "en": "Mix the oats so they soak overnight",
+    "es": "Preparar la avena para que se remoje toda la noche",
+    "night": true
   },
   "chia-pudding": {
-    "en": "Stir the chia pudding the evening before (it keeps 3 days)",
-    "es": "Preparar el pudín de chía la noche anterior (dura 3 días)"
+    "en": "Stir the chia pudding (it keeps 3 days)",
+    "es": "Preparar el pudín de chía (dura 3 días)",
+    "keeps": 3
   }
 };

@@ -137,6 +137,7 @@ const newSeed   = () => Math.floor(Math.random() * 4294967296);
 function weekMeals(w) {
   return menuOf(w.num).map((id, k) => ({ recipe: Planner.recipe(id), di: Math.floor(k / Planner.SLOTS), k }));
 }
+const prepTick = (w, task) => `p:${w.iso}:${task.day}:${task.key}`;
 const lowerFirst = text => text.charAt(0).toLowerCase() + text.slice(1);
 const mealLabel = m => t('daysShort')[m.di] + ' · ' + t('mealTypes')[m.recipe.type].label;
 
@@ -419,7 +420,7 @@ function setPill(id, done, total) {
 // Updates the counters and "still to buy"; → which lists are fully ticked
 function updateProgress(n) {
   const { w, rows, tasks } = weekData[n];
-  const prepDone = tasks.filter(task => store.ticks[`p:${w.iso}:${task.key}`]).length;
+  const prepDone = tasks.filter(task => store.ticks[prepTick(w, task)]).length;
   setPill(`prep-count-${n}`, prepDone, tasks.length);
 
   let done = 0, left = 0;
@@ -1084,8 +1085,8 @@ function buildWeek(n) {
     </div>`;
   }).join('');
 
-  const prepHtml = tasks.map(task => {
-    const key = `p:${w.iso}:${task.key}`;
+  const taskHtml = task => {
+    const key = prepTick(w, task);
     // Chopping lists the week's vegetables; every other task, its dishes
     const forText = task.key === 'chop-veg'
       ? `<small class="task-for">${task.items.map((row, i) => i ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ')}</small>`
@@ -1095,6 +1096,20 @@ function buildWeek(n) {
       <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
       <span>${prepTasks[task.key][lang]}${forText}</span>
     </label></li>`;
+  };
+  // One block per prep session: Sunday, Wednesday evening, and the evenings
+  // before meals that soak or marinate overnight
+  const prepHtml = [...new Set(tasks.map(task => task.day))].map(day => {
+    const own = tasks.filter(task => task.day === day);
+    const date = addDays(w.monday, day), iso = isoDate(date);
+    const title = day < 0 ? t('prepSunday')(fmtDay(date))
+      : own.some(task => !task.night) ? t('prepMidweek')(days[day], fmtDay(date))
+      : t('prepEvening')(days[day], fmtDay(date));
+    const state = iso === todayIso ? ' today' : iso < todayIso ? ' past' : '';
+    return `<section class="prep-session${state}">
+      <h3 class="prep-when">${title}${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}</h3>
+      <ul>${own.map(taskHtml).join('')}</ul>
+    </section>`;
   }).join('');
 
   section.innerHTML = `
@@ -1110,11 +1125,11 @@ function buildWeek(n) {
     <div class="sunday-prep">
       <button type="button" class="prep-head${prepOpen ? ' open' : ''}" id="prep-toggle-${n}" data-action="prep" data-n="${n}"
         aria-expanded="${prepOpen}" aria-controls="prep-list-${n}" data-tip="${esc(t('tipPrepToggle'))}">
-        <span class="prep-title">📋 ${t('prepTitle')(fmtDay(addDays(w.monday, -1)))}</span>
+        <span class="prep-title">📋 ${t('prepTitle')}</span>
         <span class="progress-pill" id="prep-count-${n}" data-tip="${esc(t('tipPrepCount'))}"></span>
         <span class="arrow" aria-hidden="true">▼</span>
       </button>
-      <ul id="prep-list-${n}"${prepOpen ? '' : ' hidden'}>${prepHtml}</ul>
+      <div class="prep-list" id="prep-list-${n}"${prepOpen ? '' : ' hidden'}>${prepHtml}</div>
     </div>
     <div class="calendar">${daysHtml}</div>
     <div class="shopping-section">

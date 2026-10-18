@@ -1,10 +1,10 @@
 /* ============================================================
-   Lists — the shopping list and the Sunday prep list of a week
+   Lists — the shopping list and the prep list of a week
    (logic only, no DOM)
 
    Reads `ingredients` (data/ingredients.js) and `prepTasks`
    (data/recipes.js). A meal is { recipe, di, k }: the recipe, its
-   day (0 = Monday) and its slot in the week (0–14).
+   day (0 = Monday) and its slot in the week (0–19).
    ============================================================ */
 const Lists = (() => {
 
@@ -126,28 +126,50 @@ const Lists = (() => {
     return { text: totals.map(total => fmtAmount(total, row.entry.each, lang)).join(' + '), partial: partial && totals.length > 0 };
   }
 
-  /* ── Sunday prep ───────────────────────────────────────────── */
-  // Fresh vegetables that are not washed and chopped ahead
-  const NOT_CHOPPED = new Set(['peas', 'corn', 'edamame', 'avocados', 'coleslaw-mix']);
+  /* ── Prep ──────────────────────────────────────────────────── */
+  // Two big prep sessions — Sunday and Wednesday evening — plus the
+  // evenings before for what must soak or marinate overnight. Days count
+  // from Monday (0), so Sunday is -1.
+  const SUNDAY = -1, MIDWEEK = 2;
 
-  // The make-ahead tasks of the week's recipes, each once, with the
-  // meals that need it, in the order of prepTasks. Washing and chopping
-  // comes first, with the week's vegetables as its `items` (shopping rows).
-  function prep(meals) {
-    const order = Object.keys(prepTasks), tasks = new Map();
-    const task = key => tasks.get(key) || tasks.set(key, { key, meals: [], items: [] }).get(key);
-    shopping(meals).forEach(row => {
-      if (row.cat !== 'Vegetables' || row.entry.kind === 'spice' || NOT_CHOPPED.has(row.key)) return;
-      const chop = task('chop-veg');
-      chop.items.push(row);
-      mealsOf(row).forEach(meal => { if (!chop.meals.includes(meal)) chop.meals.push(meal); });
-    });
-    meals.forEach(meal => (meal.recipe.prep || []).forEach(key => {
-      if (prepTasks[key] && key !== 'chop-veg' && !task(key).meals.includes(meal)) task(key).meals.push(meal);
-    }));
-    tasks.forEach(t => t.meals.sort((a, b) => a.k - b.k));
-    return [...tasks.values()].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
+  // When to do a task for a meal on day `di`: at the first big session whose
+  // result still keeps until then (prepTasks `keeps`, in days), else — and
+  // always for `night` tasks — the evening before
+  function prepDay(spec, di) {
+    if (!spec.night) for (const day of [SUNDAY, MIDWEEK]) if (day < di && di - day <= spec.keeps) return day;
+    return di - 1;
   }
 
-  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, substitute, entryFor: ingredientFor };
+  // Fresh vegetables that are not washed and chopped ahead
+  const NOT_CHOPPED = new Set(['peas', 'corn', 'edamame', 'avocados', 'coleslaw-mix', 'potatoes', 'sweet-potatoes']);
+
+  // The make-ahead tasks of the week, by session: { key, day, night, meals,
+  // items }, in day order and then the order of prepTasks. Washing and
+  // chopping comes first in each session, with its vegetables (shopping
+  // rows) as `items`.
+  function prep(meals) {
+    const order = Object.keys(prepTasks), tasks = new Map();
+    const task = (key, day) => {
+      const id = day + ':' + key;
+      if (!tasks.has(id)) tasks.set(id, { key, day, night: !!prepTasks[key].night, meals: [], items: [] });
+      return tasks.get(id);
+    };
+    shopping(meals).forEach(row => {
+      if (row.cat !== 'Vegetables' || row.entry.kind === 'spice' || NOT_CHOPPED.has(row.key)) return;
+      row.lines.forEach(({ meal }) => {
+        const chop = task('chop-veg', prepDay(prepTasks['chop-veg'], meal.di));
+        if (!chop.items.includes(row)) chop.items.push(row);
+        if (!chop.meals.includes(meal)) chop.meals.push(meal);
+      });
+    });
+    meals.forEach(meal => (meal.recipe.prep || []).forEach(key => {
+      if (!prepTasks[key] || key === 'chop-veg') return;
+      const t = task(key, prepDay(prepTasks[key], meal.di));
+      if (!t.meals.includes(meal)) t.meals.push(meal);
+    }));
+    tasks.forEach(t => t.meals.sort((a, b) => a.k - b.k));
+    return [...tasks.values()].sort((a, b) => a.day - b.day || order.indexOf(a.key) - order.indexOf(b.key));
+  }
+
+  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, prepDay, substitute, entryFor: ingredientFor };
 })();

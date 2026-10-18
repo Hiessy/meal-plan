@@ -48,8 +48,11 @@ above it. The README has the full table.
   - Recipes must be self-contained, with no "leftovers" or "made on Sunday" ingredients, because
     any recipe can land on any day.
   - Make-ahead work goes in `prep`, as keys of `prepTasks`. Task texts stay generic ("Marinate
-    the meat the night before…"), because the prep card names the dishes under each task.
-    Washing and chopping is not a key: `Lists.prep` lists the week's vegetables itself.
+    the meat overnight…"), because the prep card names the dishes under each task.
+    Washing and chopping is not a key: `Lists.prep` lists each session's vegetables itself.
+  - Every prep task has `keeps` (days its result lasts in the fridge) or `night: true` (done the
+    evening before). `Lists.prepDay` puts each task in the first big session — Sunday (day -1) or
+    Wednesday evening (day 2) — whose result still keeps until the meal, else the evening before.
   - `experimental: true` marks a new, not yet family-tested recipe. A separate `.exp-badge` next
     to the meal-type badge (never inside it) shows `FLASK` from `ui.js`, a pixel Erlenmeyer flask;
     `fx.css` cycles its colour and floats its bubbles. `RULES.experimental` caps them at one a week.

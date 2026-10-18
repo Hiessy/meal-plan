@@ -6,7 +6,7 @@
      shopping list   → a shopper walks the market: talks, pays,
                        takes the produce, skips a stall, buys again
                        (the stalls sell whatever aisle you hover)
-     Sunday prep     → a cook chops, blends and fries
+     Meal prep       → a cook chops, blends and fries
      breakfast meal  → morning table, toast pops, mugs steam
      lunch meal      → fridge → oven → table
      snack meal      → a kid grabs an apple from the bowl and munches
