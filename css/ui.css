@@ -388,15 +388,11 @@ button.chip { font: inherit; cursor: pointer; }
 .progress-pill.done { background: var(--done-bg); color: var(--done-txt); }
 
 /* ============================================================
-   Prep Card — Sunday, Wednesday evening and the evenings before
+   Prep — a bar that opens onto the sessions. They sit on the
+   calendar's columns: Sunday's block over Monday–Wednesday,
+   Wednesday evening's over Thursday–Friday.
    ============================================================ */
-.sunday-prep {
-  background: var(--prep-bg);
-  border: 2px solid var(--prep-border);
-  border-radius: var(--r-lg);
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-}
+.sunday-prep { margin-bottom: 1.5rem; }
 .prep-head {
   display: flex;
   align-items: center;
@@ -404,8 +400,9 @@ button.chip { font: inherit; cursor: pointer; }
   width: 100%;
   min-height: 54px;
   padding: .9rem 1.25rem;
-  border: none;
-  background: transparent;
+  border: 2px solid var(--prep-border);
+  border-radius: var(--r-lg);
+  background: var(--prep-bg);
   text-align: left;
   cursor: pointer;
 }
@@ -420,33 +417,40 @@ button.chip { font: inherit; cursor: pointer; }
 }
 .sunday-prep .progress-pill { background: #fef3c7; color: #92400e; }
 .sunday-prep .progress-pill.done { background: var(--done-bg); color: var(--done-txt); }
-.prep-list { padding: 0 1.25rem 1.25rem; }
-.prep-session + .prep-session { margin-top: 1rem; }
-.prep-session.past { opacity: .6; }
+
+.prep-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: .75rem;
+}
+.prep-block {
+  display: grid;
+  grid-template-columns: subgrid;
+  align-content: start;
+  gap: .5rem 1rem;
+}
+.prep-block.early { grid-column: 1 / span 3; }
+.prep-block.late  { grid-column: 4 / span 2; }
 .prep-when {
+  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   gap: .5rem;
-  margin: 0 0 .45rem;
+  margin: 0;
   color: #92400e;
   font-size: .8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .4px;
 }
-.sunday-prep ul {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-  gap: .5rem .6rem;
-  padding: 0;
-}
+.prep-when:not(:first-child) { margin-top: .5rem; }
+.prep-when.past, .sunday-prep .check.past { opacity: .6; }
 .sunday-prep .check {
-  height: 100%;
   color: #78350f;
   font-size: .85rem;
   padding: .55rem .75rem;
-  background: var(--surface);
+  background: var(--prep-bg);
   border: 1px solid #fcd34d;
   border-radius: var(--r-sm);
 }
@@ -463,19 +467,34 @@ button.chip { font: inherit; cursor: pointer; }
 .sunday-prep .check input:checked { border-color: #b45309; background-color: #b45309; }
 
 /* ============================================================
-   Calendar Grid
+   Calendar Grid — each day spans five shared rows (its header and
+   the four meals), so breakfasts, lunches, snacks and dinners line
+   up across the days
    ============================================================ */
 .calendar {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  column-gap: 1rem;
+  margin-bottom: .5rem;
 }
-@media (max-width: 1100px) { .calendar { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 720px)  { .calendar { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 520px)  { .calendar { grid-template-columns: 1fr; gap: .85rem; } }
+@media (max-width: 1100px) {
+  .calendar, .prep-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .prep-block.late { grid-column: 1 / span 2; }
+}
+@media (max-width: 720px) {
+  .calendar, .prep-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .prep-block.early, .prep-block.late { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .calendar, .prep-list { grid-template-columns: minmax(0, 1fr); }
+}
 
 .day-col {
+  display: grid;
+  grid-row: span 5;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  margin-bottom: 1rem;
   scroll-margin-top: 80px;
   background: var(--surface);
   border-radius: var(--r-md);
@@ -514,9 +533,11 @@ button.chip { font: inherit; cursor: pointer; }
   text-transform: uppercase;
   align-self: center;
 }
+/* Today keeps the same 1px border as the other days (a thicker one would
+   knock it out of line) and gets its ring from the shadow */
 .day-col.today {
-  border: 2px solid var(--color-accent);
-  box-shadow: 0 0 0 4px rgba(183, 121, 63, .18), var(--sh-md);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent), 0 0 0 5px rgba(183, 121, 63, .18), var(--sh-md);
 }
 .day-col.today .day-header {
   background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-dark) 100%);
@@ -529,6 +550,7 @@ button.chip { font: inherit; cursor: pointer; }
 .meal-slot {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;                /* badges line up across the days */
   align-items: center;
   gap: .3rem .6rem;
   width: 100%;
@@ -562,13 +584,13 @@ button.chip { font: inherit; cursor: pointer; }
 .badge-snack  { background: var(--badge-snack-bg);  color: var(--badge-snack-txt); }
 .badge-dinner { background: var(--badge-dinner-bg); color: var(--badge-dinner-txt); }
 
+/* The flask sits right of the meal type, on the plain background */
 .exp-chip {
-  padding: .1rem .55rem;
-  border: 1px dashed #a78bfa;
-  border-radius: var(--r-pill);
-  background: #f5f3ff;
+  display: inline-flex;
+  align-items: center;
+  gap: .2rem;
   color: #6d28d9;
-  font-size: .72rem;
+  font-size: .75rem;
   font-weight: 700;
   cursor: help;
 }
@@ -1070,23 +1092,19 @@ button.chip { font: inherit; cursor: pointer; }
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
-/* Meal type and, apart from it, the flask of an experimental recipe */
+/* Meal type and, right of it on the plain background, the flask of an
+   experimental recipe */
 .slot-tags {
   display: flex;
   align-items: center;
-  gap: .3rem;
+  gap: .4rem;
   min-width: 0;
 }
 .exp-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: .12rem .38rem;
-  border: 1px dashed #a78bfa;
-  border-radius: var(--r-pill);
-  background: #f5f3ff;
-  font-size: .78rem;
-  line-height: 1.3;
+  font-size: .95rem;
+  line-height: 1;
 }
 
 .panel { max-width: 720px; }
@@ -1340,9 +1358,7 @@ body.modal-open .toast { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
   .week-tools .tool-btn { flex: 1; min-height: 44px; }
   .balance { margin-bottom: 1rem; }
 
-  .sunday-prep { border-radius: var(--r-md); }
-  .prep-head { padding: .9rem 1rem; }
-  .prep-list { padding: 0 1rem 1rem; }
+  .prep-head { padding: .9rem 1rem; border-radius: var(--r-md); }
   .sunday-prep .check { font-size: .9rem; padding: .7rem .75rem; }
 
   .meal-name { font-size: .975rem; }
@@ -1387,8 +1403,8 @@ body.modal-open .toast { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
   .lang-btn, .tabs, .hint, .shop-tools, .arrow, .chev, .week-tools,
   .modal-overlay, .tooltip, .toast, .site-footer { display: none !important; }
   .shopping-body { display: block !important; }
-  .prep-list[hidden] { display: block !important; }
-  .day-col, .shopping-section, .sunday-prep { box-shadow: none; break-inside: avoid; }
+  .prep-list[hidden] { display: grid !important; }
+  .day-col, .shopping-section, .sunday-prep .check { box-shadow: none; break-inside: avoid; }
 }
 
 /* ============================================================

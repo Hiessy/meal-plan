@@ -41,7 +41,7 @@ const Planner = (() => {
       group: { fruit: [2, 3], dairy: [1, 2], veg: [0, 2], grain: [0, 2] }
     },
     tagCap: { soup: 2, toast: 2, tortilla: 2 }, // any other tag: at most once a week
-    experimental: [0, 1],                      // new, not yet family-tested recipes
+    experimental: [1, 2],                      // new, not yet family-tested recipes (when the lists have any)
     recentWeeks: 3                             // stay away from the last three weeks' recipes (the page shows four)
   };
 
@@ -51,6 +51,7 @@ const Planner = (() => {
 
   const byId = Object.fromEntries(recipes.map(r => [r.id, r]));
   let pools = {};                              // the recipes each slot may draw from
+  let expRange = RULES.experimental;           // [0, max] when the pools hold no experimental recipe
 
   // Which recipes the draw may use: leave out `exclude` (ids), every
   // experimental recipe if experimental is false, and any recipe that
@@ -63,6 +64,8 @@ const Planner = (() => {
       const allowed = all.filter(r => !skip.has(r.id) && (experimental || !r.experimental) && allow(r));
       return [type, allowed.length ? allowed : all];
     }));
+    const anyExp = TYPES.some(type => pools[type].some(r => r.experimental));
+    expRange = anyExp ? RULES.experimental : [0, RULES.experimental[1]];
     baseMenus.length = 0;                      // every menu is drawn again
   }
 
@@ -113,8 +116,9 @@ const Planner = (() => {
   // Change in rule cost when a count goes from n to n + 1
   const step = (n = 0, range) => !range ? 0 : n < range[0] ? -COST.rule : n >= range[1] ? COST.rule : 0;
 
-  // What adding recipe r to a partly picked week (counts in s) would cost
-  function addCost(r, s, avoid) {
+  // What adding recipe r to a partly picked week (counts in s) would cost;
+  // exp is the number of experimental recipes this draw aims for
+  function addCost(r, s, avoid, exp) {
     let c = avoid.get(r.id) || 0;
     if (r.type === 'breakfast') c += step(s.breakfast[r.group], RULES.breakfasts.group[r.group]);
     else if (r.type === 'snack') c += step(s.group[r.group], RULES.snacks.group[r.group]);
@@ -124,7 +128,7 @@ const Planner = (() => {
       if (isRed(r)) c += step(s.red, RULES.mains.redMeat);
     }
     (r.tags || []).forEach(tag => { if ((s.tag[tag] || 0) >= (RULES.tagCap[tag] || 1)) c += COST.rule; });
-    if (r.experimental) c += step(s.experimental, RULES.experimental);
+    if (r.experimental) c += step(s.experimental, exp);
     return c;
   }
 
@@ -144,7 +148,7 @@ const Planner = (() => {
     for (const b in mains.base) total += COST.rule * outside(s.base[b] || 0, mains.base[b]);
     for (const g in snacks.group) total += COST.rule * outside(s.group[g] || 0, snacks.group[g]);
     for (const tag in s.tag) total += COST.rule * Math.max(0, s.tag[tag] - (RULES.tagCap[tag] || 1));
-    total += COST.rule * outside(s.experimental, RULES.experimental);
+    total += COST.rule * outside(s.experimental, expRange);
     ids.forEach(id => { total += avoid.get(id) || 0; });
     for (let d = 0; d < DAYS; d++) {
       const day = i => byId[ids[d * SLOTS + i]];
@@ -183,14 +187,14 @@ const Planner = (() => {
   }
 
   // Fills the 20 slots in random order, each with the cheapest recipe
-  function build(random, avoid) {
+  function build(random, avoid, exp) {
     const s = newCounts();
     const picks = Object.fromEntries(TYPES.map(type => [type, []])), used = new Set();
     for (const type of shuffled(TYPES.flatMap(type => Array(DAYS).fill(type)), random)) {
       let best = null, bestCost = Infinity;
       for (const r of shuffled(pools[type], random)) {
         if (used.has(r.id)) continue;
-        const c = addCost(r, s, avoid);
+        const c = addCost(r, s, avoid, exp);
         if (c < bestCost) { best = r; bestCost = c; }
       }
       // a list with fewer than 5 recipes of a type repeats them
@@ -205,9 +209,11 @@ const Planner = (() => {
   // avoid: Map of recipe id → extra cost for using it this week
   function draw(seed, avoid = new Map()) {
     const random = seeded(seed);
+    // Aim for one or two experimental recipes, as the week's seed says
+    const exp = [expRange[0], Math.max(expRange[0], expRange[1] - (random() < .5 ? 1 : 0))];
     let best = null, bestCost = Infinity;
     for (let i = 0; i < ATTEMPTS && bestCost > 0; i++) {
-      const ids = build(random, avoid), c = cost(ids, avoid);
+      const ids = build(random, avoid, exp), c = cost(ids, avoid);
       if (c < bestCost) { best = ids; bestCost = c; }
     }
     return best;

@@ -2,8 +2,8 @@
    AI-created recipes — original combinations invented by Claude
    (AI): proteins, sauces, sides and cooking styles from around the
    world put together in new ways. They are not traditional dishes.
-   Each has ai: true and experimental: true (an Erlenmeyer flask, at
-   most one a week), and the "AI-created recipes" filter turns them
+   Each has ai: true and experimental: true (an Erlenmeyer flask, one
+   or two a week), and the "AI-created recipes" filter turns them
    on and off. Same fields as data/recipes.js; no country.
    ============================================================ */
 recipes.push(

@@ -57,7 +57,7 @@ const Lists = (() => {
          ['slice', /^slices?\b/i], ['sprig', /^sprigs?\b/i]],
     es: [['cup', /^tazas?\b/i], ['tbsp', /^cdas?\b/i], ['tsp', /^cditas?\b/i], ['kg', /^kg\b/i], ['g', /^g\b/i],
          ['ml', /^ml\b/i], ['l', /^l\b/i], ['can', /^latas?\b/i], ['clove', /^dientes?\b/i], ['head', /^cabezas?\b/i],
-         ['stalk', /^tallos?\b/i], ['bunch', /^atados?\b/i], ['slice', /^rebanadas?\b/i], ['sprig', /^ramas?\b/i]]
+         ['stalk', /^tallos?\b/i], ['bunch', /^atados?\b/i], ['slice', /^(rebanadas?|fetas?)\b/i], ['sprig', /^ramas?\b/i]]
   };
   const UNIT_NAMES = {
     en: { lb: ['lb', 'lbs'], cup: ['cup', 'cups'], tbsp: 'tbsp', tsp: 'tsp', g: 'g', ml: 'ml', can: ['can', 'cans'],

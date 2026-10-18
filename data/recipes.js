@@ -31,7 +31,7 @@
    country : where the dish comes from, an ISO code of data/countries.js.
              Everyday dishes common in Argentine homes count as 'AR'.
    experimental : true for a new, not yet family-tested recipe — shown
-             with an Erlenmeyer flask; at most one lands in a week
+             with an Erlenmeyer flask; one or two land in a week
    ai      : true for an original recipe invented by AI (in
              data/recipes-ai.js; they are experimental too)
 

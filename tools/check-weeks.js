@@ -2,8 +2,8 @@
 //
 // Checks that every week's prep and shopping list match the meals
 // planned for it, and that menus behave: no recipe twice in a week, none
-// repeated within the four weeks on screen, at most RULES.experimental[1]
-// experimental meals a week. Runs the planner the way the page does, for
+// repeated within the four weeks on screen, and RULES.experimental (one or
+// two) experimental meals a week. Runs the planner the way the page does, for
 // the default filters (home country + AI-created) and for all countries.
 // Exits with 1 when something is wrong.
 const fs = require('fs'), path = require('path');
@@ -118,7 +118,9 @@ function checkWeeks(label, allow, small = false) {
     }
     if (!small && Planner.cost(ids) > 0) report(where, `breaks a balance rule (cost ${Planner.cost(ids)})`);
     const exp = meals.filter(m => m.recipe.experimental).length;
-    if (exp > Planner.RULES.experimental[1]) report(where, `${exp} experimental meals`);
+    const [expMin, expMax] = Planner.RULES.experimental;
+    const poolHasExp = recipes.some(r => r.experimental && allow(r));
+    if (exp > expMax || poolHasExp && exp < expMin) report(where, `${exp} experimental meals`);
     experimental += exp;
     // shopping list: every line of every meal in exactly one row, nothing else
     const rows = Lists.shopping(meals);

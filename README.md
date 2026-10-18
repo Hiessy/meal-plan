@@ -16,7 +16,7 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     Oceania.
   - **✨ 1,844 AI-created recipes**: original dishes invented by Claude, such as chimichurri
     salmon with crispy potatoes, yerba mate-crusted chicken or dulce de leche BBQ halloumi wraps.
-    They count as experimental, so at most one lands in a week; the **AI-created recipes** filter
+    They count as experimental, so one or two land in a week; the **AI-created recipes** filter
     turns them off.
   - Each week aims for 1–2 egg breakfasts, 2–3 fish meals, at least one vegetarian meal, at most
     3 red-meat meals and 2–3 fruit snacks.
@@ -31,10 +31,10 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
     rest fade. Pick several at once; **✕ Show all** clears them.
 - **Experimental recipes**: 12 of the recipes are new ideas the family hasn't tried yet, like
   cauliflower-crust pizza, rice-paper rolls and avocado chocolate mousse.
-  - When one comes up, a purple badge with a pixel Erlenmeyer flask sits next to its meal type,
-    and the tooltip says it is experimental. The flask bubbles, and its liquid cycles through red, blue,
+  - When one comes up, a pixel Erlenmeyer flask sits right of its meal type, and the tooltip says
+    it is experimental. The flask bubbles, and its liquid cycles through red, blue,
     green, purple and orange.
-  - At most one lands in a week. Untick **Use experimental recipes** to leave them out.
+  - One or two land in a week. Untick **Use experimental recipes** to leave them out.
 - **📖 Choose the recipes**: the Recipes button lists every recipe, grouped by meal type, with a
   search box and All/None per group. Untick any you don't want and the menus are drawn again from
   the rest. The choice is saved in the browser, so other devices keep the shared menu.
@@ -62,8 +62,9 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
 - **Meal prep** in sessions, so nothing is made too early: a **Sunday** prep for what keeps until
   it is eaten, a **Wednesday evening** top-up for Thursday and Friday, and the **evening before**
   for what must marinate or soak overnight. Each task names the dishes it is for; washing and
-  chopping lists that session's vegetables. `node tools/check-weeks.js` checks that the
-  prep and the shopping list match every week's meals.
+  chopping lists that session's vegetables. The prep sits on the calendar's columns, and the
+  meals line up across the days. `node tools/check-weeks.js` checks that the prep and the
+  shopping list match every week's meals.
 - **Shopping list built from the week's meals**:
   - one row per ingredient, with the amounts added up
   - grouped by aisle

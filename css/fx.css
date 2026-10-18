@@ -347,7 +347,7 @@ header .px-pan { right: 7%; }
     .lang-btn:hover, .fx-sound:hover { transform: scale(1.06); }
     .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(197, 140, 34, .38); }
     .day-col:hover { transform: translateY(-4px); box-shadow: var(--sh-green); }
-    .day-col.today:hover { box-shadow: 0 0 0 4px rgba(183, 121, 63, .3), var(--sh-green); }
+    .day-col.today:hover { box-shadow: 0 0 0 1px var(--color-accent), 0 0 0 5px rgba(183, 121, 63, .3), var(--sh-green); }
 
     /* a streak of light runs across a meal */
     .meal-slot { position: relative; overflow: hidden; }
@@ -443,7 +443,7 @@ header .px-pan { right: 7%; }
   to   { background-position: -200% 0; }
 }
 @keyframes fx-glow {
-  50% { box-shadow: 0 0 0 7px rgba(183, 121, 63, .28), var(--sh-md); }
+  50% { box-shadow: 0 0 0 1px var(--color-accent), 0 0 0 8px rgba(183, 121, 63, .28), var(--sh-md); }
 }
 @keyframes fx-deal {
   from { opacity: 0; transform: perspective(600px) rotateX(-75deg) translateY(-6px); }

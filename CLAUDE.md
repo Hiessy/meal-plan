@@ -53,9 +53,12 @@ above it. The README has the full table.
   - Every prep task has `keeps` (days its result lasts in the fridge) or `night: true` (done the
     evening before). `Lists.prepDay` puts each task in the first big session — Sunday (day -1) or
     Wednesday evening (day 2) — whose result still keeps until the meal, else the evening before.
-  - `experimental: true` marks a new, not yet family-tested recipe. A separate `.exp-badge` next
-    to the meal-type badge (never inside it) shows `FLASK` from `ui.js`, a pixel Erlenmeyer flask;
-    `fx.css` cycles its colour and floats its bubbles. `RULES.experimental` caps them at one a week.
+  - `experimental: true` marks a new, not yet family-tested recipe. The flask (`FLASK` in `ui.js`,
+    a pixel Erlenmeyer flask) goes right of the meal-type badge, never inside it, on the plain
+    background with no pill of its own (`.exp-badge` on slots, `.exp-chip` in the recipe sheet);
+    `fx.css` cycles its colour and floats its bubbles. `RULES.experimental` is [1, 2]: each draw
+    aims for one or two, as the week's seed says. The minimum is dropped when the recipe choices
+    leave no experimental recipe.
 - `Planner.configure({ exclude, experimental, allow })` narrows the pools the draw uses. The UI
   calls it with the visitor's saved choices from the recipe panel (left-out recipes, countries,
   AI-created, blood types, ages) and the Use-experimental checkbox, so those choices change that
@@ -72,6 +75,10 @@ above it. The README has the full table.
     shown on hover via `Lists.substitute()`. Give every new entry one.
 - Balance chips are `data-action="facet"` toggles such as `protein:fish`. Meal slots carry
   `data-facets`, and picking a chip highlights the matching slots and sends `plan:focus`.
+- The prep blocks and the calendar share one column grid: each `.day-col` spans five subgrid
+  rows (header and four meals) so meals line up across the days, and the prep blocks use
+  `grid-template-columns: subgrid` over Monday–Wednesday and Thursday–Friday. Keep borders the
+  same width on every day (today's ring is a box-shadow) so nothing shifts.
 - A menu is 20 recipe ids, day by day in `Planner.TYPES` order (breakfast, lunch, snack, dinner);
   slot k is day `Math.floor(k / Planner.SLOTS)`.
 - In `js/planner.js`, menus are seeded by week number counted from `EPOCH` (2026-10-05). Each week

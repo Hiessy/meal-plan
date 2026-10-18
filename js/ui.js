@@ -299,8 +299,8 @@ function renderModal() {
   byId('m-name').textContent = d.name[lang];
   byId('m-meta').innerHTML =
     `<span class="meal-badge badge-${d.type}">${mt.icon} ${mt.label}</span>` +
-    `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>` +
     (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">${FLASK} ${t('experimental')}</span>` : '') +
+    `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>` +
     `<span class="origin-chip">${originHtml(d, true)}</span>`;
 
   const swapBtn = byId('m-swap');
@@ -1085,31 +1085,36 @@ function buildWeek(n) {
     </div>`;
   }).join('');
 
-  const taskHtml = task => {
+  const taskHtml = (task, state) => {
     const key = prepTick(w, task);
     // Chopping lists the week's vegetables; every other task, its dishes
     const forText = task.key === 'chop-veg'
       ? `<small class="task-for">${task.items.map((row, i) => i ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ')}</small>`
       : `<small class="task-for">${task.meals.map(m =>
           `<span class="task-meal">${mealLabel(m)} — <b>${esc(m.recipe.name[lang])}</b></span>`).join('')}</small>`;
-    return `<li><label class="check" data-tip="${esc(t('tipPrep'))}">
+    return `<label class="check${state}" data-tip="${esc(t('tipPrep'))}">
       <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
       <span>${prepTasks[task.key][lang]}${forText}</span>
-    </label></li>`;
+    </label>`;
   };
-  // One block per prep session: Sunday, Wednesday evening, and the evenings
-  // before meals that soak or marinate overnight
-  const prepHtml = [...new Set(tasks.map(task => task.day))].map(day => {
+  // A heading and the tasks of one session: Sunday, Wednesday evening, or
+  // the evening before meals that soak or marinate overnight
+  const sessionHtml = day => {
     const own = tasks.filter(task => task.day === day);
     const date = addDays(w.monday, day), iso = isoDate(date);
     const title = day < 0 ? t('prepSunday')(fmtDay(date))
       : own.some(task => !task.night) ? t('prepMidweek')(days[day], fmtDay(date))
       : t('prepEvening')(days[day], fmtDay(date));
     const state = iso === todayIso ? ' today' : iso < todayIso ? ' past' : '';
-    return `<section class="prep-session${state}">
-      <h3 class="prep-when">${title}${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}</h3>
-      <ul>${own.map(taskHtml).join('')}</ul>
-    </section>`;
+    return `<h3 class="prep-when${state}">${title}${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}</h3>` +
+      own.map(task => taskHtml(task, state)).join('');
+  };
+  // Sessions up to Tuesday evening sit over Monday–Wednesday, the rest over
+  // Thursday–Friday, on the calendar's columns
+  const sessionDays = [...new Set(tasks.map(task => task.day))];
+  const prepHtml = [['early', d => d < 2], ['late', d => d >= 2]].map(([cls, inBlock]) => {
+    const own = sessionDays.filter(inBlock);
+    return own.length ? `<div class="prep-block ${cls}">${own.map(sessionHtml).join('')}</div>` : '';
   }).join('');
 
   section.innerHTML = `
