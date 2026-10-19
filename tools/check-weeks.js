@@ -174,16 +174,15 @@ function checkWeeks(label, allow, small = false) {
       const got = tasks.filter(t => t.key === 'chop-veg' && t.items.some(x => x.key === row.key)).map(t => t.day).sort();
       if (want.join() !== got.join()) report(where, `${row.key} is chopped on days [${got}], expected [${want}]`);
     });
-    // Prep cards: one per prep day and meal, holding exactly that meal's tasks
+    // Prep cards: one per prep day, in day order, holding exactly that day's tasks
     const cards = Lists.prepCards(meals);
-    const pairs = tasks.flatMap(t => t.meals.map(m => t.day + ':' + m.k + ':' + t.key)).sort();
-    const carded = cards.flatMap(c => c.tasks.map(t => c.day + ':' + c.meal.k + ':' + t.key)).sort();
-    if (pairs.join() !== carded.join()) report(where, 'the prep cards do not hold exactly the prep tasks');
-    if (new Set(cards.map(c => c.day + ':' + c.meal.k)).size < cards.length) report(where, 'two prep cards for one day and meal');
-    cards.forEach(c => c.tasks.filter(t => t.key === 'chop-veg').forEach(t => {
-      if (!t.items.length) report(where, `a chopping card for ${c.meal.recipe.id} lists no vegetables`);
-      t.items.forEach(row => { if (!row.lines.some(l => l.meal.k === c.meal.k)) report(where, `the chopping card for ${c.meal.recipe.id} lists ${row.key}, which it does not use`); });
-    }));
+    const days = cards.map(c => c.day);
+    if (days.join() !== [...new Set(tasks.map(t => t.day))].sort((x, y) => x - y).join()) report(where, 'the prep cards are not one per prep day, in order');
+    cards.forEach(c => {
+      const own = tasks.filter(t => t.day === c.day);
+      if (c.tasks.map(t => t.key + t.meals.map(m => m.k)).join() !== own.map(t => t.key + t.meals.map(m => m.k)).join()) report(where, `the card for day ${c.day} does not hold exactly that day's tasks`);
+      c.tasks.filter(t => t.key === 'chop-veg' && !t.items.length).forEach(() => report(where, `the chopping task on day ${c.day} lists no vegetables`));
+    });
     tasks.filter(t => t.key === 'chop-veg').forEach(t => t.items.forEach(row => {
       if (!rows.some(x => x.key === row.key)) report(where, `chopping lists ${row.key}, not on the shopping list`);
     }));

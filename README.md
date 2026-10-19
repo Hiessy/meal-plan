@@ -47,6 +47,7 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
   - **🌍 Countries**: pick as many as you like. With none picked, menus use your home country:
     the one this device's time zone points to, if it has enough recipes, or else Argentina. The
     plan bar shows the active filters.
+  - **🥗 Diet**: meat-free, vegan or gluten-free (pick several and a recipe must be all of them).
   - **🩸 Blood type** (O, A, B, AB; pick several for a family): leaves out recipes with foods that
     *Eat Right 4 Your Type* (Dr. Peter J. D'Adamo with Catherine Whitney) lists to avoid, in a
     simplified form. Studies have not found health benefits from eating for your blood type.
@@ -65,10 +66,11 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
 - **⇄ Substitutes**: hover an ingredient in a recipe or in the shopping list (press and hold on a
   phone) to see what to use instead. For example tuna → trout or salmon, spinach → Swiss chard
   (acelga), milk → oat, almond or soy milk.
-- **Meal prep as a rolodex of cards.** Each card names the prep day, the meal it is for and that
-  meal's date, then its tasks. The deck opens on today (a "nothing to prep today" card when
-  there is none) and moves with the arrows, the day chips, a click on a card behind, a swipe or
-  the arrow keys. Prep happens in sessions, so nothing is made too early: **Sunday** for what
+- **Meal prep as a rolodex** of index cards, one per prep day, turning on a rod. Each task shows
+  small chips for the meals it is for; hover them for the dish and its date. The rolodex opens
+  on today (a "nothing to prep today" card when there is none). Drag it, or flick it and it
+  keeps spinning until it settles on a card; click a tab or use the arrows and arrow keys.
+  Prep happens in sessions, so nothing is made too early: **Sunday** for what
   keeps until it is eaten, **Wednesday evening** for Thursday and Friday, and the **evening
   before** for what must marinate or soak overnight. `node tools/check-weeks.js` checks that
   the prep and the shopping list match every week's meals.

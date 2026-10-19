@@ -32,8 +32,10 @@ const Diets = (() => {
   const avoided = type => bloodTypes[type].avoid;
   const suitsBlood = (r, types) => types.every(type => ![...keysOf(r)].some(k => avoided(type).includes(k)));
 
-  // { blood: ['O', 'A'], ages: ['m12'] } — a recipe fits when it suits all of them
-  const fits = (r, { blood = [], ages = [] } = {}) => suitsBlood(r, blood) && suitsAges(r, ages);
+  // { blood: ['O', 'A'], ages: ['m12'], diet: ['vegan'] } — a recipe fits
+  // when it suits all of them (diet: keys of marks())
+  const fits = (r, { blood = [], ages = [], diet = [] } = {}) =>
+    suitsBlood(r, blood) && suitsAges(r, ages) && diet.every(key => marks(r)[key]);
 
   // The blood types a recipe suits, as keys of bloodTypes
   const bloodFor = r => Object.keys(bloodTypes).filter(type => suitsBlood(r, [type]));

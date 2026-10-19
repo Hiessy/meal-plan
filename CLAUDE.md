@@ -27,7 +27,9 @@ above it. The README has the full table.
 4. **Flashy layer** — `js/fx.js`, `js/fx-scenes.js` and `css/fx.css`.
    - It is optional: the page must keep working without it.
    - It only listens to `plan:*` events and pointer hovers. Never call it from the UI.
-   - All motion stays in `fx.css`, inside `prefers-reduced-motion: no-preference`.
+   - All motion stays in `fx.css`, inside `prefers-reduced-motion: no-preference`. The one
+     exception is the prep rolodex, which `ui.js` turns frame by frame because it follows the
+     pointer; with reduced motion it jumps.
    - The pixel sprites are rows of characters in `fx.js` (see `INK` for the colours). Every row of
      every frame must be the same length.
    - `fx.js` shares `window.Fx = { play, sprites, ink }`. `fx-scenes.js` uses it and does nothing
@@ -77,14 +79,17 @@ above it. The README has the full table.
   `data-facets`, and picking a chip highlights the matching slots and sends `plan:focus`.
 - Each `.day-col` spans five subgrid rows (header and four meals) so meals line up across the
   days. Keep borders the same width on every day (today's ring is a box-shadow) so nothing shifts.
-- The prep is a deck of cards (`Lists.prepCards`: one per prep day and meal). All cards share one
-  grid cell, so they are the same size; `setDeck` in `ui.js` sets `--d`/`--ad` on each card and
-  CSS fans them out, with the transition in `fx.css`. The deck opens on today's card, and
-  `buildWeek` adds a resting card for today when today has no prep. Ticks are keyed
-  `p:{monday}:{prep day}:{slot}:{task}`.
+- The prep is a rolodex of index cards, one per prep day (`Lists.prepCards`); the meals and
+  dates of each task show as small chips and on hover. All cards share one grid cell, so they
+  are the same size. `placeDeck` in `ui.js` sets `--d` on each card (0 in front, 1, 2… behind,
+  -1…0 flipping forward over the rod; the deck wraps round) and CSS turns that into the 3D
+  pose. `runDeck` animates p with a flick's momentum, friction and a spring; `turnDeck` moves
+  it from the arrows, tabs and keys. The deck opens on today's card, and `buildWeek` adds a
+  resting card for today when today has no prep. Ticks are keyed `p:{monday}:{prep day}:{task}`.
 - Every meal shows marks right of its type (`marksHtml` in `ui.js`): the flask, its origin, the
   blood types it suits (`Diets.bloodFor`), and meat-free/vegan/gluten-free (`Diets.marks`, from
-  `dietFoods` in `data/diets.js`). The icons are pixel SVGs built by `pixelIcon`.
+  `dietFoods` in `data/diets.js`). The icons are pixel SVGs built by `pixelIcon`. The recipe
+  panel's Diet pickers (`filters.diet`) keep only recipes with those marks.
 - `markEaten` crosses out meals whose time is past (`MEAL_ENDS`, by the device clock) every minute.
 - A saved shuffle or swap only shows while `Planner.fits` it: every recipe in the current pools
   and the experimental count in range. Older ones are drawn again.

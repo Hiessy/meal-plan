@@ -377,11 +377,11 @@ header .px-pan { right: 7%; }
     header .px:hover { translate: 0 -3px; transition: translate .15s; }
   }
   .meal-slot:hover .exp-badge .flask { animation: fx-flask .9s ease-in-out infinite; }
-  /* The prep deck slides and turns like a rolodex */
-  .pcard { transition: transform .4s cubic-bezier(.2, .8, .3, 1), opacity .3s var(--ease); }
-  .deck-day, .deck-btn { transition: background .15s, color .15s, transform .15s; }
+  /* The rolodex turns in js/ui.js (it follows the pointer); its buttons and tabs move here */
+  .deck-btn, .pcard-tab { transition: background .15s, color .15s, transform .15s; }
   @media (hover: hover) {
-    .deck-btn:not(:disabled):hover { transform: scale(1.08); }
+    .deck-btn:hover { transform: scale(1.08); }
+    .pcard:not(.focus) .pcard-tab:hover { transform: translateY(-3px); }
   }
   /* The experimental flask: the liquid changes colour and bubbles float out of the neck */
   .flask .fl-liquid { animation: fl-colors 7.5s linear infinite; }

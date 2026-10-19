@@ -15,7 +15,7 @@
      plan:config   { excluded, experimental }  the recipe choices changed
      plan:panel    { open }       the recipe-choice panel opened or closed
      plan:focus    { n, facet, on, picked }  a balance chip was toggled: its meals are highlighted
-     plan:deck     { n, i, dir }  the prep deck of week n moved to card i (dir -1 back, 1 on)
+     plan:deck     { n, i, dir }  card i of week n's prep deck came to the front (dir -1 back, 1 on)
    js/fx.js turns these into sounds and motion.
    ============================================================ */
 (() => {
@@ -140,7 +140,7 @@ const newSeed   = () => Math.floor(Math.random() * 4294967296);
 function weekMeals(w) {
   return menuOf(w.num).map((id, k) => ({ recipe: Planner.recipe(id), di: Math.floor(k / Planner.SLOTS), k }));
 }
-const prepTick = (w, card, task) => `p:${w.iso}:${card.day}:${card.meal.k}:${task.key}`;
+const prepTick = (w, card, task) => `p:${w.iso}:${card.day}:${task.key}`;
 const lowerFirst = text => text.charAt(0).toLowerCase() + text.slice(1);
 const mealLabel = m => t('daysShort')[m.di] + ' · ' + t('mealTypes')[m.recipe.type].label;
 
@@ -375,10 +375,10 @@ document.addEventListener('keydown', e => {
     return;
   }
   const deck = !modalAt && e.target.closest && e.target.closest('.deck, .deck-nav');
-  if (deck && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
-    const n = +deck.closest('.week-section').id.slice(1);
+  const turn = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key];
+  if (deck && turn) {
     e.preventDefault();
-    return setDeck(n, deckAt[n] + (e.key === 'ArrowLeft' ? -1 : 1), true);
+    return turnDeck(+deck.closest('.week-section').id.slice(1), { step: turn });
   }
   if (!modalAt) return;
   if (e.key === 'ArrowLeft' && !byId('m-prev').disabled) run('step', byId('m-prev'));
@@ -393,7 +393,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ============================================================
-   Ticks — prep tasks (p:{monday}:{prep day}:{slot}:{task}) and shopping rows
+   Ticks — prep tasks (p:{monday}:{prep day}:{task}) and shopping rows
    (s:{monday}:{ingredient}) share one saved map
    ============================================================ */
 document.addEventListener('change', e => {
@@ -460,63 +460,150 @@ function togglePrep(n) {
 }
 
 /* ============================================================
-   Prep deck — the prep cards stand like a rolodex: one in front,
-   its neighbours fanned behind. It opens on today's card (or the
-   next one); arrows, the day chips, a click on a card behind,
-   a swipe or the arrow keys move it.
+   Prep deck — a rolodex: the prep cards turn on a rod, one per prep
+   day. p is where the deck stands (card index, a fraction while it
+   moves) and each card sits at d = its index − p, wrapped round the
+   loop: 0 in front, 1, 2… standing behind, between −1 and 0 flipping
+   forward over the rod. A drag turns it with the pointer; a flick
+   keeps it spinning until friction and a spring settle it on a card.
+   It opens on today's card. With reduced motion it jumps instead.
    ============================================================ */
-const deckAt = {};      // n → the card in front
+const decks  = {};      // n → { p, v, target, coast, raf, cards, front }
+const deckAt = {};      // n → the card in front, kept across redraws
+const still  = window.matchMedia('(prefers-reduced-motion: reduce)');
+const wrapIn = (x, len) => ((x % len) + len) % len;
 
-// The first card whose prep day is today or later; the last when all are past
+// The first card whose day is today or later; the last when all are past
 function todayCard(n) {
   const { w, deck } = weekData[n];
   const i = deck.findIndex(card => isoDate(addDays(w.monday, card.day)) >= todayIso);
   return i < 0 ? deck.length - 1 : i;
 }
 
-function setDeck(n, i, moved) {
-  const deck = byId('deck-' + n);
-  if (!deck) return;
-  const cards = [...deck.children], from = deckAt[n];
-  i = Math.max(0, Math.min(cards.length - 1, i));
-  deckAt[n] = i;
-  cards.forEach((card, j) => {
-    const d = j - i, ad = Math.abs(d);
-    card.style.setProperty('--d', d);
-    card.style.setProperty('--ad', Math.min(ad, 3));
-    card.classList.toggle('focus', !d);
-    card.classList.toggle('far', ad > 2);
-    card.setAttribute('aria-hidden', String(!!d));
-    if (d) card.dataset.action = 'deck-go'; else delete card.dataset.action;
-    card.querySelectorAll('input').forEach(input => { input.tabIndex = d ? -1 : 0; });
+// Puts every card where p says
+function placeDeck(n) {
+  const k = decks[n], len = k.cards.length;
+  k.cards.forEach((card, i) => {
+    const d = len > 1 ? wrapIn(i - k.p + 1, len) - 1 : i - k.p;
+    card.style.setProperty('--d', d.toFixed(3));
+    card.style.zIndex = d < 0 ? 200 : 100 - Math.round(d * 10);
+    card.classList.toggle('far', d > 3.6);
+    const front = Math.abs(d) < .5;
+    card.classList.toggle('focus', front);
+    card.setAttribute('aria-hidden', String(!front));
+    card.querySelectorAll('input').forEach(input => { input.tabIndex = front ? 0 : -1; });
   });
-  const day = weekData[n].deck[i].day;
-  document.querySelectorAll(`#prep-list-${n} .deck-day`).forEach(chip => {
-    chip.classList.toggle('active', +chip.dataset.day === day);
-    chip.setAttribute('aria-pressed', String(+chip.dataset.day === day));
-  });
-  byId('deck-count-' + n).textContent = `${i + 1} / ${cards.length}`;
-  byId('deck-prev-' + n).disabled = i === 0;
-  byId('deck-next-' + n).disabled = i === cards.length - 1;
-  if (moved && i !== from) emit('deck', { n, i, dir: Math.sign(i - from) });
+  const front = wrapIn(Math.round(k.p), len);
+  if (front !== k.front) {
+    if (k.front != null) emit('deck', { n, i: front, dir: Math.sign(k.v || 1) });
+    k.front = front;
+    deckAt[n] = front;
+    byId('deck-count-' + n).textContent = `${front + 1} / ${len}`;
+  }
 }
 
-// Swipes: a quick sideways drag over the deck moves it, and the click
-// that follows is dropped so no checkbox flips by accident
-let swipe = null, dropClick = false;
+// Runs the deck until it rests on a card: coasting after a flick, then a
+// spring onto `target`
+function runDeck(n) {
+  const k = decks[n];
+  if (still.matches) {
+    k.p = Math.round(k.coast ? k.p + Math.sign(k.v) : k.target);
+    k.v = 0; k.coast = false;
+    return placeDeck(n);
+  }
+  if (k.raf) return;
+  let last = performance.now();
+  const frame = now => {
+    const dt = Math.min(.04, (now - last) / 1000);
+    last = now;
+    if (k.coast) {
+      k.p += k.v * dt;
+      k.v *= Math.exp(-dt * 2.2);                    // friction
+      if (Math.abs(k.v) < 3) { k.coast = false; k.target = Math.round(k.p + k.v * .25); }
+    } else {
+      k.v += (180 * (k.target - k.p) - 25 * k.v) * dt;   // spring, nearly critically damped
+      k.p += k.v * dt;
+      if (Math.abs(k.target - k.p) < .002 && Math.abs(k.v) < .02) {
+        k.p = k.target = wrapIn(k.target, k.cards.length);
+        k.v = 0;
+        k.raf = 0;
+        return placeDeck(n);
+      }
+    }
+    placeDeck(n);
+    k.raf = requestAnimationFrame(frame);
+  };
+  k.raf = requestAnimationFrame(frame);
+}
+
+// Turns the deck by `step` cards, or to card `to` the short way round
+function turnDeck(n, { step, to }) {
+  const k = decks[n];
+  if (!k) return;
+  const len = k.cards.length, from = k.coast ? Math.round(k.p) : k.target;
+  k.coast = false;
+  if (to != null) {
+    let delta = wrapIn(to - from, len);
+    if (delta > len / 2) delta -= len;
+    k.target = from + delta;
+  } else k.target = from + step;
+  runDeck(n);
+}
+
+function startDeck(n) {
+  const el = byId('deck-' + n);
+  if (!el) { delete decks[n]; return; }
+  const old = decks[n];
+  if (old && old.raf) cancelAnimationFrame(old.raf);
+  const at = n in deckAt ? Math.min(deckAt[n], weekData[n].deck.length - 1) : todayCard(n);
+  decks[n] = { p: at, v: 0, target: at, coast: false, raf: 0, cards: [...el.querySelectorAll('.pcard')], front: null };
+  placeDeck(n);
+}
+
+// Dragging: the deck follows the pointer (sideways, or up and down with a
+// mouse); letting go fast flicks it. The click that ends a drag is dropped
+// so no checkbox flips by accident.
+let drag = null, dropClick = false;
 document.addEventListener('pointerdown', e => {
-  const deck = e.target.closest && e.target.closest('.deck');
-  swipe = deck ? { n: +deck.dataset.n, x: e.clientX, y: e.clientY } : null;
+  const el = e.target.closest && e.target.closest('.deck');
+  if (!el || e.button > 0 || !decks[+el.dataset.n]) return;
+  drag = { el, n: +el.dataset.n, x: e.clientX, y: e.clientY, id: e.pointerId, axis: null, samples: [] };
 });
-document.addEventListener('pointerup', e => {
-  if (!swipe) return;
-  const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y, n = swipe.n;
-  swipe = null;
-  if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-  setDeck(n, deckAt[n] + (dx < 0 ? 1 : -1), true);
+document.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const k = decks[drag.n], dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (!drag.axis) {
+    if (Math.hypot(dx, dy) < 8) return;
+    drag.axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+    if (drag.axis === 'y' && e.pointerType === 'touch') { drag = null; return; }   // let the page scroll
+    if (k.raf) { cancelAnimationFrame(k.raf); k.raf = 0; }
+    k.coast = false;
+    drag.p0 = k.p;
+    try { drag.el.setPointerCapture(e.pointerId); } catch (err) {}
+  }
+  const box = drag.el.querySelector('.pcard.focus') || drag.el;
+  k.p = drag.p0 + (drag.axis === 'x' ? -dx / (box.offsetWidth * .55) : dy / (box.offsetHeight * .6));
+  drag.samples.push({ t: e.timeStamp, p: k.p });
+  drag.samples = drag.samples.filter(s => e.timeStamp - s.t < 120);
+  k.v = 0;
+  placeDeck(drag.n);
+});
+function endDrag(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  const { n, axis, samples } = drag, k = decks[n];
+  drag = null;
+  if (!axis) return;
+  const first = samples[0], lastS = samples[samples.length - 1];
+  const v = first && lastS && lastS.t > first.t ? (lastS.p - first.p) / ((lastS.t - first.t) / 1000) : 0;
+  k.v = Math.max(-24, Math.min(24, v));
+  if (Math.abs(k.v) > 3) k.coast = true;
+  else { k.coast = false; k.target = Math.round(k.p + k.v * .15); }
+  runDeck(n);
   dropClick = true;
-  setTimeout(() => { dropClick = false; }, 60);
-});
+  setTimeout(() => { dropClick = false; }, 80);
+}
+document.addEventListener('pointerup', endDrag);
+document.addEventListener('pointercancel', endDrag);
 document.addEventListener('click', e => {
   if (dropClick) { e.preventDefault(); e.stopPropagation(); dropClick = false; }
 }, true);
@@ -796,14 +883,16 @@ if (typeof store.useExperimental !== 'boolean') store.useExperimental = true;
 
 // Filters: countries ([] = home, ['*'] = all), AI-created recipes on or off,
 // blood types and ages (data/diets.js) the recipes must all suit
-const FILTERS = () => ({ countries: [], ai: true, blood: [], ages: [] });
+const DIETS = ['meatFree', 'vegan', 'glutenFree'];
+const FILTERS = () => ({ countries: [], ai: true, blood: [], ages: [], diet: [] });
 const cleanFilters = f => {
   const d = FILTERS(), list = (v, ok) => Array.isArray(v) ? v.filter(ok) : [];
   return {
     countries: list(f && f.countries, c => c === '*' || countries[c]),
     ai: f && typeof f.ai === 'boolean' ? f.ai : d.ai,
     blood: list(f && f.blood, b => bloodTypes[b]),
-    ages: list(f && f.ages, id => ageGroups.some(g => g.id === id))
+    ages: list(f && f.ages, id => ageGroups.some(g => g.id === id)),
+    diet: list(f && f.diet, key => DIETS.includes(key))
   };
 };
 store.filters = cleanFilters(store.filters);
@@ -874,6 +963,7 @@ function filterSummary(f) {
   if (f.ai && recipes.some(r => r.ai)) parts.push('✨');
   if (f.blood.length) parts.push('🩸 ' + f.blood.map(b => bloodTypes[b].name[lang]).join(', '));
   if (f.ages.length) parts.push('👶 ' + ageGroups.find(g => f.ages.includes(g.id)).name[lang]);
+  if (f.diet.length) parts.push(f.diet.map(key => DIET_ICON[key]).join(''));
   return parts.join(' · ');
 }
 
@@ -917,6 +1007,8 @@ const NO_GLUTEN = pixelIcon([
   '.r...k..rr.',
   '..rr...rr..',
   '...rrrrr...'], { r: '#dc2626', y: '#ca8a04', k: '#854d0e' }, 'ic-no-gluten');
+
+const DIET_ICON = { meatFree: NO_MEAT, vegan: SPROUT, glutenFree: NO_GLUTEN };
 
 // The marks right of a meal's type: experimental flask, where it comes
 // from, the blood types it suits, meat-free or vegan, and gluten-free.
@@ -1049,6 +1141,11 @@ function renderFilters() {
         chip('f-blood', 'data-blood', b, bloodTypes[b].name[lang], f.blood.includes(b), t('tipBlood'))).join('')}</div>
     </div>
     <div class="filter-row">
+      <h3>🥗 ${t('dietTitle')} <button type="button" class="info-dot" data-tip="${esc(t('tipDiet'))}" aria-label="${esc(t('tipDiet'))}">?</button></h3>
+      <div class="chips">${DIETS.map(key =>
+        chip('f-diet', 'data-diet', key, `${DIET_ICON[key]} ${t(key)}`, f.diet.includes(key), t('tipDiet'))).join('')}</div>
+    </div>
+    <div class="filter-row">
       <h3>👶 ${t('agesTitle')} <button type="button" class="info-dot" data-tip="${esc(t('tipAges'))}" aria-label="${esc(t('tipAges'))}">?</button></h3>
       <div class="chips">${ageGroups.map(g =>
         chip('f-age', 'data-age', g.id, g.name[lang], f.ages.includes(g.id), g.how[lang])).join('')}</div>
@@ -1063,6 +1160,7 @@ function setFilter(kind, value) {
   }
   if (kind === 'blood') f.blood = toggle(f.blood, value);
   if (kind === 'age') f.ages = toggle(f.ages, value);
+  if (kind === 'diet') f.diet = toggle(f.diet, value);
   if (kind === 'ai') f.ai = value;
   if (kind === 'clear') draftFilters = FILTERS();
   renderFilters();
@@ -1095,7 +1193,7 @@ function renderList() {
       const off = r.experimental && !store.useExperimental;
       return `<li><label class="check pick${off ? ' off' : ''}">
           <input type="checkbox" data-pick="${r.id}"${draft.has(r.id) ? '' : ' checked'}${off ? ' disabled' : ''}>
-          <span>${iconOf(r)} ${r.name[lang]} ${originHtml(r)}${r.experimental ? ' ' + FLASK : ''}</span>
+          <span>${iconOf(r)} ${r.name[lang]} <span class="row-marks">${marksHtml(r)}</span></span>
         </label></li>`;
     }).join('');
     const more = list.length > limit
@@ -1240,60 +1338,50 @@ function buildWeek(n) {
     </div>`;
   }).join('');
 
-  // Prep cards: the prep day, the meal it is for and that meal's date,
-  // then its tasks (washing and chopping names that meal's vegetables)
-  const restHtml = card => {
-    const date = addDays(w.monday, card.day), next = cards.find(c => c.day > card.day);
-    const when = card.day < 0 ? t('prepSunday')(fmtDay(date)) : t('prepToday')(days[card.day], fmtDay(date));
-    const nextWhen = next && (next.day < 0 ? t('prepSunday') : d => t('prepEvening')(days[next.day], d))(fmtDay(addDays(w.monday, next.day)));
-    return `<article class="pcard today rest" data-n="${n}" data-i="${deck.indexOf(card)}">
-      <header class="pcard-head">
-        <h3 class="pcard-when">${when}<em class="today-pill">${t('today')}</em></h3>
-        <p class="pcard-for">${t('restTitle')}</p>
-      </header>
-      <p class="pcard-rest">${next ? t('restNext')(nextWhen, cards.filter(c => c.day === next.day).length) : t('restDone')}</p>
-    </article>`;
-  };
-  const cardHtml = card => {
-    if (card.rest) return restHtml(card);
-    const date = addDays(w.monday, card.day), iso = isoDate(date), r = card.meal.recipe;
+  // Prep cards, one per prep day: a tab and the day on top, then the
+  // tasks. The meals each task is for show as small chips (the dish and
+  // its date on hover); washing and chopping lists its vegetables.
+  const dayOf = day => day < 0 ? t('sunday') : days[day];
+  const shortOf = day => day < 0 ? t('sundayShort') : t('daysShort')[day];
+  const mealLine = m => `${days[m.di]} ${fmtDay(addDays(w.monday, m.di))} · ${mealTypes[m.recipe.type].label} — ${m.recipe.name[lang]}`;
+  const mealChip = m => `<span class="pmeal" data-tip="${esc(mealLine(m))}">${mealTypes[m.recipe.type].icon} ${t('daysShort')[m.di]} ${addDays(w.monday, m.di).getDate()}</span>`;
+  const cardHtml = (card, i) => {
+    const date = addDays(w.monday, card.day), iso = isoDate(date);
     const state = iso === todayIso ? ' today' : iso < todayIso ? ' past' : '';
-    const when = card.day < 0 ? t('prepSunday')(fmtDay(date)) : t('prepEvening')(days[card.day], fmtDay(date));
+    const head = `<button type="button" class="pcard-tab" data-action="deck-go" data-n="${n}" data-i="${i}" tabindex="-1"
+        style="--tab:${i % 4}">${shortOf(card.day)} ${date.getDate()}</button>
+      <div class="pcard-head">
+        <h3 class="pcard-day">${dayOf(card.day)}</h3>
+        <span class="pcard-date">${fmtDay(date)}</span>${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}
+      </div>`;
+    if (card.rest) {
+      const next = cards.find(c => c.day > card.day);
+      return `<article class="pcard rest${state}">${head}
+        <p class="pcard-rest"><b>${t('restTitle')}</b>${next ? t('restNext')(dayOf(next.day), next.tasks.length) : t('restDone')}</p>
+      </article>`;
+    }
     const tasksHtml = card.tasks.map(task => {
       const key = prepTick(w, card, task);
-      const items = task.key === 'chop-veg'
-        ? `<small class="task-for">${task.items.map((row, i) => i ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ')}</small>` : '';
-      return `<li><label class="check" data-tip="${esc(t('tipPrep'))}">
+      const under = task.key === 'chop-veg'
+        ? `<small class="task-for">${task.items.map((row, j) => j ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ')}</small>`
+        : `<span class="pmeals">${task.meals.map(mealChip).join('')}</span>`;
+      return `<li><label class="check" data-tip="${esc(task.meals.map(mealLine).join('\n'))}">
         <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
-        <span>${prepTasks[task.key][lang]}${items}</span>
+        <span>${prepTasks[task.key][lang]}${under}</span>
       </label></li>`;
     }).join('');
-    return `<article class="pcard${state}" data-n="${n}" data-i="${deck.indexOf(card)}">
-      <header class="pcard-head">
-        <h3 class="pcard-when">${when}${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}</h3>
-        <p class="pcard-for">${t('prepForMeal')(days[card.meal.di], fmtDay(addDays(w.monday, card.meal.di)), mealTypes[r.type].label)}</p>
-        <p class="pcard-meal">${mealTypes[r.type].icon} ${esc(r.name[lang])}</p>
-      </header>
-      <ul class="pcard-tasks">${tasksHtml}</ul>
-    </article>`;
+    return `<article class="pcard${state}">${head}<ul class="pcard-tasks">${tasksHtml}</ul></article>`;
   };
-  // A chip for each prep day, jumping to its first card
-  const dayChips = [...new Set(deck.map(card => card.day))].map(day => {
-    const date = addDays(w.monday, day);
-    return `<button type="button" class="deck-day${isoDate(date) === todayIso ? ' today' : ''}" data-action="deck-go" data-n="${n}"
-      data-i="${deck.findIndex(card => card.day === day)}" data-day="${day}" aria-pressed="false">${day < 0 ? t('sundayShort') : t('daysShort')[day]} ${date.getDate()}</button>`;
-  }).join('');
   const deckBtn = (id, step, label, icon) => `<button type="button" class="deck-btn" id="deck-${id}-${n}" data-action="deck-step"
     data-n="${n}" data-step="${step}" aria-label="${esc(label)}" data-tip="${esc(label)}">${icon}</button>`;
   const prepHtml = deck.length ? `
+      <div class="deck" id="deck-${n}" data-n="${n}" tabindex="0" role="group" aria-roledescription="carousel"
+        aria-label="${esc(t('prepTitle'))}" style="--behind:${Math.min(deck.length - 1, 3)}">${deck.map(cardHtml).join('')}</div>
       <div class="deck-nav" data-tip="${esc(t('tipDeck'))}">
         ${deckBtn('prev', -1, t('deckPrev'), '‹')}
-        <div class="deck-days">${dayChips}</div>
         <span class="deck-count" id="deck-count-${n}"></span>
         ${deckBtn('next', 1, t('deckNext'), '›')}
-      </div>
-      <div class="deck" id="deck-${n}" data-n="${n}" tabindex="0" role="group" aria-roledescription="carousel"
-        aria-label="${esc(t('prepTitle'))}">${deck.map(cardHtml).join('')}</div>`
+      </div>`
     : `<p class="deck-empty">${t('deckEmpty')}</p>`;
 
   section.innerHTML = `
@@ -1331,7 +1419,7 @@ function buildWeek(n) {
 
   applyFocus(n);
   updateProgress(n);
-  if (deck.length) setDeck(n, n in deckAt ? deckAt[n] : todayCard(n));
+  startDeck(n);
   markEaten();
 }
 
@@ -1349,8 +1437,8 @@ const actions = {
   step:        el => stepModal(+el.dataset.step),
   swap:        () => swapMeal(),
   prep:        el => togglePrep(+el.dataset.n),
-  'deck-step': el => setDeck(+el.dataset.n, deckAt[+el.dataset.n] + +el.dataset.step, true),
-  'deck-go':   el => setDeck(+el.dataset.n, +el.dataset.i, true),
+  'deck-step': el => turnDeck(+el.dataset.n, { step: +el.dataset.step }),
+  'deck-go':   el => turnDeck(+el.dataset.n, { to: +el.dataset.i }),
   shop:        el => toggleShopping(+el.dataset.n),
   offset:      el => changeOffset(+el.dataset.delta),
   copy:        el => copyList(+el.dataset.n),
@@ -1367,6 +1455,7 @@ const actions = {
   'f-country':   el => setFilter('country', el.dataset.code),
   'f-blood':     el => setFilter('blood', el.dataset.blood),
   'f-age':       el => setFilter('age', el.dataset.age),
+  'f-diet':      el => setFilter('diet', el.dataset.diet),
   'f-clear':     () => setFilter('clear')
 };
 
