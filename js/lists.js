@@ -1,10 +1,10 @@
 /* ============================================================
-   Lists — the shopping list and the prep list of a week
+   Lists — the shopping list and the Sunday prep of a week
    (logic only, no DOM)
 
-   Reads `ingredients` (data/ingredients.js) and `prepTasks`
-   (data/recipes.js). A meal is { recipe, di, k }: the recipe, its
-   day (0 = Monday) and its slot in the week (0–19).
+   Reads `ingredients` (data/ingredients.js), `prepTasks` and
+   `freezableVeg` (data/recipes.js). A meal is { recipe, di, k }: the
+   recipe, its day (0 = Monday) and its slot in the week (0–19).
    ============================================================ */
 const Lists = (() => {
 
@@ -126,62 +126,53 @@ const Lists = (() => {
     return { text: totals.map(total => fmtAmount(total, row.entry.each, lang)).join(' + '), partial: partial && totals.length > 0 };
   }
 
-  /* ── Prep ──────────────────────────────────────────────────── */
-  // Two big prep sessions — Sunday and Wednesday evening — plus the
-  // evenings before for what must soak or marinate overnight. Days count
-  // from Monday (0), so Sunday is -1.
-  const SUNDAY = -1, MIDWEEK = 2;
-
-  // When to do a task for a meal on day `di`: at the first big session whose
-  // result still keeps until then (prepTasks `keeps`, in days), else — and
-  // always for `night` tasks — the evening before
-  function prepDay(spec, di) {
-    if (!spec.night) for (const day of [SUNDAY, MIDWEEK]) if (day < di && di - day <= spec.keeps) return day;
-    return di - 1;
+  /* ── Sunday prep ───────────────────────────────────────────── */
+  // Everything is made on Sunday and waits for its meal: in the fridge (or
+  // the pantry) while it keeps (prepTasks `keeps`, in days), else in the
+  // freezer if it freezes — moved to the fridge the night before — else it
+  // is made fresh. Days count from Monday (0), so a meal on day di is
+  // di + 1 days after the prep. → { store, thaw: the day to thaw it, or null }
+  function storeFor(spec, di) {
+    if (spec.store === 'freezer') return { store: 'freezer', thaw: null };
+    if (di + 1 <= spec.keeps) return { store: spec.store || 'fridge', thaw: null };
+    if (spec.freezes) return { store: 'freezer', thaw: di - 1 };
+    return { store: 'fresh', thaw: null };
   }
 
   // Fresh vegetables that are not washed and chopped ahead
   const NOT_CHOPPED = new Set(['peas', 'corn', 'edamame', 'avocados', 'coleslaw-mix', 'potatoes', 'sweet-potatoes']);
+  const STORES = ['fridge', 'pantry', 'freezer', 'fresh'];
 
-  // The make-ahead tasks of the week, by session: { key, day, night, meals,
-  // items }, in day order and then the order of prepTasks. Washing and
-  // chopping comes first in each session, with its vegetables (shopping
-  // rows) as `items`.
+  // The week's prep as portions, one per task, day and place: { key, di,
+  // store, thaw, meals, items }, by day, then the order of prepTasks.
+  // Chopping keeps each day's vegetables apart (items: shopping rows); past
+  // the days chopped vegetables keep, those in freezableVeg are frozen and
+  // the others chopped fresh.
   function prep(meals) {
-    const order = Object.keys(prepTasks), tasks = new Map();
-    const task = (key, day) => {
-      const id = day + ':' + key;
-      if (!tasks.has(id)) tasks.set(id, { key, day, night: !!prepTasks[key].night, meals: [], items: [] });
-      return tasks.get(id);
+    const order = Object.keys(prepTasks), out = new Map();
+    const portion = (key, di, { store, thaw }) => {
+      const id = [key, di, store].join(':');
+      if (!out.has(id)) out.set(id, { key, di, store, thaw, meals: [], items: [] });
+      return out.get(id);
     };
+    const add = (list, x) => { if (!list.includes(x)) list.push(x); };
     shopping(meals).forEach(row => {
       if (row.cat !== 'Vegetables' || row.entry.kind === 'spice' || NOT_CHOPPED.has(row.key)) return;
       row.lines.forEach(({ meal }) => {
-        const chop = task('chop-veg', prepDay(prepTasks['chop-veg'], meal.di));
-        if (!chop.items.includes(row)) chop.items.push(row);
-        if (!chop.meals.includes(meal)) chop.meals.push(meal);
+        let where = storeFor(prepTasks['chop-veg'], meal.di);
+        if (where.store === 'freezer' && !freezableVeg.includes(row.key)) where = { store: 'fresh', thaw: null };
+        const p = portion('chop-veg', meal.di, where);
+        add(p.items, row);
+        add(p.meals, meal);
       });
     });
     meals.forEach(meal => (meal.recipe.prep || []).forEach(key => {
-      if (!prepTasks[key] || key === 'chop-veg') return;
-      const t = task(key, prepDay(prepTasks[key], meal.di));
-      if (!t.meals.includes(meal)) t.meals.push(meal);
+      if (prepTasks[key] && key !== 'chop-veg') add(portion(key, meal.di, storeFor(prepTasks[key], meal.di)).meals, meal);
     }));
-    tasks.forEach(t => t.meals.sort((a, b) => a.k - b.k));
-    return [...tasks.values()].sort((a, b) => a.day - b.day || order.indexOf(a.key) - order.indexOf(b.key));
+    out.forEach(p => p.meals.sort((x, y) => x.k - y.k));
+    return [...out.values()].sort((x, y) => x.di - y.di || order.indexOf(x.key) - order.indexOf(y.key) ||
+      STORES.indexOf(x.store) - STORES.indexOf(y.store));
   }
 
-  // The prep as cards, one per prep day: { day, tasks }, with the tasks
-  // of prep() for that day
-  function prepCards(meals) {
-    const cards = [];
-    prep(meals).forEach(task => {
-      let card = cards.find(c => c.day === task.day);
-      if (!card) cards.push(card = { day: task.day, tasks: [] });
-      card.tasks.push(task);
-    });
-    return cards;
-  }
-
-  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, prepDay, prepCards, substitute, entryFor: ingredientFor };
+  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, storeFor, substitute, entryFor: ingredientFor };
 })();

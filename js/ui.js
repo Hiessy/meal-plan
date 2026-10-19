@@ -140,7 +140,7 @@ const newSeed   = () => Math.floor(Math.random() * 4294967296);
 function weekMeals(w) {
   return menuOf(w.num).map((id, k) => ({ recipe: Planner.recipe(id), di: Math.floor(k / Planner.SLOTS), k }));
 }
-const prepTick = (w, card, task) => `p:${w.iso}:${card.day}:${task.key}`;
+const prepTick = (w, key) => `p:${w.iso}:${key}`;
 const lowerFirst = text => text.charAt(0).toLowerCase() + text.slice(1);
 const mealLabel = m => t('daysShort')[m.di] + ' · ' + t('mealTypes')[m.recipe.type].label;
 
@@ -393,7 +393,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ============================================================
-   Ticks — prep tasks (p:{monday}:{prep day}:{task}) and shopping rows
+   Ticks — Sunday prep tasks (p:{monday}:{task}) and shopping rows
    (s:{monday}:{ingredient}) share one saved map
    ============================================================ */
 document.addEventListener('change', e => {
@@ -426,8 +426,8 @@ function setPill(id, done, total) {
 
 // Updates the counters and "still to buy"; → which lists are fully ticked
 function updateProgress(n) {
-  const { w, rows, cards } = weekData[n];
-  const tasks = cards.flatMap(card => card.tasks.map(task => prepTick(w, card, task)));
+  const { w, rows, portions } = weekData[n];
+  const tasks = [...new Set(portions.filter(p => p.store !== 'fresh').map(p => prepTick(w, p.key)))];
   const prepDone = tasks.filter(key => store.ticks[key]).length;
   setPill(`prep-count-${n}`, prepDone, tasks.length);
 
@@ -476,7 +476,7 @@ const wrapIn = (x, len) => ((x % len) + len) % len;
 // The first card whose day is today or later; the last when all are past
 function todayCard(n) {
   const { w, deck } = weekData[n];
-  const i = deck.findIndex(card => isoDate(addDays(w.monday, card.day)) >= todayIso);
+  const i = deck.findIndex(day => isoDate(addDays(w.monday, day)) >= todayIso);
   return i < 0 ? deck.length - 1 : i;
 }
 
@@ -1009,6 +1009,7 @@ const NO_GLUTEN = pixelIcon([
   '...rrrrr...'], { r: '#dc2626', y: '#ca8a04', k: '#854d0e' }, 'ic-no-gluten');
 
 const DIET_ICON = { meatFree: NO_MEAT, vegan: SPROUT, glutenFree: NO_GLUTEN };
+const STORE_ICON = { fridge: '🧊', pantry: '🫙', freezer: '❄️', fresh: '🔪' };
 
 // The marks right of a meal's type: experimental flask, where it comes
 // from, the blood types it suits, meat-free or vegan, and gluten-free.
@@ -1288,17 +1289,9 @@ function buildWeek(n) {
   const w = weeks[n - 1];
   const meals = weekMeals(w);
   const rows = Lists.shopping(meals);
-  const cards = Lists.prepCards(meals);
-  // The deck: the prep cards, plus a resting card for today when today
-  // (Sunday to Friday of this week) has nothing to prep, so the deck can
-  // always open on today
-  const todayDay = Math.round((today - w.monday) / 864e5);
-  const deck = cards.slice();
-  if (todayDay >= -1 && todayDay <= 4 && !cards.some(card => card.day === todayDay)) {
-    const at = deck.findIndex(card => card.day > todayDay);
-    deck.splice(at < 0 ? deck.length : at, 0, { day: todayDay, rest: true });
-  }
-  weekData[n] = { w, meals, rows, cards, deck };
+  const portions = Lists.prep(meals);
+  const deck = [-1, 0, 1, 2, 3, 4];     // the Sunday card, then one card a day
+  weekData[n] = { w, meals, rows, portions, deck };
 
   const section = byId('w' + n);
   const days = t('days');
@@ -1338,51 +1331,69 @@ function buildWeek(n) {
     </div>`;
   }).join('');
 
-  // Prep cards, one per prep day: a tab and the day on top, then the
-  // tasks. The meals each task is for show as small chips (the dish and
-  // its date on hover); washing and chopping lists its vegetables.
-  const dayOf = day => day < 0 ? t('sunday') : days[day];
-  const shortOf = day => day < 0 ? t('sundayShort') : t('daysShort')[day];
+  // The rolodex: the Sunday card is the checklist — each task once, with a
+  // chip per day showing where that day's portion waits — then a card for
+  // each day: what is ready from Sunday and where, what to thaw tonight
+  // for tomorrow, and what is made fresh. Dishes and dates show on hover.
   const mealLine = m => `${days[m.di]} ${fmtDay(addDays(w.monday, m.di))} · ${mealTypes[m.recipe.type].label} — ${m.recipe.name[lang]}`;
-  const mealChip = m => `<span class="pmeal" data-tip="${esc(mealLine(m))}">${mealTypes[m.recipe.type].icon} ${t('daysShort')[m.di]} ${addDays(w.monday, m.di).getDate()}</span>`;
-  const cardHtml = (card, i) => {
-    const date = addDays(w.monday, card.day), iso = isoDate(date);
+  const mealChip = m => `<span class="pmeal" data-tip="${esc(mealLine(m))}">${mealTypes[m.recipe.type].icon} ${mealTypes[m.recipe.type].label}</span>`;
+  const vegList = rows => rows.map((row, j) => j ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ');
+  const storeText = p => p.store === 'freezer' && p.thaw != null ? t('storeThaw')(t('days')[p.thaw]) : t('store')[p.store];
+  const storeBadge = p => `<span class="store store-${p.store}">${STORE_ICON[p.store]} ${storeText(p)}</span>`;
+  const dayChip = p => `<span class="pday store-${p.store}" data-tip="${esc([storeText(p), ...p.meals.map(mealLine)].join('\n'))}">` +
+    `${STORE_ICON[p.store]} ${t('daysShort')[p.di]} ${addDays(w.monday, p.di).getDate()}</span>`;
+  const head = (day, i, lead) => {
+    const date = addDays(w.monday, day), iso = isoDate(date);
     const state = iso === todayIso ? ' today' : iso < todayIso ? ' past' : '';
-    const head = `<button type="button" class="pcard-tab" data-action="deck-go" data-n="${n}" data-i="${i}" tabindex="-1"
-        style="--tab:${i % 4}">${shortOf(card.day)} ${date.getDate()}</button>
+    return [state, `<button type="button" class="pcard-tab" data-action="deck-go" data-n="${n}" data-i="${i}" tabindex="-1"
+        style="--tab:${i % 4}">${day < 0 ? t('sundayShort') : t('daysShort')[day]} ${date.getDate()}</button>
       <div class="pcard-head">
-        <h3 class="pcard-day">${dayOf(card.day)}</h3>
+        <h3 class="pcard-day">${day < 0 ? t('sunday') : days[day]}</h3>
         <span class="pcard-date">${fmtDay(date)}</span>${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}
-      </div>`;
-    if (card.rest) {
-      const next = cards.find(c => c.day > card.day);
-      return `<article class="pcard rest${state}">${head}
-        <p class="pcard-rest"><b>${t('restTitle')}</b>${next ? t('restNext')(dayOf(next.day), next.tasks.length) : t('restDone')}</p>
-      </article>`;
-    }
-    const tasksHtml = card.tasks.map(task => {
-      const key = prepTick(w, card, task);
-      const under = task.key === 'chop-veg'
-        ? `<small class="task-for">${task.items.map((row, j) => j ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ')}</small>`
-        : `<span class="pmeals">${task.meals.map(mealChip).join('')}</span>`;
-      return `<li><label class="check" data-tip="${esc(task.meals.map(mealLine).join('\n'))}">
-        <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
-        <span>${prepTasks[task.key][lang]}${under}</span>
+        ${lead ? `<p class="pcard-lead">${lead}</p>` : ''}
+      </div>`];
+  };
+  const sundayCard = () => {
+    const keys = [...new Set(portions.filter(p => p.store !== 'fresh').map(p => p.key))];
+    const [state, top] = head(-1, 0, t('prepLead'));
+    const tasksHtml = keys.map(key => {
+      const own = portions.filter(p => p.key === key && p.store !== 'fresh'), tick = prepTick(w, key);
+      const veg = key === 'chop-veg' ? `<small class="task-for">${vegList([...new Set(own.flatMap(p => p.items))])}</small>` : '';
+      return `<li><label class="check" data-tip="${esc(t('tipPrep'))}">
+        <input type="checkbox" data-tick="${esc(tick)}"${store.ticks[tick] ? ' checked' : ''}>
+        <span>${prepTasks[key][lang]}${veg}<span class="pmeals">${own.map(dayChip).join('')}</span></span>
       </label></li>`;
     }).join('');
-    return `<article class="pcard${state}">${head}<ul class="pcard-tasks">${tasksHtml}</ul></article>`;
+    return `<article class="pcard sunday${state}">${top}
+      ${keys.length ? `<ul class="pcard-tasks">${tasksHtml}</ul>` : `<p class="pcard-rest">${t('prepNothing')}</p>`}</article>`;
   };
+  const line = (p, extra = '') => `<li class="pline">${storeBadge(p)}
+      <span class="pline-what">${p.key === 'chop-veg' ? `${prepTasks[p.key].item[lang]}: ${lowerFirst(vegList(p.items))}` : prepTasks[p.key].item[lang]}${extra}</span>
+      <span class="pmeals">${p.meals.map(mealChip).join('')}</span></li>`;
+  const dayCard = (day, i) => {
+    const ready = portions.filter(p => p.di === day && p.store !== 'fresh');
+    const thaw = portions.filter(p => p.thaw === day);
+    const fresh = portions.filter(p => p.di === day && p.store === 'fresh');
+    const [state, top] = head(day, i);
+    const section = (title, list) => list.length ? `<h4 class="pcard-sub">${title}</h4><ul class="plines">${list.join('')}</ul>` : '';
+    const body = ready.length || thaw.length || fresh.length
+      ? section(t('fromSunday'), ready.map(p => line(p))) +
+        section(t('thawTonight'), thaw.map(p => line(p))) +
+        section(t('makeFresh'), fresh.map(p => line(p)))
+      : `<p class="pcard-rest">${t('dayNothing')}</p>`;
+    return `<article class="pcard${state}">${top}<div class="pcard-body">${body}</div></article>`;
+  };
+  const cardHtml = (day, i) => day < 0 ? sundayCard() : dayCard(day, i);
   const deckBtn = (id, step, label, icon) => `<button type="button" class="deck-btn" id="deck-${id}-${n}" data-action="deck-step"
     data-n="${n}" data-step="${step}" aria-label="${esc(label)}" data-tip="${esc(label)}">${icon}</button>`;
-  const prepHtml = deck.length ? `
+  const prepHtml = `
       <div class="deck" id="deck-${n}" data-n="${n}" tabindex="0" role="group" aria-roledescription="carousel"
         aria-label="${esc(t('prepTitle'))}" style="--behind:${Math.min(deck.length - 1, 3)}">${deck.map(cardHtml).join('')}</div>
       <div class="deck-nav" data-tip="${esc(t('tipDeck'))}">
         ${deckBtn('prev', -1, t('deckPrev'), '‹')}
         <span class="deck-count" id="deck-count-${n}"></span>
         ${deckBtn('next', 1, t('deckNext'), '›')}
-      </div>`
-    : `<p class="deck-empty">${t('deckEmpty')}</p>`;
+      </div>`;
 
   section.innerHTML = `
     <div class="week-head">

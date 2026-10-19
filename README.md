@@ -66,14 +66,16 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
 - **⇄ Substitutes**: hover an ingredient in a recipe or in the shopping list (press and hold on a
   phone) to see what to use instead. For example tuna → trout or salmon, spinach → Swiss chard
   (acelga), milk → oat, almond or soy milk.
-- **Meal prep as a rolodex** of index cards, one per prep day, turning on a rod. Each task shows
-  small chips for the meals it is for; hover them for the dish and its date. The rolodex opens
-  on today (a "nothing to prep today" card when there is none). Drag it, or flick it and it
-  keeps spinning until it settles on a card; click a tab or use the arrows and arrow keys.
-  Prep happens in sessions, so nothing is made too early: **Sunday** for what
-  keeps until it is eaten, **Wednesday evening** for Thursday and Friday, and the **evening
-  before** for what must marinate or soak overnight. `node tools/check-weeks.js` checks that
-  the prep and the shopping list match every week's meals.
+- **Sunday prep as a rolodex** of index cards turning on a rod. Everything is made on Sunday,
+  then each day's part waits in the 🧊 fridge or 🫙 pantry while it keeps, or in the ❄️
+  freezer (thawed the night before) when it freezes; what neither keeps nor freezes, like
+  lettuce for Friday, is made fresh. The Sunday card is the checklist, with a chip per day
+  showing where its portion goes. Then there is a card for each weekday: what is ready from
+  Sunday, what to move to the fridge tonight, and what to make fresh. Hover a chip for the
+  dish and its date. The rolodex opens on today; drag it, or flick it and it keeps spinning
+  until it settles on a card; click a tab or use the arrows and arrow keys.
+  `node tools/check-weeks.js` checks that the prep and the shopping list match every week's
+  meals.
 - **The days line up**: breakfasts, lunches, snacks and dinners sit on the same rows across the
   week.
 - **Shopping list built from the week's meals**:

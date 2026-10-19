@@ -51,10 +51,12 @@ above it. The README has the full table.
     any recipe can land on any day.
   - Make-ahead work goes in `prep`, as keys of `prepTasks`. Task texts stay generic ("Marinate
     the meat overnight…"), because the prep card names the dishes under each task.
-    Washing and chopping is not a key: `Lists.prep` lists each session's vegetables itself.
-  - Every prep task has `keeps` (days its result lasts in the fridge) or `night: true` (done the
-    evening before). `Lists.prepDay` puts each task in the first big session — Sunday (day -1) or
-    Wednesday evening (day 2) — whose result still keeps until the meal, else the evening before.
+    Washing and chopping is not a key: `Lists.prep` lists each day's vegetables itself.
+  - All prep happens on Sunday. Every prep task has `keeps` (days its result lasts in the
+    fridge), `freezes`, an `item` name for the day cards, and `store` when it is not kept in the
+    fridge ('pantry' or 'freezer'). `Lists.storeFor` keeps each day's portion in the fridge or
+    pantry while it keeps, else in the freezer (thawed the night before) if it freezes, else it
+    is made fresh. Chopped vegetables freeze only when listed in `freezableVeg`.
   - `experimental: true` marks a new, not yet family-tested recipe. The flask (`FLASK` in `ui.js`,
     a pixel Erlenmeyer flask) goes right of the meal-type badge, never inside it, on the plain
     background with no pill of its own (`.exp-badge` on slots, `.exp-chip` in the recipe sheet);
@@ -79,13 +81,15 @@ above it. The README has the full table.
   `data-facets`, and picking a chip highlights the matching slots and sends `plan:focus`.
 - Each `.day-col` spans five subgrid rows (header and four meals) so meals line up across the
   days. Keep borders the same width on every day (today's ring is a box-shadow) so nothing shifts.
-- The prep is a rolodex of index cards, one per prep day (`Lists.prepCards`); the meals and
-  dates of each task show as small chips and on hover. All cards share one grid cell, so they
-  are the same size. `placeDeck` in `ui.js` sets `--d` on each card (0 in front, 1, 2… behind,
-  -1…0 flipping forward over the rod; the deck wraps round) and CSS turns that into the 3D
-  pose. `runDeck` animates p with a flick's momentum, friction and a spring; `turnDeck` moves
-  it from the arrows, tabs and keys. The deck opens on today's card, and `buildWeek` adds a
-  resting card for today when today has no prep. Ticks are keyed `p:{monday}:{prep day}:{task}`.
+- The prep is a rolodex of index cards: the Sunday checklist (each task once, a chip per day
+  showing where that day's portion waits), then one card for every weekday, Monday to Friday,
+  even when empty: what is ready from Sunday and where, what to thaw tonight, what is made
+  fresh. Dishes and dates show on hover. All cards share one grid cell, so they are the same
+  size. `placeDeck` in `ui.js` sets `--d` on each card (0 in front, 1, 2… behind, -1…0 flipping
+  forward over the rod; the deck wraps round) and CSS turns that into the 3D pose. `runDeck`
+  animates p with a flick's momentum, friction and a spring; `turnDeck` moves it from the
+  arrows, tabs and keys. The deck opens on today's card. Ticks are on the Sunday card only,
+  keyed `p:{monday}:{task}`.
 - Every meal shows marks right of its type (`marksHtml` in `ui.js`): the flask, its origin, the
   blood types it suits (`Diets.bloodFor`), and meat-free/vegan/gluten-free (`Diets.marks`, from
   `dietFoods` in `data/diets.js`). The icons are pixel SVGs built by `pixelIcon`. The recipe
@@ -102,7 +106,8 @@ above it. The README has the full table.
 - Run `node tools/check-weeks.js [weeks]` after changing recipes, prep tasks, the dictionary or
   the planner. It checks balance (`Planner.cost === 0`), repeats, the experimental cap, that every
   ingredient line lands on the shopping list once, that amounts add up the same in both languages,
-  and that each prep task fits its recipes (`fits` in the script) and lists only that week's meals.
+  that each prep task fits its recipes (`fits` in the script), and that every prep portion is
+  for that day's meals and kept where it lasts until them.
 - When a CSS or JS file changes, bump the `?v=` query on its tag in `index.html` so Pages caches refresh.
 - To test locally, run `python -m http.server 8123` and open `http://localhost:8123/`. Add
   `?date=YYYY-MM-DD` to preview another date; saved data is not pruned while previewing.

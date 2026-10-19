@@ -421,7 +421,7 @@ function snacks() {
       steps: [L('Cut the fruit into chunks.', 'Cortá la fruta en trozos.'), L('Thread onto skewers, alternating colours.', 'Ensartá en los palitos alternando colores.'),
         L('Squeeze lime over just before serving.', 'Exprimí lima por encima justo antes de servir.')] }); }));
   done('frozen-bites', pickQuota(cross(['banana', 'strawberry', 'mango', 'berries', 'kiwi', 'peach', 'pineapple'], ['coconut', 'granola', 'seeds', 'chia']), 20,
-    (fk, tk) => { const f = F(fk), t = T(tk); return add({ type: 'snack', group: 'fruit', tags: ['frozen'], prep: ['chill-ahead'],
+    (fk, tk) => { const f = F(fk), t = T(tk); return add({ type: 'snack', group: 'fruit', tags: ['frozen'], prep: ['freeze-ahead'],
       name: L(`Frozen ${f.en} Yogurt Bites with ${t.en}`, `Bocaditos helados de yogur y ${f.es} con ${t.es}`),
       ing: [f.ing, L('1½ cups plain yogurt', '1½ tazas yogur natural'), t.ing],
       steps: [L(`Fold ${f.the.en} into the yogurt.`, `Incorporá ${f.the.es} al yogur.`), L('Spoon small mounds onto a lined tray and sprinkle with the topping.', 'Formá montoncitos sobre una placa con papel y espolvoreá con el topping.'),

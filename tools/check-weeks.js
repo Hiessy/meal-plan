@@ -12,8 +12,8 @@ const weeksToCheck = +process.argv[2] || 120;
 const files = ['data/recipes.js', 'data/recipes-world.js', 'data/recipes-ai.js', 'data/ingredients.js', 'data/countries.js',
   'data/diets.js', 'js/planner.js', 'js/lists.js', 'js/diets.js'];
 const ctx = new Function(files.map(f => fs.readFileSync(path.join(root, f), 'utf8')).join('\n;\n') +
-  ';return { recipes, prepTasks, Planner, Lists, shopCategories };')();
-const { recipes, prepTasks, Planner, Lists, shopCategories } = ctx;
+  ';return { recipes, prepTasks, freezableVeg, Planner, Lists, shopCategories };')();
+const { recipes, prepTasks, freezableVeg, Planner, Lists, shopCategories } = ctx;
 
 const problems = [];
 const report = (where, what) => problems.push(`${where}: ${what}`);
@@ -51,9 +51,9 @@ const needs = {
 const covers = {
   marinate: ['marinate'],
   soak: ['soak'],
-  chill: ['chill-ahead', 'banana-pops', 'yogurt-bark', 'arroz-con-leche', 'chia-pudding', 'overnight-oats'],
+  chill: ['chill-ahead', 'freeze-ahead', 'banana-pops', 'yogurt-bark', 'arroz-con-leche', 'chia-pudding', 'overnight-oats'],
   slow: ['cook-ahead', 'rub-ribs', 'apple-chips'],
-  overnight: ['marinate', 'soak', 'overnight-oats', 'chia-pudding', 'chill-ahead', 'arroz-con-leche', 'cook-ahead']
+  overnight: ['marinate', 'soak', 'overnight-oats', 'chia-pudding', 'chill-ahead', 'freeze-ahead', 'arroz-con-leche', 'cook-ahead']
 };
 // What a recipe must have for a prep task to make sense for it
 const fits = {
@@ -73,7 +73,8 @@ const fits = {
   'banana-pops': r => /pop/i.test(r.name.en),
   'yogurt-bark': r => /bark/i.test(r.name.en),
   'arroz-con-leche': r => /arroz con leche/i.test(r.name.en),
-  'chill-ahead': r => needs.chill(r) || /chill|freez|refrigerat|set/i.test(stepsOf(r)),
+  'chill-ahead': r => needs.chill(r) || /chill|refrigerat|set/i.test(stepsOf(r)),
+  'freeze-ahead': r => /freez/i.test(stepsOf(r)),
   'rub-ribs': r => /ribs/i.test(r.name.en),
   'marinate': r => /marinat|rub (the )?\w+ with/i.test(stepsOf(r)),
   'soak': r => needs.soak(r),
@@ -147,44 +148,43 @@ function checkWeeks(label, allow, small = false) {
       const nums = s => (s.match(/[\d½¼¾⅓⅔.,]+/g) || []).join(' ').replace(/,/g, '.');
       if (!row.lines.some(l => /\blbs?\b/.test(l.en)) && nums(en) !== nums(es)) report(where, `row ${row.key} adds up to "${en}" in English but "${es}" in Spanish`);
     });
-    // Prep: every task is for meals of this week, done before them and
-    // while its result still keeps; every meal that needs work ahead gets it
-    const tasks = Lists.prep(meals);
-    tasks.forEach(task => {
-      const spec = prepTasks[task.key];
-      if (!task.meals.length) report(where, `prep "${task.key}" is for no meal`);
-      if (task.day !== -1 && task.day !== 2 && !task.night && task.meals.some(m => m.di - 1 !== task.day))
-        report(where, `prep "${task.key}" on day ${task.day} is neither a big session nor the evening before`);
-      task.meals.forEach(m => {
-        if (Planner.recipe(ids[m.k]) !== m.recipe) report(where, `prep "${task.key}" names a meal not in the week`);
-        if (task.day >= m.di) report(where, `prep "${task.key}" on day ${task.day} is not before ${m.recipe.id} on day ${m.di}`);
-        if (spec.night && task.day !== m.di - 1) report(where, `overnight prep "${task.key}" is not the evening before ${m.recipe.id}`);
-        if (!spec.night && m.di - task.day > spec.keeps) report(where, `prep "${task.key}" on day ${task.day} does not keep ${m.di - task.day} days for ${m.recipe.id}`);
-        if (task.key !== 'chop-veg' && !(m.recipe.prep || []).includes(task.key)) report(where, `prep "${task.key}" lists ${m.recipe.id}, which does not need it`);
+    // Sunday prep: every portion is for that day's meals of this week, kept
+    // where it lasts until the meal (fridge or pantry while it keeps, else
+    // the freezer and thawed the night before, else made fresh), and every
+    // meal that needs work ahead gets it once
+    const portions = Lists.prep(meals);
+    portions.forEach(p => {
+      const spec = prepTasks[p.key], gap = p.di + 1;
+      if (!p.meals.length) report(where, `prep "${p.key}" for day ${p.di} is for no meal`);
+      p.meals.forEach(m => {
+        if (Planner.recipe(ids[m.k]) !== m.recipe) report(where, `prep "${p.key}" names a meal not in the week`);
+        if (m.di !== p.di) report(where, `prep "${p.key}" for day ${p.di} lists ${m.recipe.id} of day ${m.di}`);
+        if (p.key !== 'chop-veg' && !(m.recipe.prep || []).includes(p.key)) report(where, `prep "${p.key}" lists ${m.recipe.id}, which does not need it`);
+      });
+      const ok = {
+        fridge: !spec.store && gap <= spec.keeps,
+        pantry: spec.store === 'pantry' && gap <= spec.keeps,
+        freezer: spec.store === 'freezer' ? p.thaw == null : spec.freezes && gap > spec.keeps && p.thaw === p.di - 1,
+        fresh: spec.store !== 'freezer' && gap > spec.keeps && (!spec.freezes || p.key === 'chop-veg')
+      }[p.store];
+      if (!ok) report(where, `prep "${p.key}" for day ${p.di} is kept as "${p.store}", which does not fit`);
+      if (p.key === 'chop-veg' && p.store === 'freezer' && p.items.some(r => !freezableVeg.includes(r.key))) report(where, 'a vegetable that does not freeze is frozen');
+      if (p.key === 'chop-veg' && p.store === 'fresh' && p.items.some(r => freezableVeg.includes(r.key))) report(where, 'a vegetable that freezes is left to chop fresh');
+    });
+    if (new Set(portions.map(p => [p.key, p.di, p.store].join(':'))).size < portions.length) report(where, 'a prep portion is listed twice');
+    meals.forEach(m => (m.recipe.prep || []).forEach(key => {
+      if (key !== 'chop-veg' && portions.filter(p => p.key === key && p.meals.includes(m)).length !== 1) report(where, `prep "${key}" of ${m.recipe.id} is not listed once`);
+    }));
+    // Chopping: each vegetable of each day's meals in that day's chopping, once
+    const skip = ['peas', 'corn', 'edamame', 'avocados', 'coleslaw-mix', 'potatoes', 'sweet-potatoes'];
+    rows.filter(row => row.cat === 'Vegetables' && row.entry.kind !== 'spice' && !skip.includes(row.key)).forEach(row => {
+      [...new Set(row.lines.map(l => l.meal.di))].forEach(di => {
+        const n = portions.filter(p => p.key === 'chop-veg' && p.di === di && p.items.some(x => x.key === row.key)).length;
+        if (n !== 1) report(where, `${row.key} for day ${di} is chopped ${n} times`);
       });
     });
-    meals.forEach(m => (m.recipe.prep || []).forEach(key => {
-      if (key !== 'chop-veg' && tasks.filter(t => t.key === key && t.meals.includes(m)).length !== 1) report(where, `prep "${key}" of ${m.recipe.id} is not listed once`);
-    }));
-    if (new Set(tasks.map(t => t.day + ':' + t.key)).size < tasks.length) report(where, 'a prep task is listed twice in one session');
-    // Chopping: each vegetable in the sessions of the meals that use it, nothing else
-    rows.filter(row => row.cat === 'Vegetables' && row.entry.kind !== 'spice').forEach(row => {
-      const skip = ['peas', 'corn', 'edamame', 'avocados', 'coleslaw-mix', 'potatoes', 'sweet-potatoes'].includes(row.key);
-      const want = skip ? [] : [...new Set(row.lines.map(l => Lists.prepDay(prepTasks['chop-veg'], l.meal.di)))].sort();
-      const got = tasks.filter(t => t.key === 'chop-veg' && t.items.some(x => x.key === row.key)).map(t => t.day).sort();
-      if (want.join() !== got.join()) report(where, `${row.key} is chopped on days [${got}], expected [${want}]`);
-    });
-    // Prep cards: one per prep day, in day order, holding exactly that day's tasks
-    const cards = Lists.prepCards(meals);
-    const days = cards.map(c => c.day);
-    if (days.join() !== [...new Set(tasks.map(t => t.day))].sort((x, y) => x - y).join()) report(where, 'the prep cards are not one per prep day, in order');
-    cards.forEach(c => {
-      const own = tasks.filter(t => t.day === c.day);
-      if (c.tasks.map(t => t.key + t.meals.map(m => m.k)).join() !== own.map(t => t.key + t.meals.map(m => m.k)).join()) report(where, `the card for day ${c.day} does not hold exactly that day's tasks`);
-      c.tasks.filter(t => t.key === 'chop-veg' && !t.items.length).forEach(() => report(where, `the chopping task on day ${c.day} lists no vegetables`));
-    });
-    tasks.filter(t => t.key === 'chop-veg').forEach(t => t.items.forEach(row => {
-      if (!rows.some(x => x.key === row.key)) report(where, `chopping lists ${row.key}, not on the shopping list`);
+    portions.filter(p => p.key === 'chop-veg').forEach(p => p.items.forEach(row => {
+      if (!row.lines.some(l => l.meal.di === p.di)) report(where, `chopping for day ${p.di} lists ${row.key}, which that day does not use`);
     }));
   });
   console.log(`${label}: ${menus.length} weeks, ${(experimental / menus.length).toFixed(2)} experimental and ` +

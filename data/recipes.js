@@ -24,10 +24,12 @@
    steps   : a step starting "Toddler tip:" / "Consejo para pequeños:"
              is shown as a highlighted note
    tip     : optional nutrition note ("" for none)
-   prep    : optional make-ahead tasks for the prep card, as keys of
+   prep    : optional make-ahead tasks for the Sunday prep, as keys of
              prepTasks at the bottom of this file. Each task says how many
-             days its result keeps (keeps) or that it is done the evening
-             before (night); js/lists.js picks the prep session from that
+             days its result keeps in the fridge (keeps), whether it
+             freezes, and where it is kept when not the fridge (store:
+             'pantry' or 'freezer'); js/lists.js decides from that where
+             each day's portion waits for its meal
    country : where the dish comes from, an ISO code of data/countries.js.
              Everyday dishes common in Argentine homes count as 'AR'.
    experimental : true for a new, not yet family-tested recipe — shown
@@ -8865,111 +8867,239 @@ const prepTasks = {
   "chop-veg": {
     "en": "Wash and chop the vegetables; store them in containers",
     "es": "Lavar y picar las verduras; guardarlas en recipientes",
-    "keeps": 3
+    "item": {
+      "en": "Chopped vegetables",
+      "es": "Verduras picadas"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "cook-chicken": {
     "en": "Cook chicken to shred or slice — roast or poach 2–3 breasts, or a whole chicken",
     "es": "Cocinar pollo para desmenuzar o cortar — asar o hervir 2–3 pechugas, o un pollo entero",
-    "keeps": 3
+    "item": {
+      "en": "Cooked chicken",
+      "es": "Pollo cocido"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "rice": {
     "en": "Cook a big pot of rice",
     "es": "Cocinar una olla grande de arroz",
-    "keeps": 3
+    "item": {
+      "en": "Cooked rice",
+      "es": "Arroz cocido"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "quinoa": {
     "en": "Cook a pot of quinoa",
     "es": "Cocinar una olla de quinoa",
-    "keeps": 4
+    "item": {
+      "en": "Cooked quinoa",
+      "es": "Quinoa cocida"
+    },
+    "keeps": 4,
+    "freezes": true
   },
   "brown-beef": {
-    "en": "Brown the ground beef (it keeps 3 days in the fridge)",
-    "es": "Dorar la carne picada (dura 3 días en la heladera)",
-    "keeps": 3
+    "en": "Brown the ground beef",
+    "es": "Dorar la carne picada",
+    "item": {
+      "en": "Browned ground beef",
+      "es": "Carne picada dorada"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "cook-ahead": {
-    "en": "Cook the slow dishes ahead — stews and braises taste even better the next day",
-    "es": "Cocinar de antemano lo que lleva horas — los guisos y braseados quedan aún más ricos al día siguiente",
-    "keeps": 3
+    "en": "Cook the stews and braises",
+    "es": "Cocinar los guisos y braseados",
+    "item": {
+      "en": "The stew or braise",
+      "es": "El guiso o braseado"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "roast-veg": {
     "en": "Roast a tray of zucchini, bell peppers, and cherry tomatoes",
     "es": "Asar una bandeja de zapallitos, morrones y tomates cherry",
-    "keeps": 3
+    "item": {
+      "en": "Roasted vegetables",
+      "es": "Verduras asadas"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "roast-pumpkin": {
-    "en": "Roast the pumpkin until soft and mash it (it keeps 3 days)",
-    "es": "Asar el zapallo hasta que esté tierno y pisarlo (dura 3 días)",
-    "keeps": 3
+    "en": "Roast the pumpkin until soft and mash it",
+    "es": "Asar el zapallo hasta que esté tierno y pisarlo",
+    "item": {
+      "en": "Roasted pumpkin",
+      "es": "Zapallo asado"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "bake-ahead": {
-    "en": "Bake ahead — they keep 3–4 days in a closed tin",
-    "es": "Hornear de antemano — duran 3–4 días en un recipiente cerrado",
-    "keeps": 4
+    "en": "Bake the muffins, loaves or cookies",
+    "es": "Hornear los muffins, budines o galletitas",
+    "item": {
+      "en": "The baking",
+      "es": "Lo horneado"
+    },
+    "keeps": 4,
+    "freezes": true,
+    "store": "pantry"
   },
   "egg-muffins": {
-    "en": "Bake the egg muffins — they keep 3 days in the fridge",
-    "es": "Hornear los muffins de huevo — duran 3 días en la heladera",
-    "keeps": 3
+    "en": "Bake the egg muffins",
+    "es": "Hornear los muffins de huevo",
+    "item": {
+      "en": "Egg muffins",
+      "es": "Muffins de huevo"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "energy-balls": {
-    "en": "Roll the energy balls (they keep a week)",
-    "es": "Armar las bolitas energéticas (duran una semana)",
+    "en": "Roll the energy balls",
+    "es": "Armar las bolitas energéticas",
+    "item": {
+      "en": "Energy balls",
+      "es": "Bolitas energéticas"
+    },
     "keeps": 7
   },
   "apple-chips": {
     "en": "Bake the apple chips (low oven, about 2 hours)",
     "es": "Hornear los chips de manzana (horno bajo, unas 2 horas)",
-    "keeps": 7
+    "item": {
+      "en": "Apple chips",
+      "es": "Chips de manzana"
+    },
+    "keeps": 7,
+    "store": "pantry"
   },
   "freeze-bananas": {
     "en": "Freeze peeled banana halves in bags for smoothies",
     "es": "Congelar mitades de banana peladas en bolsas para los batidos",
-    "keeps": 7
+    "item": {
+      "en": "Frozen bananas",
+      "es": "Bananas congeladas"
+    },
+    "keeps": 30,
+    "freezes": true,
+    "store": "freezer"
   },
   "banana-pops": {
     "en": "Dip and freeze the yogurt banana pops",
     "es": "Bañar y congelar las paletas de banana",
-    "keeps": 7
+    "item": {
+      "en": "Banana pops",
+      "es": "Paletas de banana"
+    },
+    "keeps": 30,
+    "freezes": true,
+    "store": "freezer"
   },
   "yogurt-bark": {
     "en": "Spread and freeze the yogurt bark",
     "es": "Extender y congelar la barrita de yogur",
-    "keeps": 7
+    "item": {
+      "en": "Yogurt bark",
+      "es": "Barrita de yogur"
+    },
+    "keeps": 30,
+    "freezes": true,
+    "store": "freezer"
+  },
+  "freeze-ahead": {
+    "en": "Make the frozen treats",
+    "es": "Preparar los postres helados",
+    "item": {
+      "en": "The frozen treats",
+      "es": "Los postres helados"
+    },
+    "keeps": 30,
+    "freezes": true,
+    "store": "freezer"
   },
   "arroz-con-leche": {
     "en": "Cook the arroz con leche and chill it",
     "es": "Preparar el arroz con leche y enfriarlo",
+    "item": {
+      "en": "Arroz con leche",
+      "es": "Arroz con leche"
+    },
     "keeps": 3
   },
   "chill-ahead": {
-    "en": "Make the chilled and frozen ones ahead, so they set",
-    "es": "Preparar con tiempo lo que va a la heladera o al freezer, para que tome cuerpo",
+    "en": "Make the chilled desserts so they set",
+    "es": "Preparar los postres fríos para que tomen cuerpo",
+    "item": {
+      "en": "The chilled dessert",
+      "es": "El postre frío"
+    },
     "keeps": 2
   },
   "rub-ribs": {
     "en": "Rub the ribs with spices and shred the coleslaw veg (store dry)",
     "es": "Condimentar las costillas y rallar las verduras de la ensalada (guardarlas secas)",
-    "night": true
+    "item": {
+      "en": "Seasoned ribs",
+      "es": "Costillas condimentadas"
+    },
+    "keeps": 2,
+    "freezes": true
   },
   "marinate": {
-    "en": "Marinate the meat overnight, as its recipe says",
-    "es": "Marinar la carne toda la noche, como dice su receta",
-    "night": true
+    "en": "Marinate the meat as its recipe says",
+    "es": "Marinar la carne como dice su receta",
+    "item": {
+      "en": "Marinated meat",
+      "es": "Carne marinada"
+    },
+    "keeps": 2,
+    "freezes": true
   },
   "soak": {
-    "en": "Soak overnight what its recipe says (dried beans, hominy, salt cod)",
-    "es": "Dejar en remojo toda la noche lo que dice su receta (porotos, maíz, bacalao)",
-    "night": true
+    "en": "Soak from Saturday night what its recipe says (dried beans, hominy, salt cod) and cook it",
+    "es": "Dejar en remojo desde el sábado a la noche lo que dice su receta (porotos, maíz, bacalao) y cocinarlo",
+    "item": {
+      "en": "Soaked and cooked beans, hominy or cod",
+      "es": "Porotos, maíz o bacalao remojados y cocidos"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "overnight-oats": {
-    "en": "Mix the oats so they soak overnight",
-    "es": "Preparar la avena para que se remoje toda la noche",
-    "night": true
+    "en": "Mix the overnight oats in jars",
+    "es": "Preparar la avena remojada en frascos",
+    "item": {
+      "en": "Overnight oats",
+      "es": "Avena remojada"
+    },
+    "keeps": 3,
+    "freezes": true
   },
   "chia-pudding": {
-    "en": "Stir the chia pudding (it keeps 3 days)",
-    "es": "Preparar el pudín de chía (dura 3 días)",
-    "keeps": 3
+    "en": "Stir the chia pudding in jars",
+    "es": "Preparar el pudín de chía en frascos",
+    "item": {
+      "en": "Chia pudding",
+      "es": "Pudín de chía"
+    },
+    "keeps": 4,
+    "freezes": true
   }
 };
+
+// Vegetables that freeze well chopped (for cooking). Past the days chopped
+// vegetables keep, these go to the freezer and the rest are chopped fresh.
+const freezableVeg = ['onions', 'red-onion', 'shallots', 'leek', 'garlic', 'spring-onions', 'bell-peppers', 'carrots',
+  'celery', 'broccoli', 'cauliflower', 'green-beans', 'zucchini', 'pumpkin', 'kale', 'chard', 'cabbage', 'mushrooms',
+  'okra', 'parsnips', 'beets', 'asparagus', 'cassava', 'plantains'];
