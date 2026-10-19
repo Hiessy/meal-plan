@@ -14,6 +14,8 @@
                 and `how` says how to serve the family meal.
    minAge     : ingredient key → youngest age in months it suits
    minAgeTags : recipe tag → youngest age in months it suits
+   dietFoods  : the ingredient keys behind the meat-free, vegan and
+                gluten-free marks on each meal
    ============================================================ */
 const bloodTypes = (() => {
   const WHEAT = ['bread', 'pasta', 'flour', 'pita', 'burger-buns', 'breadcrumbs', 'croutons', 'flour-tortillas',
@@ -106,3 +108,26 @@ const minAge = {
 
 // Raw fish or eggs (ceviche, sushi, poke, tartare)
 const minAgeTags = { raw: 72 };
+
+// What a meal must not have to be marked meat-free (no meat, poultry or
+// fish), vegan (nothing from animals) or gluten-free. Regular oats count
+// as gluten: only certified gluten-free oats are safe for coeliacs.
+const dietFoods = {
+  meat: ['lamb', 'beef-steak', 'beef-chuck', 'beef-sirloin', 'ground-beef', 'pork-shoulder', 'pork-tenderloin',
+    'pork-chops', 'pork-ribs', 'ground-pork', 'sausages', 'ham', 'bacon', 'chicken-cooked', 'chicken-breast',
+    'chicken-thighs', 'turkey', 'beef-broth', 'chicken-broth', 'gelatine',
+    'trout', 'salmon', 'white-fish', 'tuna', 'shrimp', 'mussels', 'squid', 'fish-sauce', 'oyster-sauce',
+    'caesar-dressing'],
+  animal: ['milk', 'greek-yogurt', 'butter', 'ricotta', 'mozzarella', 'cheddar', 'parmesan', 'cream-cheese', 'feta',
+    'shredded-cheese', 'cheese', 'sour-cream', 'cream', 'dulce-de-leche', 'paneer', 'eggs', 'mayonnaise', 'meringues',
+    'honey', 'medialunas', 'cookies', 'sponge-cake', 'egg-noodles', 'filled-pasta', 'puff-pastry', 'pie-crust',
+    'pesto', 'mushroom-soup', 'kimchi'],
+  gluten: ['flour', 'bread', 'rolls', 'pasta', 'filled-pasta', 'egg-noodles', 'udon', 'couscous', 'bulgur', 'semolina',
+    'pita', 'burger-buns', 'breadcrumbs', 'croutons', 'flour-tortillas', 'gnocchi', 'pizza-dough', 'pie-crust',
+    'empanada-discs', 'puff-pastry', 'crackers', 'medialunas', 'cookies', 'sponge-cake', 'cornflakes', 'oats',
+    'granola', 'soy-sauce', 'miso'],
+  // Lines that name meat although their shopping row is something else
+  // ("ham and cheese sorrentinos"), and gluten-free lines of a gluten row
+  meatWords: /\b(ham|beef|pork|chicken|lamb|bacon|chorizo|salami|sausages?|anchov\w*|tuna|salmon|shrimp|fish)\b/i,
+  notGluten: /gluten-free|glass noodles/i
+};

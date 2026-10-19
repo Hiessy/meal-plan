@@ -349,7 +349,8 @@
     const { name, el } = e.detail;
     switch (name) {
       case 'open': case 'close': case 'shuffle': case 'reset': case 'swap': case 'facet':
-        return;                            // these sound in plan:modal / plan:rendered / plan:focus
+      case 'deck-step': case 'deck-go':
+        return;                            // these sound in plan:modal / plan:rendered / plan:focus / plan:deck
       case 'lang':   return play('lang');
       case 'week':   return play('page');
       case 'step':   return play('step', +el.dataset.step);
@@ -364,6 +365,7 @@
   });
 
   document.addEventListener('plan:modal', e => play(e.detail.open ? 'open' : 'close'));
+  document.addEventListener('plan:deck', e => play('step', e.detail.dir));
 
   // A balance chip picked: chime and bounce the meals it lights up
   document.addEventListener('plan:focus', e => {

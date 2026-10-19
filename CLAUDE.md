@@ -75,10 +75,19 @@ above it. The README has the full table.
     shown on hover via `Lists.substitute()`. Give every new entry one.
 - Balance chips are `data-action="facet"` toggles such as `protein:fish`. Meal slots carry
   `data-facets`, and picking a chip highlights the matching slots and sends `plan:focus`.
-- The prep blocks and the calendar share one column grid: each `.day-col` spans five subgrid
-  rows (header and four meals) so meals line up across the days, and the prep blocks use
-  `grid-template-columns: subgrid` over Monday–Wednesday and Thursday–Friday. Keep borders the
-  same width on every day (today's ring is a box-shadow) so nothing shifts.
+- Each `.day-col` spans five subgrid rows (header and four meals) so meals line up across the
+  days. Keep borders the same width on every day (today's ring is a box-shadow) so nothing shifts.
+- The prep is a deck of cards (`Lists.prepCards`: one per prep day and meal). All cards share one
+  grid cell, so they are the same size; `setDeck` in `ui.js` sets `--d`/`--ad` on each card and
+  CSS fans them out, with the transition in `fx.css`. The deck opens on today's card, and
+  `buildWeek` adds a resting card for today when today has no prep. Ticks are keyed
+  `p:{monday}:{prep day}:{slot}:{task}`.
+- Every meal shows marks right of its type (`marksHtml` in `ui.js`): the flask, its origin, the
+  blood types it suits (`Diets.bloodFor`), and meat-free/vegan/gluten-free (`Diets.marks`, from
+  `dietFoods` in `data/diets.js`). The icons are pixel SVGs built by `pixelIcon`.
+- `markEaten` crosses out meals whose time is past (`MEAL_ENDS`, by the device clock) every minute.
+- A saved shuffle or swap only shows while `Planner.fits` it: every recipe in the current pools
+  and the experimental count in range. Older ones are drawn again.
 - A menu is 20 recipe ids, day by day in `Planner.TYPES` order (breakfast, lunch, snack, dinner);
   slot k is day `Math.floor(k / Planner.SLOTS)`.
 - In `js/planner.js`, menus are seeded by week number counted from `EPOCH` (2026-10-05). Each week

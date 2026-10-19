@@ -268,13 +268,21 @@ const Planner = (() => {
 
   const isMenu = ids => Array.isArray(ids) && ids.length === DAYS * SLOTS && ids.every(id => byId[id]);
 
+  // Whether a saved menu still fits the recipe choices and the rules on
+  // experimental recipes (a shuffle saved before they changed may not)
+  function fits(ids) {
+    if (!isMenu(ids)) return false;
+    const exp = ids.filter(id => byId[id].experimental).length;
+    return exp >= expRange[0] && exp <= expRange[1] && ids.every(id => pools[byId[id].type].includes(byId[id]));
+  }
+
   return {
     TYPES, SLOTS, RULES, configure,
     recipe: id => byId[id],
     count: recipes.length,
     weekNumber, mondayOfWeek,
     baseMenu, shuffleMenu, swapMeal,
-    summary, isMenu,
+    summary, isMenu, fits,
     cost: (ids, neighbours = []) => cost(ids, avoiding(neighbours))
   };
 })();

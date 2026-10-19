@@ -15,6 +15,7 @@
      plan:config   { excluded, experimental }  the recipe choices changed
      plan:panel    { open }       the recipe-choice panel opened or closed
      plan:focus    { n, facet, on, picked }  a balance chip was toggled: its meals are highlighted
+     plan:deck     { n, i, dir }  the prep deck of week n moved to card i (dir -1 back, 1 on)
    js/fx.js turns these into sounds and motion.
    ============================================================ */
 (() => {
@@ -127,7 +128,9 @@ function fmtPlanRange() {
    for that week only
    ============================================================ */
 const isoOfWeek = num => isoDate(Planner.mondayOfWeek(num));
-const savedMenu = iso => Planner.isMenu(store.menus[iso]) ? store.menus[iso] : null;
+// A saved shuffle or swap counts only while it fits the recipe choices and
+// the rules (one saved before they changed is drawn again)
+const savedMenu = iso => Planner.fits(store.menus[iso]) ? store.menus[iso] : null;
 const menuOf    = num => savedMenu(isoOfWeek(num)) || Planner.baseMenu(num);
 // The weeks a shuffle or swap stays away from: three either side, so
 // no recipe repeats among the four weeks on screen
@@ -137,7 +140,7 @@ const newSeed   = () => Math.floor(Math.random() * 4294967296);
 function weekMeals(w) {
   return menuOf(w.num).map((id, k) => ({ recipe: Planner.recipe(id), di: Math.floor(k / Planner.SLOTS), k }));
 }
-const prepTick = (w, task) => `p:${w.iso}:${task.day}:${task.key}`;
+const prepTick = (w, card, task) => `p:${w.iso}:${card.day}:${card.meal.k}:${task.key}`;
 const lowerFirst = text => text.charAt(0).toLowerCase() + text.slice(1);
 const mealLabel = m => t('daysShort')[m.di] + ' · ' + t('mealTypes')[m.recipe.type].label;
 
@@ -298,10 +301,8 @@ function renderModal() {
 
   byId('m-name').textContent = d.name[lang];
   byId('m-meta').innerHTML =
-    `<span class="meal-badge badge-${d.type}">${mt.icon} ${mt.label}</span>` +
-    (d.experimental ? `<span class="exp-chip" data-tip="${esc(t('tipExperimental'))}">${FLASK} ${t('experimental')}</span>` : '') +
-    `<span>${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>` +
-    `<span class="origin-chip">${originHtml(d, true)}</span>`;
+    `<span class="meal-badge badge-${d.type}">${mt.icon} ${mt.label}</span>` + marksHtml(d, true) +
+    `<span class="m-when">${t('days')[di]} · ${fmtDay(addDays(w.monday, di))}</span>`;
 
   const swapBtn = byId('m-swap');
   swapBtn.innerHTML = `<span class="ico">🔄</span> ${t('swap')}`;
@@ -373,6 +374,12 @@ document.addEventListener('keydown', e => {
     else if (modalAt) run('close', byId('m-close'));
     return;
   }
+  const deck = !modalAt && e.target.closest && e.target.closest('.deck, .deck-nav');
+  if (deck && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    const n = +deck.closest('.week-section').id.slice(1);
+    e.preventDefault();
+    return setDeck(n, deckAt[n] + (e.key === 'ArrowLeft' ? -1 : 1), true);
+  }
   if (!modalAt) return;
   if (e.key === 'ArrowLeft' && !byId('m-prev').disabled) run('step', byId('m-prev'));
   else if (e.key === 'ArrowRight' && !byId('m-next').disabled) run('step', byId('m-next'));
@@ -386,7 +393,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ============================================================
-   Ticks — prep tasks (p:{monday}:{task}) and shopping rows
+   Ticks — prep tasks (p:{monday}:{prep day}:{slot}:{task}) and shopping rows
    (s:{monday}:{ingredient}) share one saved map
    ============================================================ */
 document.addEventListener('change', e => {
@@ -419,8 +426,9 @@ function setPill(id, done, total) {
 
 // Updates the counters and "still to buy"; → which lists are fully ticked
 function updateProgress(n) {
-  const { w, rows, tasks } = weekData[n];
-  const prepDone = tasks.filter(task => store.ticks[prepTick(w, task)]).length;
+  const { w, rows, cards } = weekData[n];
+  const tasks = cards.flatMap(card => card.tasks.map(task => prepTick(w, card, task)));
+  const prepDone = tasks.filter(key => store.ticks[key]).length;
   setPill(`prep-count-${n}`, prepDone, tasks.length);
 
   let done = 0, left = 0;
@@ -450,6 +458,68 @@ function togglePrep(n) {
   store.prepOpen[n] = !list.hidden;
   saveStore();
 }
+
+/* ============================================================
+   Prep deck — the prep cards stand like a rolodex: one in front,
+   its neighbours fanned behind. It opens on today's card (or the
+   next one); arrows, the day chips, a click on a card behind,
+   a swipe or the arrow keys move it.
+   ============================================================ */
+const deckAt = {};      // n → the card in front
+
+// The first card whose prep day is today or later; the last when all are past
+function todayCard(n) {
+  const { w, deck } = weekData[n];
+  const i = deck.findIndex(card => isoDate(addDays(w.monday, card.day)) >= todayIso);
+  return i < 0 ? deck.length - 1 : i;
+}
+
+function setDeck(n, i, moved) {
+  const deck = byId('deck-' + n);
+  if (!deck) return;
+  const cards = [...deck.children], from = deckAt[n];
+  i = Math.max(0, Math.min(cards.length - 1, i));
+  deckAt[n] = i;
+  cards.forEach((card, j) => {
+    const d = j - i, ad = Math.abs(d);
+    card.style.setProperty('--d', d);
+    card.style.setProperty('--ad', Math.min(ad, 3));
+    card.classList.toggle('focus', !d);
+    card.classList.toggle('far', ad > 2);
+    card.setAttribute('aria-hidden', String(!!d));
+    if (d) card.dataset.action = 'deck-go'; else delete card.dataset.action;
+    card.querySelectorAll('input').forEach(input => { input.tabIndex = d ? -1 : 0; });
+  });
+  const day = weekData[n].deck[i].day;
+  document.querySelectorAll(`#prep-list-${n} .deck-day`).forEach(chip => {
+    chip.classList.toggle('active', +chip.dataset.day === day);
+    chip.setAttribute('aria-pressed', String(+chip.dataset.day === day));
+  });
+  byId('deck-count-' + n).textContent = `${i + 1} / ${cards.length}`;
+  byId('deck-prev-' + n).disabled = i === 0;
+  byId('deck-next-' + n).disabled = i === cards.length - 1;
+  if (moved && i !== from) emit('deck', { n, i, dir: Math.sign(i - from) });
+}
+
+// Swipes: a quick sideways drag over the deck moves it, and the click
+// that follows is dropped so no checkbox flips by accident
+let swipe = null, dropClick = false;
+document.addEventListener('pointerdown', e => {
+  const deck = e.target.closest && e.target.closest('.deck');
+  swipe = deck ? { n: +deck.dataset.n, x: e.clientX, y: e.clientY } : null;
+});
+document.addEventListener('pointerup', e => {
+  if (!swipe) return;
+  const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y, n = swipe.n;
+  swipe = null;
+  if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+  setDeck(n, deckAt[n] + (dx < 0 ? 1 : -1), true);
+  dropClick = true;
+  setTimeout(() => { dropClick = false; }, 60);
+});
+document.addEventListener('click', e => {
+  if (dropClick) { e.preventDefault(); e.stopPropagation(); dropClick = false; }
+}, true);
 
 function toggleShopping(n) {
   const open = byId(`shop-body-${n}`).classList.toggle('open');
@@ -807,6 +877,82 @@ function filterSummary(f) {
   return parts.join(' · ');
 }
 
+// Small pixel icons in the flask's style: a row of characters per line,
+// one colour per character (ink)
+function pixelIcon(rows, ink, cls) {
+  const w = rows[0].length, h = rows.length;
+  let rects = '';
+  rows.forEach((row, y) => [...row].forEach((ch, x) => {
+    if (ch !== '.') rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${ink[ch]}"/>`;
+  }));
+  return `<svg class="px-icon ${cls}" viewBox="0 0 ${w} ${h}" style="width:${(w / h).toFixed(3)}em" aria-hidden="true" ` +
+    `shape-rendering="crispEdges">${rects}</svg>`;
+}
+const DROP = pixelIcon(['...k...', '..krk..', '..krk..', '.krrrk.', 'krwrrrk', 'krwrrrk', 'krrrrrk', '.krrrk.', '..kkk..'],
+  { k: '#7f1d1d', r: '#dc2626', w: '#fca5a5' }, 'ic-drop');
+const SPROUT = pixelIcon(['gg.....gg', 'glg...glg', 'gllg.gllg', '.gllgllg.', '..ggsgg..', '....s....', '....s....',
+  '..bbbbb..', '.bbbbbbb.'], { g: '#166534', l: '#4ade80', s: '#15803d', b: '#92400e' }, 'ic-sprout');
+// "No" signs: a red ring and bar over a drumstick, and over an ear of wheat
+const NO_MEAT = pixelIcon([
+  '...rrrrr...',
+  '..rr...rr..',
+  '.rr..mm..r.',
+  'r..rmmmm..r',
+  'r..mrmmm..r',
+  'r..mmrmm..r',
+  'r...mmr...r',
+  'r....b.r..r',
+  '.r...b..rr.',
+  '..rr...rr..',
+  '...rrrrr...'], { r: '#dc2626', m: '#b45309', b: '#a8a29e' }, 'ic-no-meat');
+const NO_GLUTEN = pixelIcon([
+  '...rrrrr...',
+  '..rr.y.rr..',
+  '.rr.yky..r.',
+  'r..ryky...r',
+  'r...rky...r',
+  'r...yry...r',
+  'r...ykr...r',
+  'r....k.r..r',
+  '.r...k..rr.',
+  '..rr...rr..',
+  '...rrrrr...'], { r: '#dc2626', y: '#ca8a04', k: '#854d0e' }, 'ic-no-gluten');
+
+// The marks right of a meal's type: experimental flask, where it comes
+// from, the blood types it suits, meat-free or vegan, and gluten-free.
+// `named` adds their names (the recipe sheet).
+function marksHtml(r, named) {
+  const m = Diets.marks(r), blood = Diets.bloodFor(r).map(type => bloodTypes[type].name[lang]);
+  const mark = (cls, tip, icon) => `<span class="mark ${cls}" data-tip="${esc(tip)}" aria-label="${esc(tip)}">${icon}` +
+    `${named ? `<span class="mark-text">${esc(tip)}</span>` : ''}</span>`;
+  return [
+    r.experimental && mark('exp-badge', named ? t('experimental') : t('tipExperimental'), FLASK),
+    mark('mark-origin', named ? (r.ai ? t('aiBadge') : countryName(r.country)) : originText(r), r.ai ? '✨' : flagOf(r.country)),
+    blood.length && mark('mark-blood', t('bloodFor')(blood), DROP + (named ? '' : `<small>${blood.join('·')}</small>`)),
+    m.vegan ? mark('mark-vegan', t('vegan'), SPROUT) : m.meatFree && mark('mark-veg', t('meatFree'), NO_MEAT),
+    m.glutenFree && mark('mark-gf', t('glutenFree'), NO_GLUTEN)
+  ].filter(Boolean).join('');
+}
+
+// One line for a meal's tooltip: "🩸 O, A · Vegan · Gluten-free"
+function marksText(r) {
+  const m = Diets.marks(r), blood = Diets.bloodFor(r).map(type => bloodTypes[type].name[lang]);
+  return [blood.length && '🩸 ' + blood.join(', '), m.vegan ? t('vegan') : m.meatFree && t('meatFree'),
+    m.glutenFree && t('glutenFree')].filter(Boolean).join(' · ');
+}
+
+// When each meal is over, in hours of the day. Once it is, the meal is
+// crossed out — today's as the day goes on, and every meal of past days.
+const MEAL_ENDS = { breakfast: 10, lunch: 15, snack: 18.5, dinner: 22 };
+function markEaten() {
+  const now = new Date(), hour = now.getHours() + now.getMinutes() / 60;
+  document.querySelectorAll('.meal-slot[data-date]').forEach(el => {
+    const iso = el.dataset.date;
+    el.classList.toggle('eaten', iso < todayIso || iso === todayIso && hour >= MEAL_ENDS[el.dataset.type]);
+  });
+}
+setInterval(markEaten, 60000);
+
 // Pixel-art Erlenmeyer flask: the mark of an experimental recipe. css/fx.css
 // cycles the liquid through red, blue, green, purple and orange and floats the
 // bubbles up and out of the neck (the svg lets them overflow).
@@ -1038,14 +1184,23 @@ byId('p-search').addEventListener('input', () => { clearTimeout(searchTimer); se
 /* ============================================================
    Week Renderer
    ============================================================ */
-const weekData = {};    // n → { w, meals, rows, tasks } of the last render
+const weekData = {};    // n → { w, meals, rows, cards } of the last render
 
 function buildWeek(n) {
   const w = weeks[n - 1];
   const meals = weekMeals(w);
   const rows = Lists.shopping(meals);
-  const tasks = Lists.prep(meals);
-  weekData[n] = { w, meals, rows, tasks };
+  const cards = Lists.prepCards(meals);
+  // The deck: the prep cards, plus a resting card for today when today
+  // (Sunday to Friday of this week) has nothing to prep, so the deck can
+  // always open on today
+  const todayDay = Math.round((today - w.monday) / 864e5);
+  const deck = cards.slice();
+  if (todayDay >= -1 && todayDay <= 4 && !cards.some(card => card.day === todayDay)) {
+    const at = deck.findIndex(card => card.day > todayDay);
+    deck.splice(at < 0 ? deck.length : at, 0, { day: todayDay, rest: true });
+  }
+  weekData[n] = { w, meals, rows, cards, deck };
 
   const section = byId('w' + n);
   const days = t('days');
@@ -1066,15 +1221,15 @@ function buildWeek(n) {
       const tip = [
         originText(recipe),
         recipe.experimental && t('tipExperimental'),
+        marksText(recipe),
         t('tipMeal')(recipe.ing[lang].length, recipe.steps[lang].length),
         recipe.tip && recipe.tip[lang] && '💚 ' + recipe.tip[lang],
         openHint
       ].filter(Boolean).join('\n');
       return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}"
-        data-day="${di}" data-slot="${slot}" data-type="${recipe.type}" data-facets="${facetsOf(recipe)}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
-        <span class="slot-tags"><span class="meal-badge badge-${recipe.type}">${mt.icon} ${mt.label}</span>${recipe.experimental
-          ? `<span class="exp-badge" aria-label="${esc(t('experimental'))}">${FLASK}</span>` : ''}</span>
-        <span class="meal-name">${recipe.name[lang]} ${originHtml(recipe)}</span>
+        data-day="${di}" data-date="${iso}" data-slot="${slot}" data-type="${recipe.type}" data-facets="${facetsOf(recipe)}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
+        <span class="slot-tags"><span class="meal-badge badge-${recipe.type}">${mt.icon} ${mt.label}</span>${marksHtml(recipe)}</span>
+        <span class="meal-name">${recipe.name[lang]}</span>
         <span class="chev" aria-hidden="true">›</span>
       </button>`;
     }).join('');
@@ -1085,37 +1240,61 @@ function buildWeek(n) {
     </div>`;
   }).join('');
 
-  const taskHtml = (task, state) => {
-    const key = prepTick(w, task);
-    // Chopping lists the week's vegetables; every other task, its dishes
-    const forText = task.key === 'chop-veg'
-      ? `<small class="task-for">${task.items.map((row, i) => i ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ')}</small>`
-      : `<small class="task-for">${task.meals.map(m =>
-          `<span class="task-meal">${mealLabel(m)} — <b>${esc(m.recipe.name[lang])}</b></span>`).join('')}</small>`;
-    return `<label class="check${state}" data-tip="${esc(t('tipPrep'))}">
-      <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
-      <span>${prepTasks[task.key][lang]}${forText}</span>
-    </label>`;
+  // Prep cards: the prep day, the meal it is for and that meal's date,
+  // then its tasks (washing and chopping names that meal's vegetables)
+  const restHtml = card => {
+    const date = addDays(w.monday, card.day), next = cards.find(c => c.day > card.day);
+    const when = card.day < 0 ? t('prepSunday')(fmtDay(date)) : t('prepToday')(days[card.day], fmtDay(date));
+    const nextWhen = next && (next.day < 0 ? t('prepSunday') : d => t('prepEvening')(days[next.day], d))(fmtDay(addDays(w.monday, next.day)));
+    return `<article class="pcard today rest" data-n="${n}" data-i="${deck.indexOf(card)}">
+      <header class="pcard-head">
+        <h3 class="pcard-when">${when}<em class="today-pill">${t('today')}</em></h3>
+        <p class="pcard-for">${t('restTitle')}</p>
+      </header>
+      <p class="pcard-rest">${next ? t('restNext')(nextWhen, cards.filter(c => c.day === next.day).length) : t('restDone')}</p>
+    </article>`;
   };
-  // A heading and the tasks of one session: Sunday, Wednesday evening, or
-  // the evening before meals that soak or marinate overnight
-  const sessionHtml = day => {
-    const own = tasks.filter(task => task.day === day);
-    const date = addDays(w.monday, day), iso = isoDate(date);
-    const title = day < 0 ? t('prepSunday')(fmtDay(date))
-      : own.some(task => !task.night) ? t('prepMidweek')(days[day], fmtDay(date))
-      : t('prepEvening')(days[day], fmtDay(date));
+  const cardHtml = card => {
+    if (card.rest) return restHtml(card);
+    const date = addDays(w.monday, card.day), iso = isoDate(date), r = card.meal.recipe;
     const state = iso === todayIso ? ' today' : iso < todayIso ? ' past' : '';
-    return `<h3 class="prep-when${state}">${title}${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}</h3>` +
-      own.map(task => taskHtml(task, state)).join('');
+    const when = card.day < 0 ? t('prepSunday')(fmtDay(date)) : t('prepEvening')(days[card.day], fmtDay(date));
+    const tasksHtml = card.tasks.map(task => {
+      const key = prepTick(w, card, task);
+      const items = task.key === 'chop-veg'
+        ? `<small class="task-for">${task.items.map((row, i) => i ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ')}</small>` : '';
+      return `<li><label class="check" data-tip="${esc(t('tipPrep'))}">
+        <input type="checkbox" data-tick="${esc(key)}"${store.ticks[key] ? ' checked' : ''}>
+        <span>${prepTasks[task.key][lang]}${items}</span>
+      </label></li>`;
+    }).join('');
+    return `<article class="pcard${state}" data-n="${n}" data-i="${deck.indexOf(card)}">
+      <header class="pcard-head">
+        <h3 class="pcard-when">${when}${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}</h3>
+        <p class="pcard-for">${t('prepForMeal')(days[card.meal.di], fmtDay(addDays(w.monday, card.meal.di)), mealTypes[r.type].label)}</p>
+        <p class="pcard-meal">${mealTypes[r.type].icon} ${esc(r.name[lang])}</p>
+      </header>
+      <ul class="pcard-tasks">${tasksHtml}</ul>
+    </article>`;
   };
-  // Sessions up to Tuesday evening sit over Monday–Wednesday, the rest over
-  // Thursday–Friday, on the calendar's columns
-  const sessionDays = [...new Set(tasks.map(task => task.day))];
-  const prepHtml = [['early', d => d < 2], ['late', d => d >= 2]].map(([cls, inBlock]) => {
-    const own = sessionDays.filter(inBlock);
-    return own.length ? `<div class="prep-block ${cls}">${own.map(sessionHtml).join('')}</div>` : '';
+  // A chip for each prep day, jumping to its first card
+  const dayChips = [...new Set(deck.map(card => card.day))].map(day => {
+    const date = addDays(w.monday, day);
+    return `<button type="button" class="deck-day${isoDate(date) === todayIso ? ' today' : ''}" data-action="deck-go" data-n="${n}"
+      data-i="${deck.findIndex(card => card.day === day)}" data-day="${day}" aria-pressed="false">${day < 0 ? t('sundayShort') : t('daysShort')[day]} ${date.getDate()}</button>`;
   }).join('');
+  const deckBtn = (id, step, label, icon) => `<button type="button" class="deck-btn" id="deck-${id}-${n}" data-action="deck-step"
+    data-n="${n}" data-step="${step}" aria-label="${esc(label)}" data-tip="${esc(label)}">${icon}</button>`;
+  const prepHtml = deck.length ? `
+      <div class="deck-nav" data-tip="${esc(t('tipDeck'))}">
+        ${deckBtn('prev', -1, t('deckPrev'), '‹')}
+        <div class="deck-days">${dayChips}</div>
+        <span class="deck-count" id="deck-count-${n}"></span>
+        ${deckBtn('next', 1, t('deckNext'), '›')}
+      </div>
+      <div class="deck" id="deck-${n}" data-n="${n}" tabindex="0" role="group" aria-roledescription="carousel"
+        aria-label="${esc(t('prepTitle'))}">${deck.map(cardHtml).join('')}</div>`
+    : `<p class="deck-empty">${t('deckEmpty')}</p>`;
 
   section.innerHTML = `
     <div class="week-head">
@@ -1152,6 +1331,8 @@ function buildWeek(n) {
 
   applyFocus(n);
   updateProgress(n);
+  if (deck.length) setDeck(n, n in deckAt ? deckAt[n] : todayCard(n));
+  markEaten();
 }
 
 /* ============================================================
@@ -1168,6 +1349,8 @@ const actions = {
   step:        el => stepModal(+el.dataset.step),
   swap:        () => swapMeal(),
   prep:        el => togglePrep(+el.dataset.n),
+  'deck-step': el => setDeck(+el.dataset.n, deckAt[+el.dataset.n] + +el.dataset.step, true),
+  'deck-go':   el => setDeck(+el.dataset.n, +el.dataset.i, true),
   shop:        el => toggleShopping(+el.dataset.n),
   offset:      el => changeOffset(+el.dataset.delta),
   copy:        el => copyList(+el.dataset.n),

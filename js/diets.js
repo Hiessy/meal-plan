@@ -1,6 +1,6 @@
 /* ============================================================
-   Diets — which recipes suit the picked blood types and ages
-   (logic only, no DOM)
+   Diets — which recipes suit the picked blood types and ages, and
+   which are meat-free, vegan or gluten-free (logic only, no DOM)
 
    Reads data/diets.js and matches recipe lines through Lists, so
    it needs js/lists.js first. Lines marked "optional" are ignored:
@@ -35,5 +35,23 @@ const Diets = (() => {
   // { blood: ['O', 'A'], ages: ['m12'] } — a recipe fits when it suits all of them
   const fits = (r, { blood = [], ages = [] } = {}) => suitsBlood(r, blood) && suitsAges(r, ages);
 
-  return { fits, suitsBlood, suitsAges, youngest, ageGroup };
+  // The blood types a recipe suits, as keys of bloodTypes
+  const bloodFor = r => Object.keys(bloodTypes).filter(type => suitsBlood(r, [type]));
+
+  // { meatFree, vegan, glutenFree } from dietFoods
+  const markCache = new Map();
+  function marks(r) {
+    if (!markCache.has(r.id)) {
+      const lines = r.ing.en.filter(l => !isOptional(l)).map(l => ({ l, k: (Lists.entryFor(l) || {}).key }));
+      const meatFree = !lines.some(({ l, k }) => dietFoods.meat.includes(k) || dietFoods.meatWords.test(l));
+      markCache.set(r.id, {
+        meatFree,
+        vegan: meatFree && !lines.some(({ k }) => dietFoods.animal.includes(k)),
+        glutenFree: !lines.some(({ l, k }) => dietFoods.gluten.includes(k) && !dietFoods.notGluten.test(l))
+      });
+    }
+    return markCache.get(r.id);
+  }
+
+  return { fits, suitsBlood, suitsAges, youngest, ageGroup, bloodFor, marks };
 })();

@@ -171,5 +171,18 @@ const Lists = (() => {
     return [...tasks.values()].sort((a, b) => a.day - b.day || order.indexOf(a.key) - order.indexOf(b.key));
   }
 
-  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, prepDay, substitute, entryFor: ingredientFor };
+  // The prep as cards, one per prep day and meal: { day, meal, tasks:
+  // [{ key, items }] }, by prep day and then meal. Chopping lists only
+  // that meal's vegetables.
+  function prepCards(meals) {
+    const cards = new Map();
+    prep(meals).forEach(task => task.meals.forEach(meal => {
+      const id = task.day + ':' + meal.k;
+      if (!cards.has(id)) cards.set(id, { day: task.day, meal, tasks: [] });
+      cards.get(id).tasks.push({ key: task.key, items: task.items.filter(row => row.lines.some(l => l.meal === meal)) });
+    }));
+    return [...cards.values()].sort((a, b) => a.day - b.day || a.meal.k - b.meal.k);
+  }
+
+  return { shopping, name, isOptional, kind, mealsOf, price, amount, prep, prepDay, prepCards, substitute, entryFor: ingredientFor };
 })();
