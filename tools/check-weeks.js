@@ -5,15 +5,17 @@
 // repeated within the four weeks on screen, and RULES.experimental (one or
 // two) experimental meals a week. Runs the planner the way the page does, for
 // the default filters (home country + AI-created) and for all countries.
+// Also: every menu survives its share link, the Today screen picks the
+// right meal at every hour, and votes do what they say.
 // Exits with 1 when something is wrong.
 const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 const weeksToCheck = +process.argv[2] || 120;
 const files = ['data/recipes.js', 'data/recipes-world.js', 'data/recipes-ai.js', 'data/ingredients.js', 'data/countries.js',
-  'data/diets.js', 'js/planner.js', 'js/lists.js', 'js/diets.js'];
+  'data/diets.js', 'js/planner.js', 'js/lists.js', 'js/diets.js', 'js/today.js', 'js/share.js'];
 const ctx = new Function(files.map(f => fs.readFileSync(path.join(root, f), 'utf8')).join('\n;\n') +
-  ';return { recipes, prepTasks, freezableVeg, Planner, Lists, shopCategories };')();
-const { recipes, prepTasks, freezableVeg, Planner, Lists, shopCategories } = ctx;
+  ';return { recipes, prepTasks, freezableVeg, Planner, Lists, Today, Share, shopCategories };')();
+const { recipes, prepTasks, freezableVeg, Planner, Lists, Today, Share, shopCategories } = ctx;
 
 const problems = [];
 const report = (where, what) => problems.push(`${where}: ${what}`);
@@ -99,6 +101,58 @@ recipes.forEach(r => {
   seen.set(name, r.id);
 });
 
+/* ── Share links: every recipe has its own five characters ── */
+const linkCodes = new Map();
+recipes.forEach(r => {
+  const code = Share.code(r.id);
+  if (linkCodes.has(code)) report(`recipe ${r.id}`, `has the link code of ${linkCodes.get(code)} — give it another id`);
+  linkCodes.set(code, r.id);
+});
+
+/* ── The Today screen, at every day and several hours ── */
+function checkToday(where, meals, portions) {
+  for (let day = -2; day <= 4; day++) for (const hour of [0, 9.99, 10, 14.5, 15, 18.5, 21.99, 22, 23.5]) {
+    const v = Today.view({ meals, portions, day, hour }), at = `${where}, day ${day} at ${hour}`;
+    const left = meals.filter(m => m.di === day && hour < Today.ENDS[m.recipe.type]);
+    const later = meals.filter(m => m.di > day);
+    if (v.current !== (left[0] || null)) report(at, 'Today shows the wrong meal as the current one');
+    if (v.next !== ((v.current ? left[1] : null) || later[0] || null)) report(at, 'Today shows the wrong next meal');
+    if (v.meals.length !== (day >= 0 ? 4 : 0) || v.meals.some(x => x.meal.di !== day || x.past !== !left.includes(x.meal))) report(at, 'Today lists the wrong meals');
+    if (v.ready.some(p => p.di !== day || p.store === 'fresh') || v.fresh.some(p => p.di !== day || p.store !== 'fresh') ||
+        v.ready.length + v.fresh.length !== portions.filter(p => p.di === day).length) report(at, 'Today lists the wrong portions');
+    if (v.thawTonight.some(p => p.thaw !== day || p.di !== day + 1 || p.store !== 'freezer')) report(at, 'Today thaws the wrong portions');
+    if (v.rate.some(m => m.di > day || m.di < day - 1 || m.di === day && left.includes(m))) report(at, 'Today asks about a meal not eaten yet');
+  }
+}
+
+/* ── Votes: a disliked recipe is never drawn from its week on, earlier
+      weeks stay as they were, and a liked one comes back more often ── */
+function checkVotes() {
+  const allow = r => r.ai || r.country === 'AR', from = 12, weeks = 100;
+  Planner.configure({ allow });
+  const plain = [];
+  for (let n = 0; n < weeks; n++) plain.push(Planner.baseMenu(n));
+  const count = (menus, ids) => menus.reduce((sum, menu) => sum + menu.filter(id => ids.includes(id)).length, 0);
+  const liked = plain[2].filter(id => !Planner.recipe(id).experimental).slice(0, 5);
+  const disliked = [...plain[from].slice(0, 4), ...plain[from + 1].slice(4, 8)];
+  Planner.configure({ allow, liked: Object.fromEntries(liked.map(id => [id, from])), disliked: Object.fromEntries(disliked.map(id => [id, from])) });
+  const voted = [];
+  for (let n = 0; n < weeks; n++) voted.push(Planner.baseMenu(n));
+  if (voted.slice(0, from).some((menu, n) => menu.join() !== plain[n].join())) report('votes', 'a vote changed a week before the one it counts from');
+  if (count(voted.slice(from), disliked)) report('votes', 'a disliked recipe was drawn again');
+  if (voted.slice(from).some(menu => Planner.cost(menu) > 0)) report('votes', 'a week drawn with votes breaks a balance rule');
+  if (count(voted.slice(from), liked) <= count(plain.slice(from), liked)) report('votes', 'liked recipes do not come back more often');
+  // a shuffle and a swap follow every vote, even one that counts from a later week
+  Planner.configure({ allow, disliked: Object.fromEntries(disliked.map(id => [id, 1e6])) });
+  for (let seed = 1; seed <= 40; seed++) {
+    const menu = Planner.shuffleMenu(seed, []);
+    if (count([menu], disliked)) report('votes', 'a shuffle drew a disliked recipe');
+    if (count([Planner.swapMeal(menu, seed % 20, seed, [])], disliked)) report('votes', 'a swap drew a disliked recipe');
+  }
+  console.log(`votes: ${liked.length} liked recipes came up ${count(voted.slice(from), liked)} times in ${weeks - from} weeks ` +
+    `(${count(plain.slice(from), liked)} without the votes)`);
+}
+
 /* ── Weeks, the way the page draws them ── */
 // small: a pool too small for four weeks without repeats; they are only counted
 function checkWeeks(label, allow, small = false) {
@@ -110,6 +164,13 @@ function checkWeeks(label, allow, small = false) {
   menus.forEach((ids, i) => {
     const where = `${label} week ${now + i}`;
     const meals = ids.map((id, k) => ({ recipe: Planner.recipe(id), di: Math.floor(k / Planner.SLOTS), k }));
+    // the menu comes back whole from its share link; a damaged link gives nothing
+    const monday = Planner.mondayOfWeek(now + i);
+    const iso = [monday.getFullYear(), monday.getMonth() + 1, monday.getDate()].map(n => String(n).padStart(2, '0')).join('-');
+    const link = Share.encode({ [iso]: ids }), back = Share.decode(link);
+    if (!back || (back[iso] || []).join() !== ids.join()) report(where, 'the menu does not survive its share link');
+    if (Share.decode(link.slice(0, -1)) || Share.decode(link.replace(/\.\d{8}/, '.20200101'))) report(where, 'a damaged share link is taken for a menu');
+    checkToday(where, meals, Lists.prep(meals));
     // no recipe twice in a week, none from the three weeks before (the page shows four)
     if (new Set(ids).size < ids.length) report(where, 'a recipe appears twice');
     for (let back = 1; back <= 3 && i - back >= 0; back++) {
@@ -194,6 +255,7 @@ function checkWeeks(label, allow, small = false) {
 checkWeeks('home (AR) + AI', r => r.ai || r.country === 'AR');
 checkWeeks('all countries', () => true);
 checkWeeks('Italy, Mexico, Japan', r => ['IT', 'MX', 'JP'].includes(r.country), true);   // 15 breakfasts, 14 snacks
+checkVotes();
 
 const unique = [...new Set(problems)];
 const counts = {};

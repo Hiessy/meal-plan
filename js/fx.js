@@ -14,6 +14,7 @@
 
    Shares window.Fx = { play, sprites, ink } with js/fx-scenes.js.
    - Adds a 🔊 / 🔇 button to the header; the choice is saved.
+     Sound starts off on phones, on everywhere else.
 
    It reacts to pointer hovers and to the plan:* events that
    js/ui.js sends (see the top of that file).
@@ -21,7 +22,10 @@
 (() => {
   const PREF_KEY = 'meal-plan-sound';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let soundOn = (() => { try { return localStorage.getItem(PREF_KEY) !== 'off'; } catch (e) { return true; } })();
+  const phone = window.matchMedia('(max-width: 600px)').matches;
+  let soundOn = (() => {
+    try { return (localStorage.getItem(PREF_KEY) || (phone ? 'off' : 'on')) !== 'off'; } catch (e) { return !phone; }
+  })();
 
   /* ── Sound engine ─────────────────────────────────────────── */
   let ctx = null, out = null, noiseBuffer = null;
@@ -349,8 +353,8 @@
     const { name, el } = e.detail;
     switch (name) {
       case 'open': case 'close': case 'shuffle': case 'reset': case 'swap': case 'facet':
-      case 'deck-step': case 'deck-go':
-        return;                            // these sound in plan:modal / plan:rendered / plan:focus / plan:deck
+      case 'deck-step': case 'deck-go': case 'vote':
+        return;                            // these sound in plan:modal / plan:rendered / plan:focus / plan:deck / plan:vote
       case 'lang':   return play('lang');
       case 'week':   return play('page');
       case 'step':   return play('step', +el.dataset.step);
@@ -373,7 +377,15 @@
     if (e.detail.on) animate(all(`#w${e.detail.n} .meal-slot.hl`), 'fx-pop');
   });
 
-  document.addEventListener('plan:week', e => animate(all(`#w${e.detail.n} .day-col`), 'fx-rise'));
+  document.addEventListener('plan:week', e =>
+    animate(all(e.detail.n ? `#w${e.detail.n} .day-col` : '#today .now-card, #today .today-card'), 'fx-rise'));
+
+  // A thumb up or down: a chime, and the thumb pops
+  document.addEventListener('plan:vote', e => {
+    const { id, v } = e.detail;
+    play(v > 0 ? 'tickOn' : v < 0 ? 'tickOff' : 'reset');
+    if (v) animate(all(`.vote-btn[data-id="${id}"][data-v="${v}"]`), 'fx-pop');
+  });
 
   document.addEventListener('plan:rendered', e => {
     const { n, why, k } = e.detail;

@@ -17,8 +17,9 @@ above it. The README has the full table.
      `experimental: true` and no country. Check new lines with the dictionary afterwards.
    - The recipe panel shows 40 rows per meal type and loads more on demand; keep it that way,
      since there are thousands of recipes.
-2. **Menu logic** — `js/planner.js` (balanced draw), `js/lists.js` (shopping and prep lists) and
-   `js/diets.js` (blood-type and age fit).
+2. **Menu logic** — `js/planner.js` (balanced draw), `js/lists.js` (shopping and prep lists),
+   `js/diets.js` (blood-type and age fit), `js/today.js` (what to eat and take out now) and
+   `js/share.js` (a week's menu as the text of a link).
    No DOM access and no storage.
 3. **UI** — `js/i18n.js`, `js/tooltip.js`, `js/ui.js` and `css/ui.css`.
    - `ui.js` is an IIFE and exposes no globals.
@@ -96,7 +97,20 @@ above it. The README has the full table.
   panel's Diet pickers (`filters.diet`) keep only recipes with those marks.
 - `markEaten` crosses out meals whose time is past (`MEAL_ENDS`, by the device clock) every minute.
 - A saved shuffle or swap only shows while `Planner.fits` it: every recipe in the current pools
-  and the experimental count in range. Older ones are drawn again.
+  and the experimental count in range. Older ones are drawn again. A menu that came by link
+  (`store.received`) is kept as sent.
+- The page opens on the Today screen (view 0; the weeks are views 1–4, `showView`). `buildToday`
+  draws it from `Today.view` for the first week on screen, and again when a meal's time passes.
+  `?time=19:30` with `?date=` previews another moment.
+- Votes are `store.votes[id] = { v: 1 | -1, from }`. `from` is the first week number not on
+  screen when the vote was cast, and `Planner.configure({ liked, disliked })` takes maps of id →
+  `from`, so voting never changes a week in view. Shuffles and swaps follow every vote.
+- A share link is `#plan=` + `Share.encode({ mondayIso: ids })`: five letters or digits per
+  recipe, taken from a hash of its id. Two recipes must not share a code; the checker says so.
+  `takePlanLink` stores the menu for its week if that week is on screen.
+- `sw.js` reads the list of files to keep from `index.html`, so it needs no upkeep: bump the
+  `?v=` tags as always. It is not registered on localhost (stale files while developing); add
+  `?sw` to the address to try it there, then unregister it.
 - A menu is 20 recipe ids, day by day in `Planner.TYPES` order (breakfast, lunch, snack, dinner);
   slot k is day `Math.floor(k / Planner.SLOTS)`.
 - In `js/planner.js`, menus are seeded by week number counted from `EPOCH` (2026-10-05). Each week
@@ -106,8 +120,10 @@ above it. The README has the full table.
 - Run `node tools/check-weeks.js [weeks]` after changing recipes, prep tasks, the dictionary or
   the planner. It checks balance (`Planner.cost === 0`), repeats, the experimental cap, that every
   ingredient line lands on the shopping list once, that amounts add up the same in both languages,
-  that each prep task fits its recipes (`fits` in the script), and that every prep portion is
-  for that day's meals and kept where it lasts until them.
+  that each prep task fits its recipes (`fits` in the script), that every prep portion is
+  for that day's meals and kept where it lasts until them, that every menu survives its share
+  link, that the Today screen picks the right meal at every hour, and that votes hold.
 - When a CSS or JS file changes, bump the `?v=` query on its tag in `index.html` so Pages caches refresh.
 - To test locally, run `python -m http.server 8123` and open `http://localhost:8123/`. Add
   `?date=YYYY-MM-DD` to preview another date; saved data is not pruned while previewing.
+- `node tools/make-icons.js` redraws the app icons in `icons/` (pixel art, no dependencies).

@@ -567,7 +567,7 @@
   const TYPES = { breakfast: 1, lunch: 1, snack: 1, dinner: 1 };
   function sceneFor(el) {
     if (!el || !el.closest) return null;
-    const meal = el.closest('.meal-slot[data-type]');
+    const meal = el.closest('.meal-slot[data-type], .now-card[data-type]');
     if (meal && TYPES[meal.dataset.type]) return [meal.dataset.type];
     const aisle = el.closest('.shop-cat[data-cat]');
     if (aisle) return ['market', aisle.dataset.cat];
@@ -662,7 +662,8 @@
   });
 
   /* ── Power and hiding ─────────────────────────────────────── */
-  // 'on' | 'off' (the set stays, the screen goes dark) | 'hidden' (tucked away behind 📺)
+  // 'on' | 'off' (the set stays, the screen goes dark) | 'hidden' (tucked away behind 📺).
+  // On phones it starts hidden: the screen is small and the set covers the plan.
   const PREF_KEY = 'meal-plan-tv-state';
   let isOn = true;
   const save = state => { try { localStorage.setItem(PREF_KEY, state); } catch (e) {} };
@@ -689,10 +690,11 @@
   }
   power.addEventListener('click', () => setPower(!isOn));
 
-  function setShown(shown) {
+  // quiet: as the page starts — nothing is saved, so the choice stays the visitor's
+  function setShown(shown, quiet) {
     stage.hidden = !shown;
     show.hidden = shown;
-    save(shown ? (isOn ? 'on' : 'off') : 'hidden');
+    if (!quiet) save(shown ? (isOn ? 'on' : 'off') : 'hidden');
     if (shown) { place(); render(performance.now()); }
   }
   hide.addEventListener('click', () => setShown(false));
@@ -811,11 +813,11 @@
 
   /* ── Switching it on ──────────────────────────────────────── */
   document.body.append(stage, show);
-  let saved = 'on';
-  try { saved = localStorage.getItem(PREF_KEY) || 'on'; } catch (e) {}
+  let saved = window.matchMedia('(max-width: 600px)').matches ? 'hidden' : 'on';
+  try { saved = localStorage.getItem(PREF_KEY) || saved; } catch (e) {}
   if (saved === 'off') setPower(false, true);
   label();
-  setShown(saved !== 'hidden');
+  setShown(saved !== 'hidden', true);
   render(performance.now());
   if (!reduceMotion) requestAnimationFrame(tick);
 })();

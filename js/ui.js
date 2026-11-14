@@ -6,7 +6,7 @@
    Buttons carry data-action="…"; one click handler runs them.
    Other layers can follow along through events on document:
      plan:action   { name, el }   a data-action button was used
-     plan:week     { n }          another week tab is showing
+     plan:week     { n }          another tab is showing: 0 Today, 1–4 the weeks
      plan:rendered { n, why, k }  week n was redrawn: 'shuffle' | 'reset' | 'swap'
      plan:tick     { checked, complete, pill, el }  a saved checkbox (el) changed;
                                   complete: its list just got fully ticked
@@ -16,12 +16,13 @@
      plan:panel    { open }       the recipe-choice panel opened or closed
      plan:focus    { n, facet, on, picked }  a balance chip was toggled: its meals are highlighted
      plan:deck     { n, i, dir }  card i of week n's prep deck came to the front (dir -1 back, 1 on)
+     plan:vote     { id, v }      a recipe was voted on: 1 liked, -1 not again, 0 vote taken back
    js/fx.js turns these into sounds and motion.
    ============================================================ */
 (() => {
 
 /* ============================================================
-   Saved state — language, tab, price offset, ticks and menu
+   Saved state — language, price offset, ticks, votes and menu
    swaps survive a reload (localStorage, this browser only)
    ============================================================ */
 const STORE_KEY = 'meal-plan';
@@ -43,6 +44,7 @@ function saveStore() {
 }
 
 const store = Object.assign({ ticks: {}, shopOpen: {}, prepOpen: {}, menus: {} }, readStore());
+['votes', 'received'].forEach(key => { if (!store[key] || typeof store[key] !== 'object') store[key] = {}; });
 delete store.hintOff;   // that hint described the old fixed plan
 
 let lang = store.lang ||
@@ -67,7 +69,8 @@ const emit = (name, detail = {}) => document.dispatchEvent(new CustomEvent('plan
 /* ============================================================
    Dates — the plan always starts with the current week
    (on Saturday and Sunday, with the coming one). Add
-   ?date=2026-12-24 to the address to see another date's plan.
+   ?date=2026-12-24 to the address to see another date's plan,
+   and &time=19:30 for another time of day.
    ============================================================ */
 const addDays  = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const mondayOf = d => addDays(d, -((d.getDay() + 6) % 7));
@@ -81,6 +84,16 @@ const today = (() => {
 const todayIso    = isoDate(today);
 const thisMonday  = mondayOf(today);
 const firstMonday = [0, 6].includes(today.getDay()) ? addDays(thisMonday, 7) : thisMonday;
+// Today counted from that Monday: -2 Saturday, -1 Sunday, 0–4 Monday to Friday
+const todayDay = Math.round((today - firstMonday) / 864e5);
+
+// The hour of the day, as a number; ?time=19:30 pretends it is that time
+const timeParam = /^(\d{1,2}):(\d{2})$/.exec(new URLSearchParams(location.search).get('time') || '');
+function nowHour() {
+  if (timeParam) return +timeParam[1] + +timeParam[2] / 60;
+  const now = new Date();
+  return now.getHours() + now.getMinutes() / 60;
+}
 
 const weeks = [0, 1, 2, 3].map(i => {
   const monday = addDays(firstMonday, 7 * i);
@@ -92,6 +105,9 @@ function fmtDay(d) {
   const mon = t('monthsShort')[d.getMonth()];
   return lang === 'es' ? `${d.getDate()} ${mon}` : `${mon} ${d.getDate()}`;
 }
+
+// "November 16"  /  "16 de noviembre"
+const fmtDateLong = d => lang === 'es' ? `${d.getDate()} de ${t('months')[d.getMonth()]}` : `${t('months')[d.getMonth()]} ${d.getDate()}`;
 
 // "Oct 12–16" · "Sep 28–Oct 2"  /  "12–16 oct" · "28 sep–2 oct"
 function fmtRangeShort(monday) {
@@ -129,8 +145,10 @@ function fmtPlanRange() {
    ============================================================ */
 const isoOfWeek = num => isoDate(Planner.mondayOfWeek(num));
 // A saved shuffle or swap counts only while it fits the recipe choices and
-// the rules (one saved before they changed is drawn again)
-const savedMenu = iso => Planner.fits(store.menus[iso]) ? store.menus[iso] : null;
+// the rules (one saved before they changed is drawn again). A menu that
+// came by link (store.received) is kept as it was sent.
+const savedMenu = iso =>
+  (store.received[iso] ? Planner.isMenu(store.menus[iso]) : Planner.fits(store.menus[iso])) ? store.menus[iso] : null;
 const menuOf    = num => savedMenu(isoOfWeek(num)) || Planner.baseMenu(num);
 // The weeks a shuffle or swap stays away from: three either side, so
 // no recipe repeats among the four weeks on screen
@@ -147,6 +165,7 @@ const mealLabel = m => t('daysShort')[m.di] + ' · ' + t('mealTypes')[m.recipe.t
 function shuffleWeek(n) {
   const w = weeks[n - 1];
   store.menus[w.iso] = Planner.shuffleMenu(newSeed(), neighbours(w.num));
+  delete store.received[w.iso];
   saveStore();
   Tooltip.hide();
   buildWeek(n);
@@ -156,6 +175,7 @@ function shuffleWeek(n) {
 
 function resetWeek(n) {
   delete store.menus[weeks[n - 1].iso];
+  delete store.received[weeks[n - 1].iso];
   saveStore();
   Tooltip.hide();
   buildWeek(n);
@@ -225,49 +245,64 @@ function dismissHint() {
 }
 
 /* ============================================================
-   Navigation
+   Navigation — the Today screen (view 0) and the four weeks
+   (1–4). The page opens on Today unless the address says #w2.
    ============================================================ */
-const hashWeek = /^#w([1-4])$/.exec(location.hash);
-let currentWeek = hashWeek ? +hashWeek[1] : (store.week >= 1 && store.week <= 4 ? store.week : 1);
+const viewOf = hash => { const m = /^#(?:w([1-4])|today)$/.exec(hash); return m ? +(m[1] || 0) : null; };
+let currentView = viewOf(location.hash) || 0;
 
 function buildTabs() {
-  byId('tabs-nav').innerHTML = weeks.map(w => {
-    const active = w.n === currentWeek;
-    const range = fmtRangeShort(w.monday);
-    return `<button type="button" class="tab-btn${active ? ' active' : ''}" aria-current="${active}"
-      data-action="week" data-n="${w.n}" data-tip="${esc(t('tipTab')(fmtRangeLong(w.monday)))}">
-      <span class="tab-top${range.length > 10 ? ' long' : ''}">${range}</span><span class="tab-sub">${t('relWeek')(w.rel)}</span>
+  const tab = (n, top, sub, tip, cls = '') =>
+    `<button type="button" class="tab-btn${cls}${n === currentView ? ' active' : ''}" aria-current="${n === currentView}"
+      data-action="week" data-n="${n}" data-tip="${esc(tip)}">
+      <span class="tab-top${top.length > 10 ? ' long' : ''}">${top}</span><span class="tab-sub">${sub}</span>
     </button>`;
-  }).join('');
+  byId('tabs-nav').innerHTML = tab(0, t('todayTab'), fmtDay(today), t('tipTodayTab'), ' tab-today') +
+    weeks.map(w => tab(w.n, fmtRangeShort(w.monday), t('relWeek')(w.rel), t('tipTab')(fmtRangeLong(w.monday)))).join('');
+  // Five tabs on a phone: the weeks show only their Monday
+  weeks.forEach(w => {
+    const top = document.querySelector(`.tab-btn[data-n="${w.n}"] .tab-top`);
+    top.innerHTML = `<span class="tab-range">${top.textContent}</span><span class="tab-start">${fmtDay(w.monday)}</span>`;
+  });
 }
 
-function showWeek(n, initial) {
-  document.querySelectorAll('.week-section').forEach((s, i) => s.classList.toggle('active', i === n - 1));
+function showView(n, initial) {
+  byId('today').classList.toggle('active', n === 0);
+  weeks.forEach(w => byId('w' + w.n).classList.toggle('active', w.n === n));
   document.querySelectorAll('.tab-btn').forEach((b, i) => {
-    b.classList.toggle('active', i === n - 1);
-    b.setAttribute('aria-current', i === n - 1);
+    b.classList.toggle('active', i === n);
+    b.setAttribute('aria-current', i === n);
   });
-  currentWeek = n;
+  document.querySelector('main').dataset.view = n ? 'week' : 'today';
+  currentView = n;
   if (initial) return;
 
-  store.week = n;
-  saveStore();
-  try { history.replaceState(history.state, '', '#w' + n); } catch (e) {}
+  try { history.replaceState(history.state, '', n ? '#w' + n : '#today'); } catch (e) {}
 
-  // The tab bar is sticky — bring the top of the new week back into view
+  // The tab bar is sticky — bring the top of the new view back into sight
   const top = document.querySelector('header').offsetHeight;
   if (window.scrollY > top) window.scrollTo(0, top);
   emit('week', { n });
 }
 
 window.addEventListener('hashchange', () => {
-  const m = /^#w([1-4])$/.exec(location.hash);
-  if (m && +m[1] !== currentWeek) showWeek(+m[1]);
+  if (/^#plan=/.test(location.hash)) return openPlanLink();
+  const n = viewOf(location.hash);
+  if (n != null && n !== currentView) showView(n);
 });
 
 function jumpToday() {
   const el = document.querySelector('.week-section.active .day-col.today');
   if (el) el.scrollIntoView({ block: 'start' });
+}
+
+// From the Today screen to this week's prep or shopping list, opened
+function goTo(part) {
+  showView(1);
+  const open = part === 'prep' ? !byId('prep-list-1').hidden : byId('shop-body-1').classList.contains('open');
+  if (!open) (part === 'prep' ? togglePrep : toggleShopping)(1);
+  byId(part === 'prep' ? 'prep-toggle-1' : 'shop-toggle-1').scrollIntoView({ block: 'start' });
+  window.scrollBy(0, -(byId('tabs-nav').offsetHeight + 8));
 }
 
 /* ============================================================
@@ -307,6 +342,7 @@ function renderModal() {
   const swapBtn = byId('m-swap');
   swapBtn.innerHTML = `<span class="ico">🔄</span> ${t('swap')}`;
   swapBtn.dataset.tip = t('tipSwap')[d.type];
+  byId('m-votes').innerHTML = voteButtons(d);
 
   byId('m-ing').innerHTML = d.ing[lang].map((line, i) => {
     const alt = Lists.substitute(d.ing.en[i] || '', lang);
@@ -410,6 +446,8 @@ document.addEventListener('change', e => {
   if (input.checked) store.ticks[key] = 1;
   else delete store.ticks[key];
   saveStore();
+  // the Sunday checklist shows in the rolodex and on the Today screen
+  document.querySelectorAll('input[data-tick]').forEach(other => { if (other.dataset.tick === key) other.checked = input.checked; });
   const w = weeks.find(x => key.startsWith(key[0] + ':' + x.iso + ':'));
   if (!w) return;
   const done = updateProgress(w.n);
@@ -443,6 +481,7 @@ function updateProgress(n) {
     leftEl.hidden = done === 0;
     leftEl.querySelector('strong').textContent = '~' + money(left);
   }
+  if (n === 1) todayCounts(prepDone, tasks.length, rows.length - done);
   return { prep: prepDone === tasks.length, shop: done === rows.length };
 }
 
@@ -663,10 +702,8 @@ function listText(n) {
   return `🛒 ${t('shopping')} — ${t('relWeek')(w.rel)} (${fmtRangeShort(w.monday)})\n` + lines.join('\n');
 }
 
-function copyList(n) {
-  const text = listText(n);
-  if (!text) return showToast(t('toastNothing'));
-  const done = () => showToast(t('toastCopied'));
+// Copies text and says so with the toast `doneKey`
+function copyText(text, doneKey) {
   const fallback = () => {
     const ta = document.createElement('textarea');
     ta.value = text;
@@ -676,10 +713,16 @@ function copyList(n) {
     let ok = false;
     try { ok = document.execCommand('copy'); } catch (e) {}
     ta.remove();
-    showToast(t(ok ? 'toastCopied' : 'toastCopyFail'));
+    showToast(t(ok ? doneKey : 'toastCopyFail'));
   };
-  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback);
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(() => showToast(t(doneKey)), fallback);
   else fallback();
+}
+
+function copyList(n) {
+  const text = listText(n);
+  if (!text) return showToast(t('toastNothing'));
+  copyText(text, 'toastCopied');
 }
 
 function shareList(n) {
@@ -881,6 +924,14 @@ const recipeIds = new Set(recipes.map(r => r.id));
 store.excluded = (Array.isArray(store.excluded) ? store.excluded : []).filter(id => recipeIds.has(id));
 if (typeof store.useExperimental !== 'boolean') store.useExperimental = true;
 
+// Votes: recipe id → { v: 1 liked | -1 not again, from: the first week number it counts in }
+Object.keys(store.votes).forEach(id => {
+  const vote = store.votes[id];
+  if (!recipeIds.has(id) || !vote || Math.abs(vote.v) !== 1 || typeof vote.from !== 'number') delete store.votes[id];
+});
+const voteOf = id => store.votes[id] ? store.votes[id].v : 0;
+const votesOf = v => Object.fromEntries(Object.keys(store.votes).filter(id => store.votes[id].v === v).map(id => [id, store.votes[id].from]));
+
 // Filters: countries ([] = home, ['*'] = all), AI-created recipes on or off,
 // blood types and ages (data/diets.js) the recipes must all suit
 const DIETS = ['meatFree', 'vegan', 'glutenFree'];
@@ -923,7 +974,8 @@ function passes(r, f) {
 }
 
 const configurePlanner = () => Planner.configure({
-  exclude: store.excluded, experimental: store.useExperimental, allow: r => passes(r, store.filters)
+  exclude: store.excluded, experimental: store.useExperimental, allow: r => passes(r, store.filters),
+  liked: votesOf(1), disliked: votesOf(-1)
 });
 configurePlanner();
 
@@ -1034,17 +1086,20 @@ function marksText(r) {
     m.glutenFree && t('glutenFree')].filter(Boolean).join(' · ');
 }
 
-// When each meal is over, in hours of the day. Once it is, the meal is
-// crossed out — today's as the day goes on, and every meal of past days.
-const MEAL_ENDS = { breakfast: 10, lunch: 15, snack: 18.5, dinner: 22 };
+// Once a meal's time is over (Today.ENDS), it is crossed out — today's as
+// the day goes on, and every meal of past days. The Today screen moves on
+// to the next meal at the same moment.
 function markEaten() {
-  const now = new Date(), hour = now.getHours() + now.getMinutes() / 60;
+  const hour = nowHour();
   document.querySelectorAll('.meal-slot[data-date]').forEach(el => {
     const iso = el.dataset.date;
-    el.classList.toggle('eaten', iso < todayIso || iso === todayIso && hour >= MEAL_ENDS[el.dataset.type]);
+    el.classList.toggle('eaten', iso < todayIso || iso === todayIso && hour >= Today.ENDS[el.dataset.type]);
   });
 }
-setInterval(markEaten, 60000);
+setInterval(() => {
+  if (weekData[1] && pastMeals() !== shownPast) buildToday();
+  markEaten();
+}, 60000);
 
 // Pixel-art Erlenmeyer flask: the mark of an experimental recipe. css/fx.css
 // cycles the liquid through red, blue, green, purple and orange and floats the
@@ -1097,6 +1152,7 @@ function setExperimental(on) {
 const panelEl = byId('panel');
 let draft = null;          // recipe ids left out, while the panel is open
 let draftFilters = null;   // the filters, while the panel is open
+let draftVote = 0;         // 1 or -1: the panel lists only the recipes voted that way
 let panelFocus = null;
 
 const iconOf = r => r.type === 'breakfast' ? BREAKFAST_ICONS[r.group]
@@ -1150,7 +1206,12 @@ function renderFilters() {
       <h3>👶 ${t('agesTitle')} <button type="button" class="info-dot" data-tip="${esc(t('tipAges'))}" aria-label="${esc(t('tipAges'))}">?</button></h3>
       <div class="chips">${ageGroups.map(g =>
         chip('f-age', 'data-age', g.id, g.name[lang], f.ages.includes(g.id), g.how[lang])).join('')}</div>
-    </div>`;
+    </div>
+    ${Object.keys(store.votes).length ? `<div class="filter-row">
+      <h3>👍 ${t('votesTitle')} <button type="button" class="info-dot" data-tip="${esc(t('tipVotes'))}" aria-label="${esc(t('tipVotes'))}">?</button></h3>
+      <div class="chips">${[1, -1].map(v => chip('f-vote', 'data-vote', v,
+        t(v > 0 ? 'votedUp' : 'votedDown')(Object.keys(votesOf(v)).length), draftVote === v, t('tipVotes'))).join('')}</div>
+    </div>` : ''}`;
 }
 
 function setFilter(kind, value) {
@@ -1163,7 +1224,8 @@ function setFilter(kind, value) {
   if (kind === 'age') f.ages = toggle(f.ages, value);
   if (kind === 'diet') f.diet = toggle(f.diet, value);
   if (kind === 'ai') f.ai = value;
-  if (kind === 'clear') draftFilters = FILTERS();
+  if (kind === 'vote') draftVote = draftVote === +value ? 0 : +value;
+  if (kind === 'clear') { draftFilters = FILTERS(); draftVote = 0; }
   renderFilters();
   filterPanel();
 }
@@ -1185,7 +1247,8 @@ const searchKey = new Map();
 const nameKey = r => searchKey.get(r.id) || (searchKey.set(r.id, plain(r.name.en + ' ' + r.name.es)), searchKey.get(r.id));
 const matching = type => {
   const q = plain(byId('p-search').value.trim());
-  return recipes.filter(r => r.type === type && passes(r, draftFilters) && (!q || nameKey(r).includes(q)));
+  return recipes.filter(r => r.type === type && passes(r, draftFilters) && (!q || nameKey(r).includes(q)) &&
+    (!draftVote || voteOf(r.id) === draftVote));
 };
 function renderList() {
   byId('p-list').innerHTML = Planner.TYPES.map(type => {
@@ -1195,7 +1258,7 @@ function renderList() {
       return `<li><label class="check pick${off ? ' off' : ''}">
           <input type="checkbox" data-pick="${r.id}"${draft.has(r.id) ? '' : ' checked'}${off ? ' disabled' : ''}>
           <span>${iconOf(r)} ${r.name[lang]} <span class="row-marks">${marksHtml(r)}</span></span>
-        </label></li>`;
+        </label>${voteOf(r.id) || draftVote ? voteButtons(r) : ''}</li>`;
     }).join('');
     const more = list.length > limit
       ? `<button type="button" class="mini-btn more-btn" data-action="p-more" data-type="${type}">${t('showMore')(Math.min(PAGE, list.length - limit), list.length - limit)}</button>`
@@ -1231,6 +1294,7 @@ function filterPanel() {
 function openPanel() {
   draft = new Set(store.excluded);
   draftFilters = cleanFilters(store.filters);
+  draftVote = 0;
   byId('p-search').value = '';
   renderPanel();
   panelFocus = document.activeElement;
@@ -1283,7 +1347,55 @@ byId('p-search').addEventListener('input', () => { clearTimeout(searchTimer); se
 /* ============================================================
    Week Renderer
    ============================================================ */
-const weekData = {};    // n → { w, meals, rows, cards } of the last render
+const weekData = {};    // n → { w, meals, rows, portions, deck } of the last render
+
+// A meal of week n as a button that opens its recipe: type, marks, name
+function slotHtml(n, { recipe, k, di }) {
+  const mt = t('mealTypes')[recipe.type];
+  const tip = [
+    originText(recipe),
+    recipe.experimental && t('tipExperimental'),
+    marksText(recipe),
+    t('tipMeal')(recipe.ing[lang].length, recipe.steps[lang].length),
+    recipe.tip && recipe.tip[lang] && '💚 ' + recipe.tip[lang],
+    t(canHover ? 'tipMealMouse' : 'tipMealTouch')
+  ].filter(Boolean).join('\n');
+  return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}"
+    data-day="${di}" data-date="${isoDate(addDays(weeks[n - 1].monday, di))}" data-slot="${k % Planner.SLOTS}" data-type="${recipe.type}" data-facets="${facetsOf(recipe)}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
+    <span class="slot-tags"><span class="meal-badge badge-${recipe.type}">${mt.icon} ${mt.label}</span>${marksHtml(recipe)}</span>
+    <span class="meal-name">${recipe.name[lang]}</span>
+    <span class="chev" aria-hidden="true">›</span>
+  </button>`;
+}
+
+/* ── Prep pieces, shared by the rolodex and the Today screen ── */
+const mealLine = (w, m) => `${t('days')[m.di]} ${fmtDay(addDays(w.monday, m.di))} · ${t('mealTypes')[m.recipe.type].label} — ${m.recipe.name[lang]}`;
+const mealChip = (w, m) => `<span class="pmeal" data-tip="${esc(mealLine(w, m))}">${t('mealTypes')[m.recipe.type].icon} ${t('mealTypes')[m.recipe.type].label}</span>`;
+const vegList = rows => rows.map((row, j) => j ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ');
+const storeText = p => p.store === 'freezer' && p.thaw != null ? t('storeThaw')(t('days')[p.thaw]) : t('store')[p.store];
+const storeBadge = p => `<span class="store store-${p.store}">${STORE_ICON[p.store]} ${storeText(p)}</span>`;
+const dayChip = (w, p) => `<span class="pday store-${p.store}" data-tip="${esc([storeText(p), ...p.meals.map(m => mealLine(w, m))].join('\n'))}">` +
+  `${STORE_ICON[p.store]} ${t('daysShort')[p.di]} ${addDays(w.monday, p.di).getDate()}</span>`;
+const portionName = p => p.key === 'chop-veg' ? `${prepTasks[p.key].item[lang]}: ${lowerFirst(vegList(p.items))}` : prepTasks[p.key].item[lang];
+
+// A portion as a line: where it waits, what it is and the meals it is for
+const portionLine = (w, p, badge = storeBadge(p)) => `<li class="pline">${badge}
+    <span class="pline-what">${portionName(p)}</span>
+    <span class="pmeals">${p.meals.map(m => mealChip(w, m)).join('')}</span></li>`;
+
+// The Sunday checklist of week n: each task once, with a chip per day
+// showing where that day's portion waits
+function prepChecklist(n) {
+  const { w, portions } = weekData[n];
+  return [...new Set(portions.filter(p => p.store !== 'fresh').map(p => p.key))].map(key => {
+    const own = portions.filter(p => p.key === key && p.store !== 'fresh'), tick = prepTick(w, key);
+    const veg = key === 'chop-veg' ? `<small class="task-for">${vegList([...new Set(own.flatMap(p => p.items))])}</small>` : '';
+    return `<li><label class="check" data-tip="${esc(t('tipPrep'))}">
+      <input type="checkbox" data-tick="${esc(tick)}"${store.ticks[tick] ? ' checked' : ''}>
+      <span>${prepTasks[key][lang]}${veg}<span class="pmeals">${own.map(p => dayChip(w, p)).join('')}</span></span>
+    </label></li>`;
+  }).join('');
+}
 
 function buildWeek(n) {
   const w = weeks[n - 1];
@@ -1295,35 +1407,16 @@ function buildWeek(n) {
 
   const section = byId('w' + n);
   const days = t('days');
-  const mealTypes = t('mealTypes');
   const shopOpen = store.shopOpen[n] ? ' open' : '';
   // Prep starts folded on phones so Monday's meals are not a long scroll away
   const prepOpen = n in store.prepOpen ? store.prepOpen[n] : !isPhone;
-  const openHint = t(canHover ? 'tipMealMouse' : 'tipMealTouch');
   const hasToday = w.rel === 0 && today >= w.monday && today <= addDays(w.monday, 4);
 
   const daysHtml = days.map((dayName, di) => {
     const date = addDays(w.monday, di);
     const iso = isoDate(date);
     const state = iso === todayIso ? ' today' : iso < todayIso ? ' past' : '';
-    const mealsHtml = meals.filter(m => m.di === di).map(({ recipe, k }) => {
-      const slot = k % Planner.SLOTS;
-      const mt = mealTypes[recipe.type];
-      const tip = [
-        originText(recipe),
-        recipe.experimental && t('tipExperimental'),
-        marksText(recipe),
-        t('tipMeal')(recipe.ing[lang].length, recipe.steps[lang].length),
-        recipe.tip && recipe.tip[lang] && '💚 ' + recipe.tip[lang],
-        openHint
-      ].filter(Boolean).join('\n');
-      return `<button type="button" class="meal-slot" data-action="open" data-n="${n}" data-k="${k}"
-        data-day="${di}" data-date="${iso}" data-slot="${slot}" data-type="${recipe.type}" data-facets="${facetsOf(recipe)}"${recipe.experimental ? ' data-exp="1"' : ''} data-tip="${esc(tip)}">
-        <span class="slot-tags"><span class="meal-badge badge-${recipe.type}">${mt.icon} ${mt.label}</span>${marksHtml(recipe)}</span>
-        <span class="meal-name">${recipe.name[lang]}</span>
-        <span class="chev" aria-hidden="true">›</span>
-      </button>`;
-    }).join('');
+    const mealsHtml = meals.filter(m => m.di === di).map(m => slotHtml(n, m)).join('');
 
     return `<div class="day-col${state}">
       <div class="day-header">${dayName}${state === ' today' ? `<em class="today-pill">${t('today')}</em>` : ''}<span>${fmtDay(date)}</span></div>
@@ -1331,17 +1424,9 @@ function buildWeek(n) {
     </div>`;
   }).join('');
 
-  // The rolodex: the Sunday card is the checklist — each task once, with a
-  // chip per day showing where that day's portion waits — then a card for
-  // each day: what is ready from Sunday and where, what to thaw tonight
-  // for tomorrow, and what is made fresh. Dishes and dates show on hover.
-  const mealLine = m => `${days[m.di]} ${fmtDay(addDays(w.monday, m.di))} · ${mealTypes[m.recipe.type].label} — ${m.recipe.name[lang]}`;
-  const mealChip = m => `<span class="pmeal" data-tip="${esc(mealLine(m))}">${mealTypes[m.recipe.type].icon} ${mealTypes[m.recipe.type].label}</span>`;
-  const vegList = rows => rows.map((row, j) => j ? lowerFirst(Lists.name(row, lang)) : Lists.name(row, lang)).join(', ');
-  const storeText = p => p.store === 'freezer' && p.thaw != null ? t('storeThaw')(t('days')[p.thaw]) : t('store')[p.store];
-  const storeBadge = p => `<span class="store store-${p.store}">${STORE_ICON[p.store]} ${storeText(p)}</span>`;
-  const dayChip = p => `<span class="pday store-${p.store}" data-tip="${esc([storeText(p), ...p.meals.map(mealLine)].join('\n'))}">` +
-    `${STORE_ICON[p.store]} ${t('daysShort')[p.di]} ${addDays(w.monday, p.di).getDate()}</span>`;
+  // The rolodex: the Sunday card is the checklist, then a card for each
+  // day: what is ready from Sunday and where, what to thaw tonight for
+  // tomorrow, and what is made fresh. Dishes and dates show on hover.
   const head = (day, i, lead) => {
     const date = addDays(w.monday, day), iso = isoDate(date);
     const state = iso === todayIso ? ' today' : iso < todayIso ? ' past' : '';
@@ -1354,32 +1439,18 @@ function buildWeek(n) {
       </div>`];
   };
   const sundayCard = () => {
-    const keys = [...new Set(portions.filter(p => p.store !== 'fresh').map(p => p.key))];
-    const [state, top] = head(-1, 0, t('prepLead'));
-    const tasksHtml = keys.map(key => {
-      const own = portions.filter(p => p.key === key && p.store !== 'fresh'), tick = prepTick(w, key);
-      const veg = key === 'chop-veg' ? `<small class="task-for">${vegList([...new Set(own.flatMap(p => p.items))])}</small>` : '';
-      return `<li><label class="check" data-tip="${esc(t('tipPrep'))}">
-        <input type="checkbox" data-tick="${esc(tick)}"${store.ticks[tick] ? ' checked' : ''}>
-        <span>${prepTasks[key][lang]}${veg}<span class="pmeals">${own.map(dayChip).join('')}</span></span>
-      </label></li>`;
-    }).join('');
+    const [state, top] = head(-1, 0, t('prepLead')), tasksHtml = prepChecklist(n);
     return `<article class="pcard sunday${state}">${top}
-      ${keys.length ? `<ul class="pcard-tasks">${tasksHtml}</ul>` : `<p class="pcard-rest">${t('prepNothing')}</p>`}</article>`;
+      ${tasksHtml ? `<ul class="pcard-tasks">${tasksHtml}</ul>` : `<p class="pcard-rest">${t('prepNothing')}</p>`}</article>`;
   };
-  const line = (p, extra = '') => `<li class="pline">${storeBadge(p)}
-      <span class="pline-what">${p.key === 'chop-veg' ? `${prepTasks[p.key].item[lang]}: ${lowerFirst(vegList(p.items))}` : prepTasks[p.key].item[lang]}${extra}</span>
-      <span class="pmeals">${p.meals.map(mealChip).join('')}</span></li>`;
   const dayCard = (day, i) => {
     const ready = portions.filter(p => p.di === day && p.store !== 'fresh');
     const thaw = portions.filter(p => p.thaw === day);
     const fresh = portions.filter(p => p.di === day && p.store === 'fresh');
     const [state, top] = head(day, i);
-    const section = (title, list) => list.length ? `<h4 class="pcard-sub">${title}</h4><ul class="plines">${list.join('')}</ul>` : '';
+    const section = (title, list) => list.length ? `<h4 class="pcard-sub">${title}</h4><ul class="plines">${list.map(p => portionLine(w, p)).join('')}</ul>` : '';
     const body = ready.length || thaw.length || fresh.length
-      ? section(t('fromSunday'), ready.map(p => line(p))) +
-        section(t('thawTonight'), thaw.map(p => line(p))) +
-        section(t('makeFresh'), fresh.map(p => line(p)))
+      ? section(t('fromSunday'), ready) + section(t('thawTonight'), thaw) + section(t('makeFresh'), fresh)
       : `<p class="pcard-rest">${t('dayNothing')}</p>`;
     return `<article class="pcard${state}">${top}<div class="pcard-body">${body}</div></article>`;
   };
@@ -1402,6 +1473,8 @@ function buildWeek(n) {
         ${hasToday ? tool('today', '📍', 'todayBtn', 'tipToday') : ''}
         ${tool('shuffle', '🎲', 'shuffle', 'tipShuffle', n)}
         ${savedMenu(w.iso) ? tool('reset', '↺', 'resetMenu', 'tipReset', n) : ''}
+        ${sendBtn('send-week', 'sendWeek', 'tipSendWeek', n)}
+        ${tool('copy-link', '🔗', 'copyLink', 'tipCopyLink', n)}
       </div>
     </div>
     ${buildBalance(meals, n)}
@@ -1429,9 +1502,210 @@ function buildWeek(n) {
     </div>`;
 
   applyFocus(n);
-  updateProgress(n);
   startDeck(n);
+  if (n === 1) buildToday();
+  updateProgress(n);
   markEaten();
+}
+
+/* ============================================================
+   Votes — 👍 and 👎 on a recipe, saved on this device. A liked
+   recipe comes back more often and one voted down never again
+   (js/planner.js). A vote counts from the first week that is not
+   on screen yet, so the weeks in view stay as they are, and in
+   every shuffle and swap from then on.
+   ============================================================ */
+const voteButtons = r => `<span class="votes" data-votes="${r.id}">` + [[1, '👍', 'voteUp'], [-1, '👎', 'voteDown']].map(([v, icon, key]) =>
+  `<button type="button" class="vote-btn" data-action="vote" data-id="${r.id}" data-v="${v}" aria-pressed="${voteOf(r.id) === v}"
+    aria-label="${esc(t(key))}" data-tip="${esc(t(key))}">${icon}</button>`).join('') + '</span>';
+
+function vote(id, v) {
+  if (voteOf(id) === v) delete store.votes[id];             // the same thumb again takes the vote back
+  else store.votes[id] = { v, from: weeks[3].num + 1 };
+  saveStore();
+  configurePlanner();
+  document.querySelectorAll('[data-votes]').forEach(el => el.querySelectorAll('.vote-btn').forEach(btn =>
+    btn.setAttribute('aria-pressed', voteOf(el.dataset.votes) === +btn.dataset.v)));
+  if (draft) { renderFilters(); renderList(); }
+  emit('vote', { id, v: voteOf(id) });
+  showToast(t(voteOf(id) > 0 ? 'toastVoteUp' : voteOf(id) < 0 ? 'toastVoteDown' : 'toastVoteClear'));
+}
+
+/* ============================================================
+   Sending the menu — today's or a week's as a WhatsApp message,
+   ending in a link that opens the same week's menu on the other
+   phone (#plan=…, see js/share.js)
+   ============================================================ */
+const WA_ICON = '<svg class="wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" ' +
+  'd="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.8-1.3A9.5 9.5 0 1 0 12 2.5z"/></svg>';
+const sendBtn = (action, label, tipKey, n) =>
+  `<button type="button" class="tool-btn wa-btn" data-action="${action}"${n ? ` data-n="${n}"` : ''}
+    data-tip="${esc(t(tipKey))}">${WA_ICON} ${t(label)}</button>`;
+
+const planLink = n => location.origin + location.pathname + '#plan=' +
+  Share.encode({ [weeks[n - 1].iso]: menuOf(weeks[n - 1].num) });
+const dayLines = (meals, di, named) => meals.filter(m => m.di === di).map(m => {
+  const mt = t('mealTypes')[m.recipe.type];
+  return `${mt.icon} ${named ? mt.label + ': ' : ''}${m.recipe.name[lang]}`;
+});
+
+// Today's menu — Monday's on the weekend
+function dayText() {
+  const { w, meals } = weekData[1], di = Math.max(0, todayDay);
+  return [`🍽 *${t('shareDay')(`${t('days')[di]} ${fmtDay(addDays(w.monday, di))}`)}*`, ...dayLines(meals, di, true),
+    '', t('shareOpen'), planLink(1)].join('\n');
+}
+
+function weekText(n) {
+  const { w, meals } = weekData[n];
+  const days = t('days').map((day, di) => [`*${day} ${addDays(w.monday, di).getDate()}*`, ...dayLines(meals, di)].join('\n'));
+  return [`🗓 *${t('shareWeek')(fmtRangeShort(w.monday))}*`, '', days.join('\n\n'), '', t('shareOpen'), planLink(n)].join('\n');
+}
+
+const whatsapp = text => { window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener'); };
+
+// The address may carry a week's menu: keep it for its week, if that week
+// is still on screen. → the week's tab, 0 when the link is of no use, or
+// null when the address carries no menu.
+function takePlanLink() {
+  const m = /^#plan=(.*)$/.exec(location.hash);
+  if (!m) return null;
+  try { history.replaceState(history.state, '', location.pathname + location.search); } catch (e) {}
+  const menus = Share.decode(m[1]);
+  const got = weeks.filter(w => menus && menus[w.iso]);
+  if (!got.length) {
+    console.error('Meal plan link not used: ' + (menus ? 'its week is no longer on screen' : 'it does not hold a menu'));
+    return 0;
+  }
+  got.forEach(w => { store.menus[w.iso] = menus[w.iso]; store.received[w.iso] = 1; });
+  saveStore();
+  return got[0].n;
+}
+const planToast = n => showToast(n ? t('toastReceived')(fmtRangeShort(weeks[n - 1].monday)) : t('toastBadLink'));
+
+// A link opened while the page is already up
+function openPlanLink() {
+  const n = takePlanLink();
+  if (n == null) return;
+  if (n) {
+    [1, 2, 3, 4].forEach(buildWeek);
+    showView(n);
+  }
+  planToast(n);
+}
+
+/* ============================================================
+   Installing — the browser's own prompt where it has one; on an
+   iPhone, a line that says where the option is
+   ============================================================ */
+let installEvent = null;
+const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const canInstall = () => !standalone && !!(installEvent || isIos);
+const showInstall = () => document.querySelectorAll('[data-install]').forEach(el => { el.hidden = !canInstall(); });
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvent = e; showInstall(); });
+window.addEventListener('appinstalled', () => { installEvent = null; showInstall(); });
+
+function install() {
+  if (!installEvent) return showToast(t('installIos'));
+  installEvent.prompt();
+  installEvent = null;
+  showInstall();
+}
+
+/* ============================================================
+   Today — the first screen. On a weekday: the meal to cook or
+   eat now with its parts from the Sunday prep, what to move to
+   the fridge tonight, the day's meals, and 👍 / 👎 for the ones
+   just eaten. Saturday points to the shopping, Sunday shows the
+   prep checklist. It always reads the first week on screen.
+   ============================================================ */
+let shownPast = -1;     // how many of the week's meals were over when Today was last drawn
+const pastMeals = () => weekData[1].meals.filter(m => Today.isPast(m, todayDay, nowHour())).length;
+
+// The counts on the links to the prep and the shopping list
+function todayCounts(prepDone, prepAll, toBuy) {
+  document.querySelectorAll('#today [data-count]').forEach(el => {
+    el.textContent = el.dataset.count === 'shop' ? (toBuy ? '· ' + t('toBuy')(toBuy) : '✓')
+      : !prepAll ? '' : prepDone === prepAll ? '✓' : `${prepDone}/${prepAll}`;
+  });
+}
+
+function buildToday() {
+  const { w, meals, portions } = weekData[1];
+  const v = Today.view({ meals, portions, day: todayDay, hour: nowHour() });
+  shownPast = pastMeals();
+  const days = t('days'), typeOf = m => t('mealTypes')[m.recipe.type];
+  const dayName = todayDay === -2 ? t('saturday') : todayDay === -1 ? t('sunday') : days[todayDay];
+  // "" for a meal of today, else "Tomorrow", "On Monday" or the day's name
+  const when = m => m.di === todayDay ? '' : m.di === todayDay + 1 ? t('tomorrowLabel') : m.di === 0 ? t('mondayLabel') : days[m.di];
+
+  const thenHtml = m => m ? `<button type="button" class="now-next" data-action="open" data-n="1" data-k="${m.k}">
+      <span><b>${t('thenLabel')}${when(m) ? ' · ' + when(m).toLowerCase() : ''}</b> ${typeOf(m).icon} ${esc(m.recipe.name[lang])}</span>
+      <span class="chev" aria-hidden="true">›</span></button>` : '';
+  const goBtn = (part, icon, label) => `<button type="button" class="tool-btn" data-action="go" data-to="${part}">
+      <span class="ico">${icon}</span> ${label} <span class="link-count" data-count="${part}"></span></button>`;
+
+  // A meal in full: its parts from the prep and the way to its recipe
+  const hero = (meal, label, then) => {
+    const r = meal.recipe, parts = portions.filter(p => p.meals.includes(meal));
+    return `<section class="now-card" data-type="${r.type}">
+      <p class="now-label"><b>${label}</b><span class="meal-badge badge-${r.type}">${typeOf(meal).icon} ${typeOf(meal).label}</span>${marksHtml(r)}</p>
+      <h3 class="now-name">${esc(r.name[lang])}</h3>
+      ${parts.length ? `<ul class="plines now-parts">${parts.map(p =>
+        `<li class="pline">${storeBadge(p)}<span class="pline-what">${portionName(p)}</span></li>`).join('')}</ul>` : ''}
+      <div class="now-actions">
+        <button type="button" class="big-btn" data-action="open" data-n="1" data-k="${meal.k}"><span class="ico">📖</span> ${t('openRecipe')}</button>
+        ${sendBtn('send-day', 'sendDay', 'tipSendDay')}
+      </div>
+      ${thenHtml(then)}
+    </section>`;
+  };
+  // A day without a meal to show: a title, a line and where to go
+  const note = (icon, title, text, buttons, extra = '') => `<section class="now-card">
+      <p class="now-label"><b>${icon} ${title}</b></p>
+      <p class="now-lead">${text}</p>${extra}
+      <div class="now-actions">${buttons}</div>
+      ${thenHtml(v.next)}
+    </section>`;
+
+  let main;
+  if (todayDay === -1) {
+    const tasks = prepChecklist(1);
+    main = note('📋', t('sunTitle'), t(tasks ? 'prepLead' : 'prepNothing'), goBtn('shop', '🛒', t('shopping')),
+      tasks ? `<div class="sunday-prep today-prep"><ul class="pcard-tasks">${tasks}</ul></div>` : '');
+  } else if (todayDay === -2) {
+    main = note('🛒', t('satTitle'), t('satText'), goBtn('shop', '🛒', t('shopping')) + goBtn('prep', '📋', t('prepTitle')));
+  } else if (v.current) main = hero(v.current, t('nowLabel'), v.next);
+  else if (v.next) main = hero(v.next, when(v.next));
+  else main = note('🎉', t('weekDoneTitle'), t('weekDoneText'),
+    `<button type="button" class="big-btn" data-action="week" data-n="2">${t('seeNextWeek')} ›</button>`);
+
+  const card = (title, sub, body) => `<section class="today-card"><h3>${title}</h3>${sub ? `<p class="today-sub">${sub}</p>` : ''}${body}</section>`;
+  const asked = v.rate.filter(m => m.di === todayDay || !voteOf(m.recipe.id)).slice(0, 5);
+  const side = [
+    v.thawTonight.length && card('🌙 ' + t('thawTonight'), '',
+      `<ul class="plines">${v.thawTonight.map(p => portionLine(w, p, '<span class="store store-freezer">❄️ → 🧊</span>')).join('')}</ul>`),
+    v.meals.length && card(t('todayMeals'), '', `<div class="today-meals">${v.meals.map(x => slotHtml(1, x.meal)).join('')}</div>`),
+    asked.length && card(t('rateTitle'), t('rateHint'), `<ul class="rate-list">${asked.map(m =>
+      `<li><span class="rate-name">${typeOf(m).icon} ${esc(m.recipe.name[lang])}</span>${voteButtons(m.recipe)}</li>`).join('')}</ul>`)
+  ].filter(Boolean).join('');
+
+  byId('today').innerHTML = `
+    <h2 class="today-title">${dayName} <span>${fmtDateLong(today)}</span></h2>
+    <div class="today-grid${side ? '' : ' solo'}">
+      ${main}
+      ${side ? `<div class="today-side">${side}</div>` : ''}
+    </div>
+    <nav class="today-links" aria-label="${esc(t('goWeek'))}">
+      <button type="button" class="tool-btn" data-action="week" data-n="1"><span class="ico">🗓</span> ${t('goWeek')}</button>
+      ${goBtn('prep', '📋', t('prepTitle'))}
+      ${goBtn('shop', '🛒', t('shopping'))}
+      ${sendBtn('send-week', 'sendWeek', 'tipSendWeek', 1)}
+      <button type="button" class="tool-btn" data-action="install" data-install data-tip="${esc(t('tipInstall'))}"${canInstall() ? '' : ' hidden'}>
+        <span class="ico">📲</span> ${t('install')}</button>
+    </nav>`;
+  updateProgress(1);
 }
 
 /* ============================================================
@@ -1439,8 +1713,14 @@ function buildWeek(n) {
    ============================================================ */
 const actions = {
   lang:        () => toggleLang(),
-  week:        el => showWeek(+el.dataset.n),
+  week:        el => showView(+el.dataset.n),
   today:       () => jumpToday(),
+  go:          el => goTo(el.dataset.to),
+  vote:        el => vote(el.dataset.id, +el.dataset.v),
+  'send-day':  () => whatsapp(dayText()),
+  'send-week': el => whatsapp(weekText(+el.dataset.n)),
+  'copy-link': el => copyText(planLink(+el.dataset.n), 'toastLinkCopied'),
+  install:     () => install(),
   shuffle:     el => shuffleWeek(+el.dataset.n),
   reset:       el => resetWeek(+el.dataset.n),
   open:        el => openModal(+el.dataset.n, +el.dataset.k),
@@ -1467,6 +1747,7 @@ const actions = {
   'f-blood':     el => setFilter('blood', el.dataset.blood),
   'f-age':       el => setFilter('age', el.dataset.age),
   'f-diet':      el => setFilter('diet', el.dataset.diet),
+  'f-vote':      el => setFilter('vote', el.dataset.vote),
   'f-clear':     () => setFilter('clear')
 };
 
@@ -1509,10 +1790,24 @@ if (!dateParam) {
     if (!m || m[1] < weeks[0].iso) delete store.ticks[k];
   });
   Object.keys(store.menus).forEach(iso => { if (iso < keepMenusFrom) delete store.menus[iso]; });
+  Object.keys(store.received).forEach(iso => { if (!store.menus[iso]) delete store.received[iso]; });
   saveStore();
 }
 
+// A menu that came with the address opens on its week
+const linked = takePlanLink();
+if (linked) currentView = linked;
+
 applyLang();
-showWeek(currentWeek, true);
+showView(currentView, true);
+if (linked != null) planToast(linked);
+
+// The service worker (sw.js) keeps the page working without signal. Not on
+// a development server, where it would keep serving old files: add ?sw to
+// the address to try it there.
+if ('serviceWorker' in navigator && (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) ||
+    new URLSearchParams(location.search).has('sw'))) {
+  navigator.serviceWorker.register('sw.js').catch(e => console.error('Service worker not registered:', e));
+}
 
 })();

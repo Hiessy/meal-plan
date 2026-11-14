@@ -278,6 +278,23 @@ header .px-pan { right: 7%; }
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
 }
+/* On phones the set starts hidden: its button waits in the header, beside
+   the sound button, instead of floating over the plan */
+@media (max-width: 600px) {
+  .fx-stage-open {
+    position: absolute;
+    top: max(1rem, env(safe-area-inset-top));
+    left: calc(max(1rem, env(safe-area-inset-left)) + 44px);
+    bottom: auto;
+    z-index: 1;
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid rgba(255,255,255,.6);
+    background: rgba(255,255,255,.2);
+    font-size: 1rem;
+    box-shadow: none;
+  }
+}
 
 /* ── Confetti when a list is fully ticked (js/fx.js) ──────── */
 .fx-confetti {
@@ -314,7 +331,7 @@ header .px-pan { right: 7%; }
   .day-col.today { animation: fx-glow 3s ease-in-out infinite; }
 
   /* ── Smooth changes ─────────────────────────────────────── */
-  .lang-btn, .fx-sound, .tab-btn, .day-col, .tool-btn, .swap-btn, .offset-btn, .nav-btn,
+  .lang-btn, .fx-sound, .tab-btn, .day-col, .tool-btn, .swap-btn, .offset-btn, .nav-btn, .big-btn, .now-next, .vote-btn,
   .modal-close, .info-btn, .hint-close, .prep-head, .shopping-toggle, .sunday-prep .check, .chip {
     transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease),
                 box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
@@ -393,7 +410,10 @@ header .px-pan { right: 7%; }
 
   /* ── Moments — classes added by js/fx.js ────────────────── */
   .meal-slot.fx-deal { animation: fx-deal .45s cubic-bezier(.2,.8,.3,1.15) both; animation-delay: calc(var(--fx-i, 0) * 28ms); }
-  .day-col.fx-rise, .day-col.today.fx-rise { animation: fx-rise .4s var(--ease) both; animation-delay: calc(var(--fx-i, 0) * 50ms); }
+  .day-col.fx-rise, .day-col.today.fx-rise, .now-card.fx-rise, .today-card.fx-rise {
+    animation: fx-rise .4s var(--ease) both;
+    animation-delay: calc(var(--fx-i, 0) * 50ms);
+  }
   .fx-pop, .day-col.today.fx-pop { animation: fx-pop .5s cubic-bezier(.2,.9,.3,1.4); }
   .day-col.fx-flash, .day-col.today.fx-flash { animation: fx-flash 1.2s var(--ease); }
   .check input.fx-check { animation: fx-check .32s cubic-bezier(.2,.9,.3,1.6); }

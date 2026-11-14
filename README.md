@@ -8,6 +8,22 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
 
 ## Features
 
+- **📍 Today, first**: the page opens on what matters right now.
+  - The meal to cook or eat now, with its parts from the Sunday prep and where they wait, one tap
+    from its recipe; then the meal after it.
+  - What to move from the freezer to the fridge tonight, today's four meals, and 👍 / 👎 for the
+    ones just eaten.
+  - On Saturday it points to the shopping list; on Sunday it shows the prep checklist.
+  - The four weeks, with the prep and the shopping list, are one tab away.
+- **👍 / 👎 votes**: a liked recipe comes back more often (about once a month) and one voted down
+  never comes up again. Vote on the Today screen or in a recipe; the recipe panel lists your
+  votes, and the same thumb again takes a vote back. The weeks already on screen do not change
+  when you vote.
+- **Send it on WhatsApp**: today's menu or the whole week as a message, ending in a link. Whoever
+  opens the link gets that same week's menu on their phone, whatever their own choices.
+  **🔗 Copy link** gives the link alone.
+- **📲 Installable and offline**: add it to the home screen and it opens like an app; once
+  opened, it keeps working without signal — in the supermarket, say.
 - **A balanced random menu every week**: 5 breakfasts, 5 lunches, 5 snacks and 5 dinners picked
   from the recipe list.
   - 2,584 recipes. 740 are dishes from 99 countries: 145 Argentine ones (milanesas, locro,
@@ -102,16 +118,18 @@ The recipes include pregnancy-friendly nutrition notes and toddler tips.
       × tucks it away behind a 📺 button.
     - Drag the set to move it and the corner grip to resize it; double-click it to put it back,
       small and top left. Where it sits is remembered on this device.
+    - On phones it starts tucked away, and the sounds start off.
     - Each scene plays its sounds the first time through: coins, chopping, the blender, sizzling.
   - 🔊 in the header mutes the sounds.
   - Browsers start sound only after your first click or tap.
   - Motion is skipped for visitors who turn on "reduce motion".
 - 🌐 English / Español and tooltips everywhere. Hover, focus with the keyboard, or press and hold on a phone.
 - Built for phones as well as desktop.
-- Ticks, swaps and settings are saved in the browser.
+- Ticks, swaps, votes and settings are saved in the browser.
 - No dependencies and no build step: plain HTML, CSS and JavaScript.
 
-To see the plan for another date, add `?date=2026-12-24` to the address.
+To see the plan for another date, add `?date=2026-12-24` to the address, and `&time=19:30` for
+another time of day.
 
 ## How it is organised
 
@@ -128,6 +146,8 @@ The code is split into four layers. Each one only uses the layers listed above i
 | Menu logic | `js/planner.js` | Balanced random weekly menus: the rules, the draw, shuffle and swap (no page code) |
 | | `js/lists.js` | Builds the shopping list and the prep list from a week's meals (no page code) |
 | | `js/diets.js` | Which recipes suit the picked blood types and ages, and which are meat-free, vegan or gluten-free (no page code) |
+| | `js/today.js` | What to eat, take out and thaw right now, from a week's meals and prep (no page code) |
+| | `js/share.js` | Packs a week's menu into the short text of a share link, and reads it back (no page code) |
 | UI | `js/i18n.js` | All interface text in English and Spanish |
 | | `js/tooltip.js` | Tooltips for anything with a `data-tip` |
 | | `js/ui.js` | Draws the page, saves ticks and swaps, and handles every button |
@@ -135,6 +155,8 @@ The code is split into four layers. Each one only uses the layers listed above i
 | Flashy layer | `js/fx.js` | Sounds, animations, the header pixel art and the 🔊 button |
 | | `js/fx-scenes.js` | The kitchen TV: pixel scenes drawn on a canvas, picked by what you hover |
 | | `css/fx.css` | Every animation, transition and hover lift, and the kitchen TV's frame |
+| Install | `manifest.webmanifest`, `icons/` | Name, colours and icons for the home screen (`node tools/make-icons.js` draws the icons) |
+| | `sw.js` | Service worker: saves the page and every file it names, so it works offline |
 
 The flashy layer is optional. Without `js/fx.js`, `js/fx-scenes.js` and `css/fx.css`, the page
 works the same, just quietly and without motion. `js/ui.js` sends `plan:*` events (listed at the

@@ -19,7 +19,12 @@
 
    The randomness is seeded by the week number, so every device
    shows the same menu for the same week — unless that device has
-   narrowed the recipe list with configure().
+   narrowed the recipe list or voted on recipes (configure()).
+
+   Votes: a disliked recipe is never drawn again and a liked one is
+   favoured in about half the weeks, so it comes back roughly once a
+   month. Each vote counts from a given week on, so the weeks already
+   on screen do not change when someone votes.
    ============================================================ */
 const Planner = (() => {
   const TYPES = ['breakfast', 'lunch', 'snack', 'dinner'];
@@ -46,19 +51,23 @@ const Planner = (() => {
   };
 
   /* What breaking each rule costs; the cheapest week wins */
-  const COST = { rule: 10, lastWeek: 8, earlierWeek: 6, sameDay: 3 };
+  const COST = { rule: 10, lastWeek: 8, earlierWeek: 6, sameDay: 3, liked: 2 };
   const ATTEMPTS = 12;
 
   const byId = Object.fromEntries(recipes.map(r => [r.id, r]));
   let pools = {};                              // the recipes each slot may draw from
   let expRange = RULES.experimental;           // [0, max] when the pools hold no experimental recipe
+  let liked = {}, disliked = {};               // recipe id → the week number its vote counts from
 
   // Which recipes the draw may use: leave out `exclude` (ids), every
   // experimental recipe if experimental is false, and any recipe that
   // allow(recipe) turns down. A type that would be left empty keeps its
-  // whole list.
-  function configure({ exclude = [], experimental = true, allow = () => true } = {}) {
+  // whole list. `liked` and `disliked` map recipe ids to the first week
+  // number their vote counts in.
+  function configure({ exclude = [], experimental = true, allow = () => true, liked: up = {}, disliked: down = {} } = {}) {
     const skip = new Set(exclude);
+    liked = up;
+    disliked = down;
     pools = Object.fromEntries(TYPES.map(type => {
       const all = recipes.filter(r => r.type === type);
       const allowed = all.filter(r => !skip.has(r.id) && (experimental || !r.experimental) && allow(r));
@@ -116,10 +125,16 @@ const Planner = (() => {
   // Change in rule cost when a count goes from n to n + 1
   const step = (n = 0, range) => !range ? 0 : n < range[0] ? -COST.rule : n >= range[1] ? COST.rule : 0;
 
+  // A liked recipe is favoured in about half the draws, so favourites take
+  // turns instead of filling every week
+  const favoured = (r, { num, seed }) => liked[r.id] <= num && hash(r.id + ':' + seed) % 2 === 0;
+
   // What adding recipe r to a partly picked week (counts in s) would cost;
-  // exp is the number of experimental recipes this draw aims for
-  function addCost(r, s, avoid, exp) {
+  // exp is the number of experimental recipes this draw aims for, and
+  // week is { num, seed } of the draw
+  function addCost(r, s, avoid, exp, week) {
     let c = avoid.get(r.id) || 0;
+    if (favoured(r, week)) c -= COST.liked;
     if (r.type === 'breakfast') c += step(s.breakfast[r.group], RULES.breakfasts.group[r.group]);
     else if (r.type === 'snack') c += step(s.group[r.group], RULES.snacks.group[r.group]);
     else {
@@ -187,14 +202,15 @@ const Planner = (() => {
   }
 
   // Fills the 20 slots in random order, each with the cheapest recipe
-  function build(random, avoid, exp) {
+  // that week.num has not been told to leave out
+  function build(random, avoid, exp, week) {
     const s = newCounts();
     const picks = Object.fromEntries(TYPES.map(type => [type, []])), used = new Set();
     for (const type of shuffled(TYPES.flatMap(type => Array(DAYS).fill(type)), random)) {
       let best = null, bestCost = Infinity;
       for (const r of shuffled(pools[type], random)) {
-        if (used.has(r.id)) continue;
-        const c = addCost(r, s, avoid, exp);
+        if (used.has(r.id) || disliked[r.id] <= week.num) continue;
+        const c = addCost(r, s, avoid, exp, week);
         if (c < bestCost) { best = r; bestCost = c; }
       }
       // a list with fewer than 5 recipes of a type repeats them
@@ -206,14 +222,15 @@ const Planner = (() => {
     return arrange(picks);
   }
 
-  // avoid: Map of recipe id → extra cost for using it this week
-  function draw(seed, avoid = new Map()) {
-    const random = seeded(seed);
+  // avoid: Map of recipe id → extra cost for using it this week;
+  // num: the week number, which says which votes count (all by default)
+  function draw(seed, avoid = new Map(), num = Infinity) {
+    const random = seeded(seed), week = { num, seed };
     // Aim for one or two experimental recipes, as the week's seed says
     const exp = [expRange[0], Math.max(expRange[0], expRange[1] - (random() < .5 ? 1 : 0))];
     let best = null, bestCost = Infinity;
     for (let i = 0; i < ATTEMPTS && bestCost > 0; i++) {
-      const ids = build(random, avoid, exp), c = cost(ids, avoid);
+      const ids = build(random, avoid, exp, week), c = cost(ids, avoid);
       if (c < bestCost) { best = ids; bestCost = c; }
     }
     return best;
@@ -237,36 +254,41 @@ const Planner = (() => {
   const baseMenus = [];
   configure();
   function baseMenu(num) {
-    if (num < 0) return draw(hash('week ' + num));
+    if (num < 0) return draw(hash('week ' + num), undefined, num);
     for (let i = baseMenus.length; i <= num; i++) {
       const avoid = new Map();
       for (let back = RULES.recentWeeks; back >= 1; back--) {
         (baseMenus[i - back] || []).forEach(id => avoid.set(id, back === 1 ? COST.lastWeek : COST.earlierWeek));
       }
-      baseMenus[i] = draw(hash('week ' + i), avoid);
+      baseMenus[i] = draw(hash('week ' + i), avoid, i);
     }
     return baseMenus[num];
   }
 
   /* ── Changing a week ───────────────────────────────────────── */
+  // Both follow every vote, also those too new for the week's own draw.
+
   // A fresh balanced menu that keeps away from the other weeks on screen
   const shuffleMenu = (seed, neighbours) => draw(seed, avoiding(neighbours));
 
-  // Replaces slot k with the recipe that keeps the week most balanced
+  // Replaces slot k with the recipe that keeps the week most balanced;
+  // between equals, a liked one
   function swapMeal(ids, k, seed, neighbours) {
     const avoid = avoiding(neighbours), inWeek = new Set(ids);
     let best = null, bestCost = Infinity;
     for (const r of shuffled(pools[byId[ids[k]].type], seeded(seed))) {
-      if (inWeek.has(r.id)) continue;
+      if (inWeek.has(r.id) || r.id in disliked) continue;
       const next = ids.slice();
       next[k] = r.id;
-      const c = cost(next, avoid);
+      const c = cost(next, avoid) - (r.id in liked ? COST.liked / 4 : 0);
       if (c < bestCost) { best = next; bestCost = c; }
     }
     return best || ids;
   }
 
-  const isMenu = ids => Array.isArray(ids) && ids.length === DAYS * SLOTS && ids.every(id => byId[id]);
+  // 20 known recipes, each of its slot's meal type
+  const isMenu = ids => Array.isArray(ids) && ids.length === DAYS * SLOTS &&
+    ids.every((id, k) => byId[id] && byId[id].type === TYPES[k % SLOTS]);
 
   // Whether a saved menu still fits the recipe choices and the rules on
   // experimental recipes (a shuffle saved before they changed may not)
@@ -277,7 +299,7 @@ const Planner = (() => {
   }
 
   return {
-    TYPES, SLOTS, RULES, configure,
+    TYPES, SLOTS, RULES, configure, hash,
     recipe: id => byId[id],
     count: recipes.length,
     weekNumber, mondayOfWeek,
